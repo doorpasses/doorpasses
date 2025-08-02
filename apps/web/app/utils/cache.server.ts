@@ -144,12 +144,140 @@ export const cache: CachifiedCache = {
 	},
 }
 
+// Enhanced cache statistics queries
+const getCacheStatsStatement = cacheDb.prepare(`
+	SELECT 
+		COUNT(*) as totalKeys,
+		SUM(LENGTH(value)) as totalSize
+	FROM cache
+`)
+
+const getCacheKeyDetailsStatement = cacheDb.prepare(`
+	SELECT 
+		key,
+		LENGTH(value) as size,
+		metadata
+	FROM cache 
+	WHERE key = ?
+`)
+
+const getAllCacheKeysWithDetailsStatement = cacheDb.prepare(`
+	SELECT 
+		key,
+		LENGTH(value) as size,
+		metadata
+	FROM cache 
+	ORDER BY key
+	LIMIT ?
+`)
+
+const searchCacheKeysWithDetailsStatement = cacheDb.prepare(`
+	SELECT 
+		key,
+		LENGTH(value) as size,
+		metadata
+	FROM cache 
+	WHERE key LIKE ? 
+	ORDER BY key
+	LIMIT ?
+`)
+
+export interface CacheKeyInfo {
+	key: string
+	size: number
+	createdAt?: Date
+	ttl?: number | null
+	swr?: number | null
+}
+
+export interface CacheStats {
+	sqlite: {
+		totalKeys: number
+		totalSize: number
+		averageSize: number
+	}
+	lru: {
+		totalKeys: number
+		maxSize: number
+		currentSize: number
+	}
+}
+
+export async function getCacheStats(): Promise<CacheStats> {
+	// SQLite cache stats
+	const sqliteStats = getCacheStatsStatement.get() as { totalKeys: number; totalSize: number }
+	
+	// LRU cache stats
+	const lruKeys = [...lru.keys()]
+	const lruSize = lru.size
+	const lruMaxSize = lru.max || 0
+
+	return {
+		sqlite: {
+			totalKeys: sqliteStats.totalKeys || 0,
+			totalSize: sqliteStats.totalSize || 0,
+			averageSize: sqliteStats.totalKeys > 0 ? Math.round((sqliteStats.totalSize || 0) / sqliteStats.totalKeys) : 0,
+		},
+		lru: {
+			totalKeys: lruKeys.length,
+			maxSize: lruMaxSize,
+			currentSize: lruSize,
+		}
+	}
+}
+
 export async function getAllCacheKeys(limit: number) {
 	return {
 		sqlite: getAllKeysStatement
 			.all(limit)
 			.map((row) => (row as { key: string }).key),
 		lru: [...lru.keys()],
+	}
+}
+
+export async function getAllCacheKeysWithDetails(limit: number): Promise<{
+	sqlite: CacheKeyInfo[]
+	lru: CacheKeyInfo[]
+}> {
+	// Get SQLite cache keys with details
+	const sqliteRows = getAllCacheKeysWithDetailsStatement.all(limit) as Array<{
+		key: string
+		size: number
+		metadata: string
+	}>
+	
+	const sqliteKeys: CacheKeyInfo[] = sqliteRows.map(row => {
+		let metadata: any = {}
+		try {
+			metadata = JSON.parse(row.metadata)
+		} catch {
+			// ignore parse errors
+		}
+		
+		return {
+			key: row.key,
+			size: row.size,
+			createdAt: metadata.createdTime ? new Date(metadata.createdTime) : undefined,
+			ttl: metadata.ttl,
+			swr: metadata.swr,
+		}
+	})
+
+	// Get LRU cache keys with details
+	const lruKeys: CacheKeyInfo[] = [...lru.keys()].slice(0, limit).map(key => {
+		const entry = lru.get(key)
+		return {
+			key,
+			size: 0, // LRU doesn't track size easily
+			createdAt: entry?.metadata?.createdTime ? new Date(entry.metadata.createdTime) : undefined,
+			ttl: entry?.metadata?.ttl,
+			swr: entry?.metadata?.swr,
+		}
+	})
+
+	return {
+		sqlite: sqliteKeys,
+		lru: lruKeys,
 	}
 }
 
@@ -160,6 +288,122 @@ export async function searchCacheKeys(search: string, limit: number) {
 			.map((row) => (row as { key: string }).key),
 		lru: [...lru.keys()].filter((key) => key.includes(search)),
 	}
+}
+
+export async function searchCacheKeysWithDetails(search: string, limit: number): Promise<{
+	sqlite: CacheKeyInfo[]
+	lru: CacheKeyInfo[]
+}> {
+	// Get SQLite cache keys with details
+	const sqliteRows = searchCacheKeysWithDetailsStatement.all(`%${search}%`, limit) as Array<{
+		key: string
+		size: number
+		metadata: string
+	}>
+	
+	const sqliteKeys: CacheKeyInfo[] = sqliteRows.map(row => {
+		let metadata: any = {}
+		try {
+			metadata = JSON.parse(row.metadata)
+		} catch {
+			// ignore parse errors
+		}
+		
+		return {
+			key: row.key,
+			size: row.size,
+			createdAt: metadata.createdTime ? new Date(metadata.createdTime) : undefined,
+			ttl: metadata.ttl,
+			swr: metadata.swr,
+		}
+	})
+
+	// Get LRU cache keys with details
+	const lruKeys: CacheKeyInfo[] = [...lru.keys()]
+		.filter((key) => key.includes(search))
+		.slice(0, limit)
+		.map(key => {
+			const entry = lru.get(key)
+			return {
+				key,
+				size: 0, // LRU doesn't track size easily
+				createdAt: entry?.metadata?.createdTime ? new Date(entry.metadata.createdTime) : undefined,
+				ttl: entry?.metadata?.ttl,
+				swr: entry?.metadata?.swr,
+			}
+		})
+
+	return {
+		sqlite: sqliteKeys,
+		lru: lruKeys,
+	}
+}
+
+export async function getCacheKeyDetails(key: string, type: 'sqlite' | 'lru'): Promise<CacheKeyInfo | null> {
+	if (type === 'sqlite') {
+		const row = getCacheKeyDetailsStatement.get(key) as { key: string; size: number; metadata: string } | undefined
+		if (!row) return null
+		
+		let metadata: any = {}
+		try {
+			metadata = JSON.parse(row.metadata)
+		} catch {
+			// ignore parse errors
+		}
+		
+		return {
+			key: row.key,
+			size: row.size,
+			createdAt: metadata.createdTime ? new Date(metadata.createdTime) : undefined,
+			ttl: metadata.ttl,
+			swr: metadata.swr,
+		}
+	} else {
+		const entry = lru.get(key)
+		if (!entry) return null
+		
+		return {
+			key,
+			size: 0, // LRU doesn't track size easily
+			createdAt: entry.metadata?.createdTime ? new Date(entry.metadata.createdTime) : undefined,
+			ttl: entry.metadata?.ttl,
+			swr: entry.metadata?.swr,
+		}
+	}
+}
+
+// Bulk operations
+export async function clearCacheByType(type: 'sqlite' | 'lru'): Promise<number> {
+	if (type === 'sqlite') {
+		const result = cacheDb.prepare('DELETE FROM cache').run()
+		return result.changes || 0
+	} else {
+		const count = lru.size
+		lru.clear()
+		return count
+	}
+}
+
+export async function deleteCacheKeys(keys: string[], type: 'sqlite' | 'lru'): Promise<number> {
+	let deletedCount = 0
+	
+	if (type === 'sqlite') {
+		const deleteStmt = cacheDb.prepare('DELETE FROM cache WHERE key = ?')
+		for (const key of keys) {
+			const result = deleteStmt.run(key)
+			if (result.changes && result.changes > 0) {
+				deletedCount++
+			}
+		}
+	} else {
+		for (const key of keys) {
+			if (lru.delete(key)) {
+				deletedCount++
+			}
+		}
+	}
+	
+	return deletedCount
 }
 
 export async function cachified<Value>(

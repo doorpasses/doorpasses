@@ -1,5 +1,6 @@
 import { type User } from '@prisma/client'
 import { prisma } from '@repo/prisma'
+import { getUserId } from './auth.server.ts'
 
 export type OrganizationWithImage = {
 	id: string
@@ -255,19 +256,21 @@ export async function userHasOrgAccess(
 	request: Request,
 	organizationId: string,
 ): Promise<boolean> {
-	const user = await prisma.user.findFirst({
-		where: {
-			sessions: {
-				some: {
-					expirationDate: { gt: new Date() },
-				},
-			},
-		},
-		select: { id: true },
+	// Get the current user ID from the session (handles impersonation correctly)
+	const userId = await getUserId(request)
+
+	if (!userId) {
+		throw new Response('Unauthorized', { status: 401 })
+	}
+
+	// Get user details for logging
+	const user = await prisma.user.findUnique({
+		where: { id: userId },
+		select: { id: true, name: true, username: true },
 	})
 
 	if (!user) {
-		throw new Response('Unauthorized', { status: 401 })
+		throw new Response('User not found', { status: 401 })
 	}
 
 	// Check if user is a member of this organization
@@ -278,6 +281,8 @@ export async function userHasOrgAccess(
 			active: true,
 		},
 	})
+
+	console.log('User accessing org:', user.name || user.username, user.id, 'Org ID:', organizationId, 'Has access:', !!userOrg)
 
 	if (!userOrg) {
 		throw new Response('You do not have access to this organization', {

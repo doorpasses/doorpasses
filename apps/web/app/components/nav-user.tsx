@@ -20,6 +20,7 @@ import {
 import { UserIcon } from './icons/user-icon'
 import { LogoutIcon } from './icons/logout-icon'
 import { BuildingIcon } from './icons/building-icon'
+import { SettingsGearIcon } from './icons/settings-gear-icon'
 
 export function NavUser({
 	user,
@@ -28,10 +29,14 @@ export function NavUser({
 		name: string
 		email: string
 		avatar: string
+		roles?: Array<{ name: string }> | undefined
 	}
 }) {
 	const { isMobile } = useSidebar()
 	const iconRefs = useRef<{ [key: string]: any }>({})
+
+	// Check if user has admin role
+	const isAdmin = user.roles?.some(role => role.name === 'admin') ?? false
 
 	const handleMenuItemMouseEnter = (iconKey: string) => {
 		const iconRef = iconRefs.current[iconKey]
@@ -104,6 +109,22 @@ export function NavUser({
 									Organizations
 								</Link>
 							</DropdownMenuItem>
+							{isAdmin && (
+								<DropdownMenuItem
+									asChild
+									className="gap-2"
+									onMouseEnter={() => handleMenuItemMouseEnter('admin')}
+									onMouseLeave={() => handleMenuItemMouseLeave('admin')}
+								>
+									<Link to="/admin">
+										<SettingsGearIcon
+											ref={(ref: any) => (iconRefs.current['admin'] = ref)}
+											size={16}
+										/>
+										Super Admin
+									</Link>
+								</DropdownMenuItem>
+							)}
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem

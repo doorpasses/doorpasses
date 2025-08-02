@@ -1,0 +1,599 @@
+import { Link } from 'react-router'
+import {
+	IconBuilding,
+	IconUsers,
+	IconNotes,
+	IconPlug,
+	IconMail,
+	IconCalendar,
+	IconActivity,
+	IconSettings,
+	IconCreditCard,
+	IconShield,
+	IconClock,
+} from '@tabler/icons-react'
+
+import { Avatar, AvatarFallback, AvatarImage } from '#app/components/ui/avatar'
+import { Badge } from '#app/components/ui/badge'
+import { Button } from '#app/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#app/components/ui/card'
+import { Separator } from '#app/components/ui/separator'
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '#app/components/ui/table'
+import { formatDistanceToNow } from 'date-fns'
+
+export interface AdminOrganizationDetail {
+	id: string
+	name: string
+	slug: string
+	description: string | null
+	active: boolean
+	createdAt: string
+	updatedAt: string
+	planName: string | null
+	subscriptionStatus: string | null
+	size: string | null
+	stripeCustomerId: string | null
+	stripeSubscriptionId: string | null
+	stripeProductId: string | null
+	memberCount: number
+	totalMembers: number
+	activeIntegrations: number
+	totalIntegrations: number
+	pendingInvitations: number
+	image?: {
+		id: string
+		altText: string | null
+	} | null
+	users: Array<{
+		id: string
+		userId: string
+		role: string
+		active: boolean
+		isDefault: boolean
+		createdAt: string
+		updatedAt: string
+		department: string | null
+		user: {
+			id: string
+			name: string | null
+			email: string
+			username: string
+			image?: {
+				id: string
+				altText: string | null
+			} | null
+		}
+	}>
+	notes: Array<{
+		id: string
+		title: string
+		createdAt: string
+		updatedAt: string
+		isPublic: boolean
+		createdBy: {
+			id: string
+			name: string | null
+			username: string
+		}
+	}>
+	integrations: Array<{
+		id: string
+		providerName: string
+		providerType: string
+		isActive: boolean
+		lastSyncAt: string | null
+		createdAt: string
+		updatedAt: string
+	}>
+	invitations: Array<{
+		id: string
+		email: string
+		role: string
+		createdAt: string
+		expiresAt: string | null
+		inviter: {
+			id: string
+			name: string | null
+			username: string
+		} | null
+	}>
+	_count: {
+		users: number
+		notes: number
+		integrations: number
+		invitations: number
+	}
+}
+
+export interface RecentActivity {
+	id: string
+	action: string
+	createdAt: string
+	metadata: any
+	user: {
+		id: string
+		name: string | null
+		username: string
+	}
+	note: {
+		id: string
+		title: string
+	}
+}
+
+interface AdminOrganizationDetailProps {
+	organization: AdminOrganizationDetail
+	recentActivity: RecentActivity[]
+}
+
+const getSubscriptionStatusBadge = (status: string | null) => {
+	if (!status) {
+		return <Badge variant="secondary">No Subscription</Badge>
+	}
+	
+	switch (status.toLowerCase()) {
+		case 'active':
+			return <Badge variant="default">Active</Badge>
+		case 'canceled':
+		case 'cancelled':
+			return <Badge variant="destructive">Canceled</Badge>
+		case 'past_due':
+			return <Badge variant="destructive">Past Due</Badge>
+		case 'unpaid':
+			return <Badge variant="destructive">Unpaid</Badge>
+		case 'trialing':
+			return <Badge variant="secondary">Trial</Badge>
+		case 'incomplete':
+			return <Badge variant="outline">Incomplete</Badge>
+		default:
+			return <Badge variant="outline">{status}</Badge>
+	}
+}
+
+const getRoleBadge = (role: string) => {
+	switch (role.toLowerCase()) {
+		case 'owner':
+			return <Badge variant="default">Owner</Badge>
+		case 'admin':
+			return <Badge variant="secondary">Admin</Badge>
+		case 'member':
+			return <Badge variant="outline">Member</Badge>
+		default:
+			return <Badge variant="outline">{role}</Badge>
+	}
+}
+
+const getActivityIcon = (action: string) => {
+	switch (action.toLowerCase()) {
+		case 'created':
+			return <IconNotes className="h-4 w-4 text-green-500" />
+		case 'updated':
+			return <IconSettings className="h-4 w-4 text-blue-500" />
+		case 'deleted':
+			return <IconActivity className="h-4 w-4 text-red-500" />
+		default:
+			return <IconActivity className="h-4 w-4 text-muted-foreground" />
+	}
+}
+
+export function AdminOrganizationDetail({
+	organization,
+	recentActivity,
+}: AdminOrganizationDetailProps) {
+	return (
+		<div className="space-y-6">
+			{/* Header */}
+			<div className="flex items-start justify-between">
+				<div className="flex items-center gap-4">
+					<Avatar className="h-16 w-16">
+						<AvatarImage
+							src={organization.image?.id ? `/resources/organization-images/${organization.image.id}` : undefined}
+							alt={organization.image?.altText ?? organization.name}
+						/>
+						<AvatarFallback>
+							<IconBuilding className="h-8 w-8" />
+						</AvatarFallback>
+					</Avatar>
+					<div>
+						<h1 className="text-3xl font-bold tracking-tight">{organization.name}</h1>
+						<p className="text-muted-foreground">@{organization.slug}</p>
+						{organization.description && (
+							<p className="text-sm text-muted-foreground mt-1">
+								{organization.description}
+							</p>
+						)}
+					</div>
+				</div>
+				<div className="flex items-center gap-2">
+					<Badge variant={organization.active ? 'default' : 'secondary'}>
+						{organization.active ? 'Active' : 'Inactive'}
+					</Badge>
+					{organization.size && (
+						<Badge variant="outline">{organization.size}</Badge>
+					)}
+				</div>
+			</div>
+
+			{/* Overview Cards */}
+			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+				<Card>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+						<CardTitle className="text-sm font-medium">Members</CardTitle>
+						<IconUsers className="h-4 w-4 text-muted-foreground" />
+					</CardHeader>
+					<CardContent>
+						<div className="text-2xl font-bold">{organization.memberCount}</div>
+						<p className="text-xs text-muted-foreground">
+							{organization.totalMembers !== organization.memberCount && (
+								<span>{organization.totalMembers} total, </span>
+							)}
+							{organization.pendingInvitations > 0 && (
+								<span>{organization.pendingInvitations} pending</span>
+							)}
+						</p>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+						<CardTitle className="text-sm font-medium">Notes</CardTitle>
+						<IconNotes className="h-4 w-4 text-muted-foreground" />
+					</CardHeader>
+					<CardContent>
+						<div className="text-2xl font-bold">{organization._count.notes}</div>
+						<p className="text-xs text-muted-foreground">
+							Total notes created
+						</p>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+						<CardTitle className="text-sm font-medium">Integrations</CardTitle>
+						<IconPlug className="h-4 w-4 text-muted-foreground" />
+					</CardHeader>
+					<CardContent>
+						<div className="text-2xl font-bold">{organization.activeIntegrations}</div>
+						<p className="text-xs text-muted-foreground">
+							{organization.totalIntegrations !== organization.activeIntegrations && (
+								<span>{organization.totalIntegrations} total, </span>
+							)}
+							Active integrations
+						</p>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+						<CardTitle className="text-sm font-medium">Subscription</CardTitle>
+						<IconCreditCard className="h-4 w-4 text-muted-foreground" />
+					</CardHeader>
+					<CardContent>
+						<div className="flex flex-col gap-1">
+							{getSubscriptionStatusBadge(organization.subscriptionStatus)}
+							{organization.planName && (
+								<p className="text-xs text-muted-foreground">
+									{organization.planName}
+								</p>
+							)}
+						</div>
+					</CardContent>
+				</Card>
+			</div>
+
+			<div className="grid gap-6 lg:grid-cols-2">
+				{/* Members */}
+				<Card>
+					<CardHeader>
+						<CardTitle className="flex items-center gap-2">
+							<IconUsers className="h-5 w-5" />
+							Members ({organization.users.length})
+						</CardTitle>
+						<CardDescription>
+							Organization members and their roles
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<div className="space-y-4">
+							{organization.users.slice(0, 10).map((member) => (
+								<div key={member.id} className="flex items-center justify-between">
+									<div className="flex items-center gap-3">
+										<Avatar className="h-8 w-8">
+											<AvatarImage
+												src={member.user.image?.id ? `/resources/user-images/${member.user.image.id}` : undefined}
+												alt={member.user.image?.altText ?? member.user.name ?? member.user.username}
+											/>
+											<AvatarFallback>
+												{(member.user.name ?? member.user.username).slice(0, 2).toUpperCase()}
+											</AvatarFallback>
+										</Avatar>
+										<div className="flex flex-col">
+											<span className="text-sm font-medium">
+												{member.user.name || member.user.username}
+											</span>
+											<span className="text-xs text-muted-foreground">
+												{member.user.email}
+											</span>
+											{member.department && (
+												<span className="text-xs text-muted-foreground">
+													{member.department}
+												</span>
+											)}
+										</div>
+									</div>
+									<div className="flex items-center gap-2">
+										{getRoleBadge(member.role)}
+										{!member.active && (
+											<Badge variant="outline" className="text-xs">
+												Inactive
+											</Badge>
+										)}
+										{member.isDefault && (
+											<Badge variant="outline" className="text-xs">
+												Default
+											</Badge>
+										)}
+									</div>
+								</div>
+							))}
+							{organization.users.length > 10 && (
+								<div className="text-center">
+									<Button variant="outline" size="sm">
+										View all {organization.users.length} members
+									</Button>
+								</div>
+							)}
+						</div>
+					</CardContent>
+				</Card>
+
+				{/* Recent Notes */}
+				<Card>
+					<CardHeader>
+						<CardTitle className="flex items-center gap-2">
+							<IconNotes className="h-5 w-5" />
+							Recent Notes ({organization.notes.length})
+						</CardTitle>
+						<CardDescription>
+							Recently created or updated notes
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<div className="space-y-4">
+							{organization.notes.map((note) => (
+								<div key={note.id} className="flex items-start justify-between">
+									<div className="flex-1">
+										<div className="flex items-center gap-2">
+											<span className="text-sm font-medium line-clamp-1">
+												{note.title}
+											</span>
+											{!note.isPublic && (
+												<IconShield className="h-3 w-3 text-muted-foreground" />
+											)}
+										</div>
+										<div className="flex items-center gap-2 text-xs text-muted-foreground">
+											<span>by {note.createdBy.name || note.createdBy.username}</span>
+											<span>•</span>
+											<span>{formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}</span>
+										</div>
+									</div>
+								</div>
+							))}
+							{organization.notes.length === 0 && (
+								<p className="text-sm text-muted-foreground text-center py-4">
+									No notes found
+								</p>
+							)}
+						</div>
+					</CardContent>
+				</Card>
+			</div>
+
+			{/* Integrations and Activity */}
+			<div className="grid gap-6 lg:grid-cols-2">
+				{/* Integrations */}
+				<Card>
+					<CardHeader>
+						<CardTitle className="flex items-center gap-2">
+							<IconPlug className="h-5 w-5" />
+							Integrations ({organization.integrations.length})
+						</CardTitle>
+						<CardDescription>
+							Connected third-party integrations
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<div className="space-y-4">
+							{organization.integrations.map((integration) => (
+								<div key={integration.id} className="flex items-center justify-between">
+									<div className="flex items-center gap-3">
+										<div className="flex flex-col">
+											<span className="text-sm font-medium capitalize">
+												{integration.providerName}
+											</span>
+											<span className="text-xs text-muted-foreground">
+												{integration.providerType}
+											</span>
+										</div>
+									</div>
+									<div className="flex items-center gap-2">
+										<Badge variant={integration.isActive ? 'default' : 'secondary'}>
+											{integration.isActive ? 'Active' : 'Inactive'}
+										</Badge>
+										{integration.lastSyncAt && (
+											<span className="text-xs text-muted-foreground">
+												Last sync: {formatDistanceToNow(new Date(integration.lastSyncAt), { addSuffix: true })}
+											</span>
+										)}
+									</div>
+								</div>
+							))}
+							{organization.integrations.length === 0 && (
+								<p className="text-sm text-muted-foreground text-center py-4">
+									No integrations configured
+								</p>
+							)}
+						</div>
+					</CardContent>
+				</Card>
+
+				{/* Recent Activity */}
+				<Card>
+					<CardHeader>
+						<CardTitle className="flex items-center gap-2">
+							<IconActivity className="h-5 w-5" />
+							Recent Activity
+						</CardTitle>
+						<CardDescription>
+							Latest organization activity
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<div className="space-y-4">
+							{recentActivity.slice(0, 10).map((activity) => (
+								<div key={activity.id} className="flex items-start gap-3">
+									{getActivityIcon(activity.action)}
+									<div className="flex-1 space-y-1">
+										<div className="flex items-center gap-2">
+											<span className="text-sm font-medium">
+												{activity.user.name || activity.user.username}
+											</span>
+											<span className="text-sm text-muted-foreground">
+												{activity.action}
+											</span>
+											<span className="text-sm font-medium">
+												{activity.note.title}
+											</span>
+										</div>
+										<div className="flex items-center gap-2 text-xs text-muted-foreground">
+											<IconClock className="h-3 w-3" />
+											<span>{formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}</span>
+										</div>
+									</div>
+								</div>
+							))}
+							{recentActivity.length === 0 && (
+								<p className="text-sm text-muted-foreground text-center py-4">
+									No recent activity
+								</p>
+							)}
+						</div>
+					</CardContent>
+				</Card>
+			</div>
+
+			{/* Organization Details */}
+			<Card>
+				<CardHeader>
+					<CardTitle className="flex items-center gap-2">
+						<IconSettings className="h-5 w-5" />
+						Organization Details
+					</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<div className="grid gap-4 md:grid-cols-2">
+						<div className="space-y-2">
+							<div className="flex items-center gap-2">
+								<IconCalendar className="h-4 w-4 text-muted-foreground" />
+								<span className="text-sm font-medium">Created:</span>
+								<span className="text-sm text-muted-foreground">
+									{new Date(organization.createdAt).toLocaleDateString()}
+								</span>
+							</div>
+							<div className="flex items-center gap-2">
+								<IconCalendar className="h-4 w-4 text-muted-foreground" />
+								<span className="text-sm font-medium">Updated:</span>
+								<span className="text-sm text-muted-foreground">
+									{new Date(organization.updatedAt).toLocaleDateString()}
+								</span>
+							</div>
+						</div>
+						<div className="space-y-2">
+							{organization.stripeCustomerId && (
+								<div className="flex items-center gap-2">
+									<IconCreditCard className="h-4 w-4 text-muted-foreground" />
+									<span className="text-sm font-medium">Stripe Customer:</span>
+									<span className="text-sm text-muted-foreground font-mono">
+										{organization.stripeCustomerId}
+									</span>
+								</div>
+							)}
+							{organization.stripeSubscriptionId && (
+								<div className="flex items-center gap-2">
+									<IconCreditCard className="h-4 w-4 text-muted-foreground" />
+									<span className="text-sm font-medium">Subscription:</span>
+									<span className="text-sm text-muted-foreground font-mono">
+										{organization.stripeSubscriptionId}
+									</span>
+								</div>
+							)}
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+
+			{/* Pending Invitations */}
+			{organization.invitations.length > 0 && (
+				<Card>
+					<CardHeader>
+						<CardTitle className="flex items-center gap-2">
+							<IconMail className="h-5 w-5" />
+							Pending Invitations ({organization.invitations.length})
+						</CardTitle>
+						<CardDescription>
+							Outstanding invitations to join the organization
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<Table>
+							<TableHeader>
+								<TableRow>
+									<TableHead>Email</TableHead>
+									<TableHead>Role</TableHead>
+									<TableHead>Invited By</TableHead>
+									<TableHead>Sent</TableHead>
+									<TableHead>Expires</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{organization.invitations.map((invitation) => (
+									<TableRow key={invitation.id}>
+										<TableCell className="font-medium">
+											{invitation.email}
+										</TableCell>
+										<TableCell>
+											{getRoleBadge(invitation.role)}
+										</TableCell>
+										<TableCell>
+											{invitation.inviter?.name || invitation.inviter?.username || 'System'}
+										</TableCell>
+										<TableCell>
+											{formatDistanceToNow(new Date(invitation.createdAt), { addSuffix: true })}
+										</TableCell>
+										<TableCell>
+											{invitation.expiresAt ? (
+												<span className={
+													new Date(invitation.expiresAt) <= new Date() 
+														? 'text-red-500' 
+														: 'text-muted-foreground'
+												}>
+													{formatDistanceToNow(new Date(invitation.expiresAt), { addSuffix: true })}
+												</span>
+											) : (
+												<span className="text-muted-foreground">Never</span>
+											)}
+										</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</CardContent>
+				</Card>
+			)}
+		</div>
+	)
+}

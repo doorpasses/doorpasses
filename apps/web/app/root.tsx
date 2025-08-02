@@ -33,8 +33,10 @@ import { type Theme, getTheme } from './utils/theme.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
 import { storeUtmParams } from './utils/utm.server.ts'
+import { getImpersonationInfo } from './utils/impersonation.server.ts'
 import { EpicToaster } from './components/ui/sonner.tsx'
 import { useToast } from './components/toaster.tsx'
+import { ImpersonationBanner } from './components/impersonation-banner.tsx'
 
 export const links: Route.LinksFunction = () => {
 	return [
@@ -179,6 +181,9 @@ export async function loader({ request }: Route.LoaderArgs) {
 	const utmResponse = await storeUtmParams(request)
 	const utmHeaders = utmResponse?.headers || {}
 
+	// Get impersonation info if user is an admin
+	const impersonationInfo = await getImpersonationInfo(request)
+
 	console.log('locale', locale)
 
 	return data(
@@ -191,6 +196,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 			locale,
 			userOrganizations,
 			favoriteNotes,
+			impersonationInfo,
 		},
 		{
 			headers: combineHeaders(
@@ -294,6 +300,9 @@ function AppWithProviders() {
 					subscriberId={`${data.userOrganizations?.currentOrganization?.organization.id}_${data.user?.id}`}
 					applicationIdentifier="XQdYIaaQAOv5"
 				>
+					{data.impersonationInfo && (
+						<ImpersonationBanner impersonationInfo={data.impersonationInfo} />
+					)}
 					<Outlet />
 					<EpicToaster />
 				</NovuProvider>

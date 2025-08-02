@@ -7,16 +7,57 @@ import {
 	useFetcher,
 	useSearchParams,
 	useSubmit,
+	useLoaderData,
 } from 'react-router'
+import { useState, useEffect } from 'react'
+import { 
+	IconDatabase,
+	IconTrash,
+	IconRefresh,
+	IconSearch,
+	IconX,
+	IconChevronDown,
+} from '@tabler/icons-react'
 import { GeneralErrorBoundary } from '#app/components/error-boundary'
 import { Field } from '#app/components/forms.tsx'
-import { Spacer } from '#app/components/spacer.tsx'
 import { Button } from '#app/components/ui/button.tsx'
+import { Input } from '#app/components/ui/input.tsx'
+import { Badge } from '#app/components/ui/badge.tsx'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#app/components/ui/card.tsx'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '#app/components/ui/select.tsx'
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '#app/components/ui/table.tsx'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from '#app/components/ui/dropdown-menu.tsx'
+import { CacheConfirmationDialog } from '#app/components/admin-cache-confirmation-dialog.tsx'
+import { useToast } from '#app/components/toaster.tsx'
 import {
 	cache,
-	getAllCacheKeys,
 	lruCache,
-	searchCacheKeys,
+	getAllCacheKeysWithDetails,
+	searchCacheKeysWithDetails,
+	getCacheStats,
+	clearCacheByType,
+	deleteCacheKeys,
+	type CacheKeyInfo,
+	type CacheStats,
 } from '#app/utils/cache.server.ts'
 import {
 	ensureInstance,
@@ -25,6 +66,7 @@ import {
 } from '#app/utils/litefs.server.ts'
 import { useDebounce, useDoubleCheck } from '#app/utils/misc.tsx'
 import { requireUserWithRole } from '#app/utils/permissions.server.ts'
+import { getToast, redirectWithToast } from '#app/utils/toast.server.ts'
 import { type Route } from './+types/cache.ts'
 
 export const handle: SEOHandle = {
@@ -40,6 +82,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 		return redirect(`/admin/cache?${searchParams.toString()}`)
 	}
 	const limit = Number(searchParams.get('limit') ?? 100)
+	const cacheType = searchParams.get('type') || 'all'
 
 	const currentInstanceInfo = await getInstanceInfo()
 	const instance =
@@ -47,114 +90,309 @@ export async function loader({ request }: Route.LoaderArgs) {
 	const instances = await getAllInstances()
 	await ensureInstance(instance)
 
-	let cacheKeys: { sqlite: Array<string>; lru: Array<string> }
+	// Get toast message
+	const { toast, headers: toastHeaders } = await getToast(request)
+
+	// Get cache statistics
+	const stats = await getCacheStats()
+
+	// Get cache keys with details
+	let cacheData: { sqlite: CacheKeyInfo[]; lru: CacheKeyInfo[] }
 	if (typeof query === 'string') {
-		cacheKeys = await searchCacheKeys(query, limit)
+		cacheData = await searchCacheKeysWithDetails(query, limit)
 	} else {
-		cacheKeys = await getAllCacheKeys(limit)
+		cacheData = await getAllCacheKeysWithDetails(limit)
 	}
-	return { cacheKeys, instance, instances, currentInstanceInfo }
+
+	// Filter by cache type if specified
+	if (cacheType === 'sqlite') {
+		cacheData.lru = []
+	} else if (cacheType === 'lru') {
+		cacheData.sqlite = []
+	}
+
+	return { 
+		cacheData, 
+		stats, 
+		instance, 
+		instances, 
+		currentInstanceInfo,
+		toast,
+		filters: {
+			query: query || '',
+			type: cacheType,
+			limit,
+		}
+	}
 }
 
 export async function action({ request }: Route.ActionArgs) {
 	await requireUserWithRole(request, 'admin')
 	const formData = await request.formData()
-	const key = formData.get('cacheKey')
+	const actionType = formData.get('actionType')
 	const { currentInstance } = await getInstanceInfo()
 	const instance = formData.get('instance') ?? currentInstance
-	const type = formData.get('type')
-
-	invariantResponse(typeof key === 'string', 'cacheKey must be a string')
-	invariantResponse(typeof type === 'string', 'type must be a string')
+	
+	invariantResponse(typeof actionType === 'string', 'actionType must be a string')
 	invariantResponse(typeof instance === 'string', 'instance must be a string')
 	await ensureInstance(instance)
 
-	switch (type) {
-		case 'sqlite': {
-			await cache.delete(key)
-			break
+	const url = new URL(request.url)
+
+	try {
+		switch (actionType) {
+			case 'deleteKey': {
+				const key = formData.get('cacheKey')
+				const type = formData.get('type')
+				invariantResponse(typeof key === 'string', 'cacheKey must be a string')
+				invariantResponse(typeof type === 'string', 'type must be a string')
+				
+				if (type === 'sqlite') {
+					await cache.delete(key)
+				} else if (type === 'lru') {
+					lruCache.delete(key)
+				}
+				
+				return redirectWithToast(url.pathname + url.search, {
+					type: 'success',
+					title: 'Cache Key Deleted',
+					description: `Successfully deleted cache key "${key}" from ${type.toUpperCase()} cache`,
+				})
+			}
+			case 'clearCache': {
+				const type = formData.get('type')
+				invariantResponse(typeof type === 'string', 'type must be a string')
+				invariantResponse(type === 'sqlite' || type === 'lru', 'Invalid cache type')
+				
+				const deletedCount = await clearCacheByType(type)
+				return redirectWithToast(url.pathname + url.search, {
+					type: 'success',
+					title: 'Cache Cleared',
+					description: `Successfully cleared ${deletedCount} keys from ${type.toUpperCase()} cache`,
+				})
+			}
+			case 'bulkDelete': {
+				const keys = formData.get('keys')
+				const type = formData.get('type')
+				invariantResponse(typeof keys === 'string', 'keys must be a string')
+				invariantResponse(typeof type === 'string', 'type must be a string')
+				
+				const keyArray = JSON.parse(keys) as string[]
+				const deletedCount = await deleteCacheKeys(keyArray, type as 'sqlite' | 'lru')
+				return redirectWithToast(url.pathname + url.search, {
+					type: 'success',
+					title: 'Bulk Delete Complete',
+					description: `Successfully deleted ${deletedCount} cache keys from ${type.toUpperCase()} cache`,
+				})
+			}
+			default: {
+				throw new Error(`Unknown action type: ${actionType}`)
+			}
 		}
-		case 'lru': {
-			lruCache.delete(key)
-			break
-		}
-		default: {
-			throw new Error(`Unknown cache type: ${type}`)
-		}
+	} catch (error) {
+		console.error('Cache action error:', error)
+		return redirectWithToast(url.pathname + url.search, {
+			type: 'error',
+			title: 'Cache Operation Failed',
+			description: error instanceof Error ? error.message : 'An unexpected error occurred',
+		})
 	}
-	return { success: true }
 }
 
 export default function CacheAdminRoute({ loaderData }: Route.ComponentProps) {
-	const [searchParams] = useSearchParams()
+	const [searchParams, setSearchParams] = useSearchParams()
 	const submit = useSubmit()
+	const [searchQuery, setSearchQuery] = useState(loaderData.filters.query)
+	const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set())
+	
+	// Use toast notifications
+	useToast(loaderData.toast)
+	
 	const query = searchParams.get('query') ?? ''
 	const limit = searchParams.get('limit') ?? '100'
+	const cacheType = searchParams.get('type') ?? 'all'
 	const instance = searchParams.get('instance') ?? loaderData.instance
 
 	const handleFormChange = useDebounce(async (form: HTMLFormElement) => {
 		await submit(form)
 	}, 400)
 
+	const handleSearch = (value: string) => {
+		setSearchQuery(value)
+		const newSearchParams = new URLSearchParams(searchParams)
+		if (value) {
+			newSearchParams.set('query', value)
+		} else {
+			newSearchParams.delete('query')
+		}
+		setSearchParams(newSearchParams)
+	}
+
+	const handleTypeFilter = (value: string) => {
+		const newSearchParams = new URLSearchParams(searchParams)
+		if (value === 'all') {
+			newSearchParams.delete('type')
+		} else {
+			newSearchParams.set('type', value)
+		}
+		setSearchParams(newSearchParams)
+	}
+
+	const clearFilters = () => {
+		setSearchQuery('')
+		setSelectedKeys(new Set())
+		setSearchParams({})
+	}
+
+	const hasActiveFilters = query || cacheType !== 'all'
+	const totalKeys = loaderData.cacheData.sqlite.length + loaderData.cacheData.lru.length
+
 	return (
-		<div className="container">
-			<h1 className="text-h1">Cache Admin</h1>
-			<Spacer size="2xs" />
-			<Form
-				method="get"
-				className="flex flex-col gap-4"
-				onChange={(e) => handleFormChange(e.currentTarget)}
-			>
-				<div className="flex-1">
-					<div className="flex flex-1 gap-4">
-						<button
-							type="submit"
-							className="flex h-16 items-center justify-center"
-						>
-							🔎
-						</button>
-						<Field
-							className="flex-1"
-							labelProps={{ children: 'Search' }}
-							inputProps={{
-								type: 'search',
-								name: 'query',
-								defaultValue: query,
-							}}
-						/>
-						<div className="text-muted-foreground flex h-16 w-14 items-center text-lg font-medium">
-							<span title="Total results shown">
-								{loaderData.cacheKeys.sqlite.length +
-									loaderData.cacheKeys.lru.length}
-							</span>
+		<div className="space-y-6">
+			{/* Header */}
+			<div>
+				<h1 className="text-3xl font-bold tracking-tight">Cache Management</h1>
+				<p className="text-muted-foreground">
+					Monitor and manage system cache performance
+				</p>
+			</div>
+
+			{/* Cache Statistics */}
+			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+				<Card>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+						<CardTitle className="text-sm font-medium">SQLite Cache</CardTitle>
+						<IconDatabase className="h-4 w-4 text-muted-foreground" />
+					</CardHeader>
+					<CardContent>
+						<div className="text-2xl font-bold">{data.stats.sqlite.totalKeys}</div>
+						<p className="text-xs text-muted-foreground">
+							{formatBytes(data.stats.sqlite.totalSize)} total
+						</p>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+						<CardTitle className="text-sm font-medium">LRU Cache</CardTitle>
+						<IconDatabase className="h-4 w-4 text-muted-foreground" />
+					</CardHeader>
+					<CardContent>
+						<div className="text-2xl font-bold">{data.stats.lru.totalKeys}</div>
+						<p className="text-xs text-muted-foreground">
+							{data.stats.lru.currentSize} / {data.stats.lru.maxSize} max
+						</p>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+						<CardTitle className="text-sm font-medium">Average Size</CardTitle>
+						<IconDatabase className="h-4 w-4 text-muted-foreground" />
+					</CardHeader>
+					<CardContent>
+						<div className="text-2xl font-bold">
+							{formatBytes(data.stats.sqlite.averageSize)}
 						</div>
+						<p className="text-xs text-muted-foreground">
+							per SQLite entry
+						</p>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+						<CardTitle className="text-sm font-medium">Total Entries</CardTitle>
+						<IconDatabase className="h-4 w-4 text-muted-foreground" />
+					</CardHeader>
+					<CardContent>
+						<div className="text-2xl font-bold">
+							{data.stats.sqlite.totalKeys + data.stats.lru.totalKeys}
+						</div>
+						<p className="text-xs text-muted-foreground">
+							across all caches
+						</p>
+					</CardContent>
+				</Card>
+			</div>
+
+			{/* Search and Filters */}
+			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+				<div className="flex flex-1 items-center gap-2">
+					<div className="relative flex-1 max-w-sm">
+						<IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+						<Input
+							placeholder="Search cache keys..."
+							value={searchQuery}
+							onChange={(e) => handleSearch(e.target.value)}
+							className="pl-9"
+						/>
 					</div>
+					<Select value={cacheType} onValueChange={handleTypeFilter}>
+						<SelectTrigger className="w-48">
+							<SelectValue placeholder="Filter by cache type" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="all">All caches</SelectItem>
+							<SelectItem value="sqlite">SQLite only</SelectItem>
+							<SelectItem value="lru">LRU only</SelectItem>
+						</SelectContent>
+					</Select>
+					<Select value={limit} onValueChange={(value) => {
+						const newSearchParams = new URLSearchParams(searchParams)
+						newSearchParams.set('limit', value)
+						setSearchParams(newSearchParams)
+					}}>
+						<SelectTrigger className="w-24">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="50">50</SelectItem>
+							<SelectItem value="100">100</SelectItem>
+							<SelectItem value="200">200</SelectItem>
+							<SelectItem value="500">500</SelectItem>
+						</SelectContent>
+					</Select>
+					{hasActiveFilters && (
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={clearFilters}
+							className="h-8 px-2 lg:px-3"
+						>
+							Reset
+							<IconX className="ml-2 h-4 w-4" />
+						</Button>
+					)}
 				</div>
-				<div className="flex flex-wrap items-center gap-4">
-					<Field
-						labelProps={{
-							children: 'Limit',
-						}}
-						inputProps={{
-							name: 'limit',
-							defaultValue: limit,
-							type: 'number',
-							step: '1',
-							min: '1',
-							max: '10000',
-							placeholder: 'results limit',
-						}}
+				<div className="flex items-center gap-2">
+					<CacheBulkActions 
+						selectedKeys={selectedKeys}
+						onClearSelection={() => setSelectedKeys(new Set())}
 					/>
-					<select name="instance" defaultValue={instance}>
-						{Object.entries(loaderData.instances).map(([inst, region]) => (
+				</div>
+			</div>
+
+			{/* Instance Selection */}
+			<Form method="get" className="flex items-center gap-4">
+				<input type="hidden" name="query" value={query} />
+				<input type="hidden" name="type" value={cacheType} />
+				<input type="hidden" name="limit" value={limit} />
+				<div className="flex items-center gap-2">
+					<label htmlFor="instance" className="text-sm font-medium">Instance:</label>
+					<select 
+						name="instance" 
+						id="instance"
+						defaultValue={instance}
+						onChange={(e) => e.currentTarget.form?.submit()}
+						className="rounded-md border border-input bg-background px-3 py-1 text-sm"
+					>
+						{Object.entries(data.instances).map(([inst, region]) => (
 							<option key={inst} value={inst}>
 								{[
 									inst,
 									`(${region})`,
-									inst === loaderData.currentInstanceInfo.currentInstance
+									inst === data.currentInstanceInfo.currentInstance
 										? '(current)'
 										: '',
-									inst === loaderData.currentInstanceInfo.primaryInstance
+									inst === data.currentInstanceInfo.primaryInstance
 										? ' (primary)'
 										: '',
 								]
@@ -165,70 +403,427 @@ export default function CacheAdminRoute({ loaderData }: Route.ComponentProps) {
 					</select>
 				</div>
 			</Form>
-			<Spacer size="2xs" />
-			<div className="flex flex-col gap-4">
-				<h2 className="text-h2">LRU Cache:</h2>
-				{loaderData.cacheKeys.lru.map((key) => (
-					<CacheKeyRow
-						key={key}
-						cacheKey={key}
-						instance={instance}
-						type="lru"
-					/>
-				))}
+
+			{/* Results Summary */}
+			<div className="flex items-center justify-between text-sm text-muted-foreground">
+				<div>
+					Showing {totalKeys} cache entries
+					{query && ` matching "${query}"`}
+					{cacheType !== 'all' && ` in ${cacheType.toUpperCase()} cache`}
+				</div>
+				{selectedKeys.size > 0 && (
+					<div>
+						{selectedKeys.size} selected
+					</div>
+				)}
 			</div>
-			<Spacer size="3xs" />
-			<div className="flex flex-col gap-4">
-				<h2 className="text-h2">SQLite Cache:</h2>
-				{loaderData.cacheKeys.sqlite.map((key) => (
-					<CacheKeyRow
-						key={key}
-						cacheKey={key}
-						instance={instance}
+
+			{/* Cache Tables */}
+			<div className="space-y-6">
+				{data.cacheData.sqlite.length > 0 && (
+					<CacheTable
+						title="SQLite Cache"
 						type="sqlite"
+						keys={data.cacheData.sqlite}
+						instance={instance}
+						selectedKeys={selectedKeys}
+						onSelectionChange={setSelectedKeys}
 					/>
-				))}
+				)}
+				
+				{data.cacheData.lru.length > 0 && (
+					<CacheTable
+						title="LRU Cache"
+						type="lru"
+						keys={data.cacheData.lru}
+						instance={instance}
+						selectedKeys={selectedKeys}
+						onSelectionChange={setSelectedKeys}
+					/>
+				)}
+
+				{totalKeys === 0 && (
+					<Card>
+						<CardContent className="flex flex-col items-center justify-center py-12">
+							<IconDatabase className="h-12 w-12 text-muted-foreground mb-4" />
+							<h3 className="text-lg font-semibold mb-2">No cache entries found</h3>
+							<p className="text-muted-foreground text-center">
+								{query 
+									? `No cache keys match "${query}"`
+									: 'The cache is empty'
+								}
+							</p>
+						</CardContent>
+					</Card>
+				)}
 			</div>
 		</div>
 	)
 }
 
-function CacheKeyRow({
-	cacheKey,
-	instance,
+function CacheTable({
+	title,
 	type,
+	keys,
+	instance,
+	selectedKeys,
+	onSelectionChange,
 }: {
-	cacheKey: string
-	instance?: string
+	title: string
 	type: 'sqlite' | 'lru'
+	keys: CacheKeyInfo[]
+	instance: string
+	selectedKeys: Set<string>
+	onSelectionChange: (keys: Set<string>) => void
+}) {
+	const handleSelectAll = (checked: boolean) => {
+		const newSelection = new Set(selectedKeys)
+		if (checked) {
+			keys.forEach(key => newSelection.add(`${type}:${key.key}`))
+		} else {
+			keys.forEach(key => newSelection.delete(`${type}:${key.key}`))
+		}
+		onSelectionChange(newSelection)
+	}
+
+	const handleSelectKey = (key: string, checked: boolean) => {
+		const newSelection = new Set(selectedKeys)
+		const fullKey = `${type}:${key}`
+		if (checked) {
+			newSelection.add(fullKey)
+		} else {
+			newSelection.delete(fullKey)
+		}
+		onSelectionChange(newSelection)
+	}
+
+	const allSelected = keys.every(key => selectedKeys.has(`${type}:${key.key}`))
+	const someSelected = keys.some(key => selectedKeys.has(`${type}:${key.key}`))
+
+	return (
+		<Card>
+			<CardHeader>
+				<div className="flex items-center justify-between">
+					<div>
+						<CardTitle className="flex items-center gap-2">
+							{title}
+							<Badge variant="secondary">{keys.length}</Badge>
+						</CardTitle>
+						<CardDescription>
+							{type === 'sqlite' ? 'Persistent cache stored in SQLite database' : 'In-memory LRU cache'}
+						</CardDescription>
+					</div>
+					<CacheClearButton type={type} />
+				</div>
+			</CardHeader>
+			<CardContent>
+				<div className="rounded-md border">
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead className="w-12">
+									<input
+										type="checkbox"
+										checked={allSelected}
+										ref={(el) => {
+											if (el) el.indeterminate = someSelected && !allSelected
+										}}
+										onChange={(e) => handleSelectAll(e.target.checked)}
+										className="rounded border-gray-300"
+									/>
+								</TableHead>
+								<TableHead>Key</TableHead>
+								<TableHead>Size</TableHead>
+								<TableHead>Created</TableHead>
+								<TableHead>TTL</TableHead>
+								<TableHead className="w-24">Actions</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							{keys.map((keyInfo) => (
+								<CacheKeyRow
+									key={keyInfo.key}
+									keyInfo={keyInfo}
+									type={type}
+									instance={instance}
+									isSelected={selectedKeys.has(`${type}:${keyInfo.key}`)}
+									onSelect={(checked) => handleSelectKey(keyInfo.key, checked)}
+								/>
+							))}
+						</TableBody>
+					</Table>
+				</div>
+			</CardContent>
+		</Card>
+	)
+}
+
+function CacheKeyRow({
+	keyInfo,
+	type,
+	instance,
+	isSelected,
+	onSelect,
+}: {
+	keyInfo: CacheKeyInfo
+	type: 'sqlite' | 'lru'
+	instance: string
+	isSelected: boolean
+	onSelect: (checked: boolean) => void
 }) {
 	const fetcher = useFetcher<typeof action>()
-	const dc = useDoubleCheck()
-	const encodedKey = encodeURIComponent(cacheKey)
+	const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+	const encodedKey = encodeURIComponent(keyInfo.key)
 	const valuePage = `/admin/cache/${type}/${encodedKey}?instance=${instance}`
+	
+	const isDeleting = fetcher.state !== 'idle' && fetcher.formData?.get('cacheKey') === keyInfo.key
+
+	const handleConfirm = () => {
+		fetcher.submit(
+			{
+				actionType: 'deleteKey',
+				cacheKey: keyInfo.key,
+				instance,
+				type,
+			},
+			{ method: 'POST' }
+		)
+		setShowConfirmDialog(false)
+	}
+
 	return (
-		<div className="flex items-center gap-2 font-mono">
-			<fetcher.Form method="POST">
-				<input type="hidden" name="cacheKey" value={cacheKey} />
-				<input type="hidden" name="instance" value={instance} />
-				<input type="hidden" name="type" value={type} />
-				<Button
-					size="sm"
-					variant="secondary"
-					{...dc.getButtonProps({ type: 'submit' })}
-				>
-					{fetcher.state === 'idle'
-						? dc.doubleCheck
-							? 'You sure?'
-							: 'Delete'
-						: 'Deleting...'}
-				</Button>
-			</fetcher.Form>
-			<Link reloadDocument to={valuePage}>
-				{cacheKey}
-			</Link>
-		</div>
+		<>
+			<TableRow>
+				<TableCell>
+					<input
+						type="checkbox"
+						checked={isSelected}
+						onChange={(e) => onSelect(e.target.checked)}
+						className="rounded border-gray-300"
+					/>
+				</TableCell>
+				<TableCell>
+					<Link 
+						to={valuePage} 
+						className="font-mono text-sm hover:underline"
+						reloadDocument
+					>
+						{keyInfo.key}
+					</Link>
+				</TableCell>
+				<TableCell>
+					{keyInfo.size > 0 ? formatBytes(keyInfo.size) : '-'}
+				</TableCell>
+				<TableCell>
+					{keyInfo.createdAt ? (
+						<span className="text-sm">
+							{keyInfo.createdAt.toLocaleDateString()} {keyInfo.createdAt.toLocaleTimeString()}
+						</span>
+					) : (
+						'-'
+					)}
+				</TableCell>
+				<TableCell>
+					{keyInfo.ttl ? (
+						<Badge variant="outline">{keyInfo.ttl}ms</Badge>
+					) : (
+						'-'
+					)}
+				</TableCell>
+				<TableCell>
+					<Button
+						size="sm"
+						variant="ghost"
+						disabled={isDeleting}
+						onClick={() => setShowConfirmDialog(true)}
+					>
+						{isDeleting ? (
+							<IconRefresh className="h-4 w-4 animate-spin" />
+						) : (
+							<IconTrash className="h-4 w-4" />
+						)}
+					</Button>
+				</TableCell>
+			</TableRow>
+
+			<CacheConfirmationDialog
+				isOpen={showConfirmDialog}
+				onClose={() => setShowConfirmDialog(false)}
+				onConfirm={handleConfirm}
+				title="Delete Cache Key"
+				description={`This will permanently delete the cache key "${keyInfo.key}" from the ${type.toUpperCase()} cache. This action cannot be undone.`}
+				confirmText="Delete Key"
+				variant="destructive"
+				isLoading={isDeleting}
+				details={{
+					type: type.toUpperCase(),
+					keys: [keyInfo.key],
+				}}
+			/>
+		</>
 	)
+}
+
+function CacheClearButton({ type }: { type: 'sqlite' | 'lru' }) {
+	const fetcher = useFetcher<typeof action>()
+	const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+	const isClearing = fetcher.state !== 'idle' && fetcher.formData?.get('type') === type
+
+	const handleConfirm = () => {
+		fetcher.submit(
+			{
+				actionType: 'clearCache',
+				type,
+			},
+			{ method: 'POST' }
+		)
+		setShowConfirmDialog(false)
+	}
+
+	return (
+		<>
+			<Button
+				size="sm"
+				variant="destructive"
+				disabled={isClearing}
+				onClick={() => setShowConfirmDialog(true)}
+			>
+				{isClearing ? (
+					<IconRefresh className="h-4 w-4 animate-spin mr-2" />
+				) : (
+					<IconTrash className="h-4 w-4 mr-2" />
+				)}
+				Clear {type.toUpperCase()}
+			</Button>
+
+			<CacheConfirmationDialog
+				isOpen={showConfirmDialog}
+				onClose={() => setShowConfirmDialog(false)}
+				onConfirm={handleConfirm}
+				title={`Clear ${type.toUpperCase()} Cache`}
+				description={`This will permanently delete all entries in the ${type.toUpperCase()} cache. This action cannot be undone.`}
+				confirmText={`Clear ${type.toUpperCase()} Cache`}
+				variant="destructive"
+				isLoading={isClearing}
+				details={{
+					type: type.toUpperCase(),
+				}}
+			/>
+		</>
+	)
+}
+
+function CacheBulkActions({
+	selectedKeys,
+	onClearSelection,
+}: {
+	selectedKeys: Set<string>
+	onClearSelection: () => void
+}) {
+	const fetcher = useFetcher<typeof action>()
+	const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+	const [pendingAction, setPendingAction] = useState<{
+		type: 'sqlite' | 'lru'
+		keys: string[]
+	} | null>(null)
+	
+	if (selectedKeys.size === 0) return null
+
+	const sqliteKeys = Array.from(selectedKeys)
+		.filter(key => key.startsWith('sqlite:'))
+		.map(key => key.replace('sqlite:', ''))
+	
+	const lruKeys = Array.from(selectedKeys)
+		.filter(key => key.startsWith('lru:'))
+		.map(key => key.replace('lru:', ''))
+
+	const handleBulkDelete = (type: 'sqlite' | 'lru') => {
+		const keys = type === 'sqlite' ? sqliteKeys : lruKeys
+		if (keys.length === 0) return
+
+		setPendingAction({ type, keys })
+		setShowConfirmDialog(true)
+	}
+
+	const handleConfirm = () => {
+		if (!pendingAction) return
+
+		fetcher.submit(
+			{
+				actionType: 'bulkDelete',
+				type: pendingAction.type,
+				keys: JSON.stringify(pendingAction.keys),
+			},
+			{ method: 'POST' }
+		)
+		setShowConfirmDialog(false)
+		setPendingAction(null)
+		onClearSelection()
+	}
+
+	const isDeleting = fetcher.state !== 'idle'
+
+	return (
+		<>
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button variant="outline" size="sm" disabled={isDeleting}>
+						Bulk Actions ({selectedKeys.size})
+						<IconChevronDown className="ml-2 h-4 w-4" />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="end">
+					{sqliteKeys.length > 0 && (
+						<DropdownMenuItem onClick={() => handleBulkDelete('sqlite')}>
+							<IconTrash className="mr-2 h-4 w-4" />
+							Delete {sqliteKeys.length} SQLite keys
+						</DropdownMenuItem>
+					)}
+					{lruKeys.length > 0 && (
+						<DropdownMenuItem onClick={() => handleBulkDelete('lru')}>
+							<IconTrash className="mr-2 h-4 w-4" />
+							Delete {lruKeys.length} LRU keys
+						</DropdownMenuItem>
+					)}
+					<DropdownMenuSeparator />
+					<DropdownMenuItem onClick={onClearSelection}>
+						<IconX className="mr-2 h-4 w-4" />
+						Clear selection
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+
+			{pendingAction && (
+				<CacheConfirmationDialog
+					isOpen={showConfirmDialog}
+					onClose={() => {
+						setShowConfirmDialog(false)
+						setPendingAction(null)
+					}}
+					onConfirm={handleConfirm}
+					title={`Delete ${pendingAction.keys.length} Cache Keys`}
+					description={`This will permanently delete ${pendingAction.keys.length} keys from the ${pendingAction.type.toUpperCase()} cache. This action cannot be undone.`}
+					confirmText={`Delete ${pendingAction.keys.length} Keys`}
+					variant="destructive"
+					isLoading={isDeleting}
+					details={{
+						type: pendingAction.type.toUpperCase(),
+						count: pendingAction.keys.length,
+						keys: pendingAction.keys,
+					}}
+				/>
+			)}
+		</>
+	)
+}
+
+// Utility function to format bytes
+function formatBytes(bytes: number): string {
+	if (bytes === 0) return '0 B'
+	const k = 1024
+	const sizes = ['B', 'KB', 'MB', 'GB']
+	const i = Math.floor(Math.log(bytes) / Math.log(k))
+	return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
 }
 
 export function ErrorBoundary() {
@@ -236,7 +831,27 @@ export function ErrorBoundary() {
 		<GeneralErrorBoundary
 			statusHandlers={{
 				403: ({ error }) => (
-					<p>You are not allowed to do that: {error?.data.message}</p>
+					<div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+						<div className="text-center">
+							<h2 className="text-2xl font-bold text-foreground mb-2">
+								Access Denied
+							</h2>
+							<p className="text-muted-foreground mb-4">
+								You don't have permission to access this admin area.
+							</p>
+							<p className="text-sm text-muted-foreground">
+								{error?.data?.message || 'Admin role required'}
+							</p>
+						</div>
+						<div className="text-center">
+							<a
+								href="/admin"
+								className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+							>
+								Return to Admin Dashboard
+							</a>
+						</div>
+					</div>
 				),
 			}}
 		/>

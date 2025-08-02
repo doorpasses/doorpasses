@@ -141,6 +141,7 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
 	const isPending = useIsPending()
 	const [searchParams] = useSearchParams()
 	const redirectTo = searchParams.get('redirectTo')
+	const isBanned = searchParams.get('banned') === 'true'
 
 	const [form, fields] = useForm({
 		id: 'login-form',
@@ -162,6 +163,17 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
+				{isBanned && (
+					<div className="mb-4 rounded-lg border border-destructive bg-destructive/10 p-4">
+						<div className="flex items-center gap-2 text-destructive">
+							<Icon name="lock-closed" className="h-5 w-5" />
+							<h3 className="font-semibold">Account Suspended</h3>
+						</div>
+						<p className="mt-2 text-sm text-destructive/80">
+							Your account has been suspended. Please contact support if you believe this is an error.
+						</p>
+					</div>
+				)}
 				<div className="grid gap-6">
 					{/* Social Login Buttons */}
 					<div className="flex flex-col gap-4">

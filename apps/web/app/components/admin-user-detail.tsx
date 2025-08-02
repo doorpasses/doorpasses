@@ -1,0 +1,659 @@
+import { useState } from 'react'
+import { useNavigate, useSubmit } from 'react-router'
+import {
+	IconArrowLeft,
+	IconBan,
+	IconEdit,
+	IconUser,
+	IconMail,
+	IconCalendar,
+	IconBuilding,
+	IconKey,
+	IconShield,
+	IconActivity,
+	IconMessageCircle,
+	IconFileText,
+	IconExternalLink,
+	IconShieldCheck,
+	IconAlertTriangle,
+} from '@tabler/icons-react'
+
+import { Avatar, AvatarFallback, AvatarImage } from '#app/components/ui/avatar'
+import { Badge } from '#app/components/ui/badge'
+import { Button } from '#app/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#app/components/ui/card'
+import { Separator } from '#app/components/ui/separator'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '#app/components/ui/tabs'
+import { getUserImgSrc } from '#app/utils/misc.tsx'
+import { BanUserDialog } from '#app/components/admin-ban-user-dialog'
+
+export interface AdminUserDetail {
+	id: string
+	name: string | null
+	email: string
+	username: string
+	createdAt: string
+	updatedAt: string
+	hasPassword: boolean
+	isBanned: boolean
+	banReason: string | null
+	banExpiresAt: string | null
+	bannedAt: string | null
+	bannedBy?: {
+		id: string
+		name: string | null
+		username: string
+	} | null
+	image?: {
+		id: string
+		altText: string | null
+	} | null
+	organizations: Array<{
+		role: string
+		active: boolean
+		isDefault: boolean
+		createdAt: string
+		department: string | null
+		organization: {
+			id: string
+			name: string
+			slug: string
+			description: string | null
+			active: boolean
+			subscriptionStatus: string | null
+			planName: string | null
+		}
+	}>
+	sessions: Array<{
+		id: string
+		createdAt: string
+		expirationDate: string
+	}>
+	connections: Array<{
+		id: string
+		providerName: string
+		providerId: string
+		createdAt: string
+	}>
+	roles: Array<{
+		id: string
+		name: string
+		description: string
+	}>
+	notes: Array<{
+		id: string
+		title: string
+		createdAt: string
+		updatedAt: string
+	}>
+}
+
+export interface RecentActivity {
+	comments: Array<{
+		id: string
+		content: string
+		createdAt: string
+		note: {
+			id: string
+			title: string
+		}
+	}>
+	activityLogs: Array<{
+		id: string
+		action: string
+		createdAt: string
+		note: {
+			id: string
+			title: string
+		}
+	}>
+}
+
+interface UserDetailViewProps {
+	user: AdminUserDetail
+	recentActivity: RecentActivity
+}
+
+export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
+	const navigate = useNavigate()
+	const submit = useSubmit()
+	const [showBanDialog, setShowBanDialog] = useState(false)
+
+	const handleBanUser = () => {
+		setShowBanDialog(true)
+	}
+
+	const handleLiftBan = () => {
+		const formData = new FormData()
+		formData.append('intent', 'lift-ban')
+
+		submit(formData, {
+			method: 'POST',
+			action: `/admin/users/${user.id}/ban`,
+		})
+	}
+
+	const handleImpersonateUser = () => {
+		const formData = new FormData()
+		submit(formData, {
+			method: 'POST',
+			action: `/admin/users/${user.id}/impersonate`,
+		})
+	}
+
+	const handleEditUser = () => {
+		// TODO: Navigate to edit user page
+		console.log('Edit user:', user.id)
+	}
+
+	// Check if ban is expired
+	const isBanExpired = user.isBanned && user.banExpiresAt && new Date(user.banExpiresAt) <= new Date()
+
+	const activeSessions = user.sessions.filter(
+		session => new Date(session.expirationDate) > new Date()
+	)
+
+	return (
+		<>
+			<div className="space-y-6">
+				{/* Header */}
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-4">
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={() => navigate('/admin/users')}
+							className="gap-2"
+						>
+							<IconArrowLeft className="h-4 w-4" />
+							Back to Users
+						</Button>
+						<Separator orientation="vertical" className="h-6" />
+						<div className="flex items-center gap-3">
+							<Avatar className="h-12 w-12">
+								<AvatarImage
+									src={getUserImgSrc(user.image?.id)}
+									alt={user.image?.altText ?? user.name ?? user.username}
+								/>
+								<AvatarFallback>
+									{(user.name ?? user.username).slice(0, 2).toUpperCase()}
+								</AvatarFallback>
+							</Avatar>
+							<div>
+								<div className="flex items-center gap-2">
+									<h1 className="text-2xl font-bold">
+										{user.name || user.username}
+									</h1>
+									{user.isBanned && (
+										<Badge variant="destructive" className="gap-1">
+											<IconBan className="h-3 w-3" />
+											{isBanExpired ? 'Ban Expired' : 'Banned'}
+										</Badge>
+									)}
+								</div>
+								<p className="text-muted-foreground">{user.email}</p>
+								{user.isBanned && user.banReason && (
+									<p className="text-sm text-destructive mt-1">
+										<IconAlertTriangle className="h-4 w-4 inline mr-1" />
+										{user.banReason}
+									</p>
+								)}
+							</div>
+						</div>
+					</div>
+					<div className="flex items-center gap-2">
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={handleEditUser}
+							className="gap-2"
+						>
+							<IconEdit className="h-4 w-4" />
+							Edit
+						</Button>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={handleImpersonateUser}
+							className="gap-2"
+							disabled={user.isBanned && !isBanExpired}
+						>
+							<IconUser className="h-4 w-4" />
+							Impersonate
+						</Button>
+						{user.isBanned ? (
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={handleLiftBan}
+								className="gap-2"
+							>
+								<IconShieldCheck className="h-4 w-4" />
+								Lift Ban
+							</Button>
+						) : (
+							<Button
+								variant="destructive"
+								size="sm"
+								onClick={handleBanUser}
+								className="gap-2"
+							>
+								<IconBan className="h-4 w-4" />
+								Ban User
+							</Button>
+						)}
+					</div>
+				</div>
+
+				{/* Overview Cards */}
+				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+					<Card>
+						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+							<CardTitle className="text-sm font-medium">Organizations</CardTitle>
+							<IconBuilding className="h-4 w-4 text-muted-foreground" />
+						</CardHeader>
+						<CardContent>
+							<div className="text-2xl font-bold">{user.organizations.length}</div>
+							<p className="text-xs text-muted-foreground">
+								{user.organizations.filter(org => org.active).length} active
+							</p>
+						</CardContent>
+					</Card>
+					<Card>
+						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+							<CardTitle className="text-sm font-medium">Active Sessions</CardTitle>
+							<IconKey className="h-4 w-4 text-muted-foreground" />
+						</CardHeader>
+						<CardContent>
+							<div className="text-2xl font-bold">{activeSessions.length}</div>
+							<p className="text-xs text-muted-foreground">
+								{user.sessions.length} total sessions
+							</p>
+						</CardContent>
+					</Card>
+					<Card>
+						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+							<CardTitle className="text-sm font-medium">Notes Created</CardTitle>
+							<IconFileText className="h-4 w-4 text-muted-foreground" />
+						</CardHeader>
+						<CardContent>
+							<div className="text-2xl font-bold">{user.notes.length}</div>
+							<p className="text-xs text-muted-foreground">
+								Recent notes shown
+							</p>
+						</CardContent>
+					</Card>
+					<Card>
+						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+							<CardTitle className="text-sm font-medium">Security</CardTitle>
+							<IconShield className="h-4 w-4 text-muted-foreground" />
+						</CardHeader>
+						<CardContent>
+							<div className="text-2xl font-bold">
+								{user.hasPassword ? '✓' : '✗'}
+							</div>
+							<p className="text-xs text-muted-foreground">
+								0 passkeys
+							</p>
+						</CardContent>
+					</Card>
+				</div>
+
+				{/* Detailed Information */}
+				<Tabs defaultValue="overview" className="space-y-4">
+					<TabsList>
+						<TabsTrigger value="overview">Overview</TabsTrigger>
+						<TabsTrigger value="organizations">Organizations</TabsTrigger>
+						<TabsTrigger value="activity">Activity</TabsTrigger>
+						<TabsTrigger value="security">Security</TabsTrigger>
+					</TabsList>
+
+					<TabsContent value="overview" className="space-y-4">
+						{user.isBanned && (
+							<Card className="border-destructive">
+								<CardHeader>
+									<CardTitle className="flex items-center gap-2 text-destructive">
+										<IconBan className="h-5 w-5" />
+										Ban Information
+									</CardTitle>
+								</CardHeader>
+								<CardContent className="space-y-3">
+									<div className="grid gap-2">
+										<div className="flex items-center gap-2 text-sm">
+											<span className="font-medium">Status:</span>
+											<Badge variant="destructive">
+												{isBanExpired ? 'Ban Expired' : 'Banned'}
+											</Badge>
+										</div>
+										{user.banReason && (
+											<div className="flex items-start gap-2 text-sm">
+												<span className="font-medium">Reason:</span>
+												<span className="flex-1">{user.banReason}</span>
+											</div>
+										)}
+										{user.bannedAt && (
+											<div className="flex items-center gap-2 text-sm">
+												<span className="font-medium">Banned:</span>
+												<span>{new Date(user.bannedAt).toLocaleString()}</span>
+											</div>
+										)}
+										{user.banExpiresAt && (
+											<div className="flex items-center gap-2 text-sm">
+												<span className="font-medium">Expires:</span>
+												<span className={isBanExpired ? 'text-muted-foreground' : ''}>
+													{new Date(user.banExpiresAt).toLocaleString()}
+													{isBanExpired && ' (Expired)'}
+												</span>
+											</div>
+										)}
+										{user.bannedBy && (
+											<div className="flex items-center gap-2 text-sm">
+												<span className="font-medium">Banned by:</span>
+												<span>{user.bannedBy.name || user.bannedBy.username}</span>
+											</div>
+										)}
+									</div>
+								</CardContent>
+							</Card>
+						)}
+						<div className="grid gap-4 md:grid-cols-2">
+							<Card>
+								<CardHeader>
+									<CardTitle className="flex items-center gap-2">
+										<IconUser className="h-5 w-5" />
+										User Information
+									</CardTitle>
+								</CardHeader>
+								<CardContent className="space-y-4">
+									<div className="grid gap-2">
+										<div className="flex items-center gap-2 text-sm">
+											<IconMail className="h-4 w-4 text-muted-foreground" />
+											<span className="font-medium">Email:</span>
+											<span>{user.email}</span>
+										</div>
+										<div className="flex items-center gap-2 text-sm">
+											<IconUser className="h-4 w-4 text-muted-foreground" />
+											<span className="font-medium">Username:</span>
+											<span className="font-mono">{user.username}</span>
+										</div>
+										<div className="flex items-center gap-2 text-sm">
+											<IconCalendar className="h-4 w-4 text-muted-foreground" />
+											<span className="font-medium">Created:</span>
+											<span>{new Date(user.createdAt).toLocaleDateString()}</span>
+										</div>
+										<div className="flex items-center gap-2 text-sm">
+											<IconCalendar className="h-4 w-4 text-muted-foreground" />
+											<span className="font-medium">Updated:</span>
+											<span>{new Date(user.updatedAt).toLocaleDateString()}</span>
+										</div>
+									</div>
+								</CardContent>
+							</Card>
+
+							<Card>
+								<CardHeader>
+									<CardTitle className="flex items-center gap-2">
+										<IconShield className="h-5 w-5" />
+										Roles & Permissions
+									</CardTitle>
+								</CardHeader>
+								<CardContent>
+									<div className="space-y-2">
+										{user.roles.length > 0 ? (
+											user.roles.map((role) => (
+												<div key={role.id} className="flex items-center justify-between">
+													<Badge variant="secondary">{role.name}</Badge>
+													<span className="text-xs text-muted-foreground">
+														{role.description}
+													</span>
+												</div>
+											))
+										) : (
+											<p className="text-sm text-muted-foreground">No roles assigned</p>
+										)}
+									</div>
+								</CardContent>
+							</Card>
+						</div>
+					</TabsContent>
+
+					<TabsContent value="organizations" className="space-y-4">
+						<Card>
+							<CardHeader>
+								<CardTitle>Organization Memberships</CardTitle>
+								<CardDescription>
+									Organizations this user belongs to
+								</CardDescription>
+							</CardHeader>
+							<CardContent>
+								{user.organizations.length > 0 ? (
+									<div className="space-y-4">
+										{user.organizations.map((membership) => (
+											<div
+												key={membership.organization.id}
+												className="flex items-center justify-between p-4 border rounded-lg"
+											>
+												<div className="space-y-1">
+													<div className="flex items-center gap-2">
+														<h4 className="font-medium">{membership.organization.name}</h4>
+														{membership.isDefault && (
+															<Badge variant="outline" className="text-xs">Default</Badge>
+														)}
+														{!membership.active && (
+															<Badge variant="destructive" className="text-xs">Inactive</Badge>
+														)}
+													</div>
+													<p className="text-sm text-muted-foreground">
+														{membership.organization.description || 'No description'}
+													</p>
+													<div className="flex items-center gap-4 text-xs text-muted-foreground">
+														<span>Role: {membership.role}</span>
+														{membership.department && (
+															<span>Department: {membership.department}</span>
+														)}
+														<span>Joined: {new Date(membership.createdAt).toLocaleDateString()}</span>
+													</div>
+												</div>
+												<div className="flex items-center gap-2">
+													{membership.organization.subscriptionStatus && (
+														<Badge variant="outline">
+															{membership.organization.subscriptionStatus}
+														</Badge>
+													)}
+													<Button
+														variant="ghost"
+														size="sm"
+														onClick={() => navigate(`/admin/organizations/${membership.organization.id}`)}
+													>
+														<IconExternalLink className="h-4 w-4" />
+													</Button>
+												</div>
+											</div>
+										))}
+									</div>
+								) : (
+									<p className="text-sm text-muted-foreground">
+										User is not a member of any organizations
+									</p>
+								)}
+							</CardContent>
+						</Card>
+					</TabsContent>
+
+					<TabsContent value="activity" className="space-y-4">
+						<div className="grid gap-4 md:grid-cols-2">
+							<Card>
+								<CardHeader>
+									<CardTitle className="flex items-center gap-2">
+										<IconMessageCircle className="h-5 w-5" />
+										Recent Comments
+									</CardTitle>
+								</CardHeader>
+								<CardContent>
+									{recentActivity.comments.length > 0 ? (
+										<div className="space-y-3">
+											{recentActivity.comments.map((comment) => (
+												<div key={comment.id} className="space-y-1">
+													<p className="text-sm">{comment.content}</p>
+													<div className="flex items-center gap-2 text-xs text-muted-foreground">
+														<span>On: {comment.note.title}</span>
+														<span>•</span>
+														<span>{new Date(comment.createdAt).toLocaleDateString()}</span>
+													</div>
+												</div>
+											))}
+										</div>
+									) : (
+										<p className="text-sm text-muted-foreground">No recent comments</p>
+									)}
+								</CardContent>
+							</Card>
+
+							<Card>
+								<CardHeader>
+									<CardTitle className="flex items-center gap-2">
+										<IconActivity className="h-5 w-5" />
+										Recent Activity
+									</CardTitle>
+								</CardHeader>
+								<CardContent>
+									{recentActivity.activityLogs.length > 0 ? (
+										<div className="space-y-3">
+											{recentActivity.activityLogs.map((log) => (
+												<div key={log.id} className="space-y-1">
+													<p className="text-sm font-medium">{log.action}</p>
+													<div className="flex items-center gap-2 text-xs text-muted-foreground">
+														<span>On: {log.note.title}</span>
+														<span>•</span>
+														<span>{new Date(log.createdAt).toLocaleDateString()}</span>
+													</div>
+												</div>
+											))}
+										</div>
+									) : (
+										<p className="text-sm text-muted-foreground">No recent activity</p>
+									)}
+								</CardContent>
+							</Card>
+						</div>
+
+						<Card>
+							<CardHeader>
+								<CardTitle className="flex items-center gap-2">
+									<IconFileText className="h-5 w-5" />
+									Recent Notes
+								</CardTitle>
+							</CardHeader>
+							<CardContent>
+								{user.notes.length > 0 ? (
+									<div className="space-y-3">
+										{user.notes.map((note) => (
+											<div key={note.id} className="flex items-center justify-between">
+												<div>
+													<p className="font-medium">{note.title}</p>
+													<p className="text-xs text-muted-foreground">
+														Created: {new Date(note.createdAt).toLocaleDateString()} •
+														Updated: {new Date(note.updatedAt).toLocaleDateString()}
+													</p>
+												</div>
+											</div>
+										))}
+									</div>
+								) : (
+									<p className="text-sm text-muted-foreground">No notes created</p>
+								)}
+							</CardContent>
+						</Card>
+					</TabsContent>
+
+					<TabsContent value="security" className="space-y-4">
+						<div className="grid gap-4 md:grid-cols-2">
+							<Card>
+								<CardHeader>
+									<CardTitle>Authentication Methods</CardTitle>
+								</CardHeader>
+								<CardContent className="space-y-4">
+									<div className="flex items-center justify-between">
+										<span className="text-sm">Password</span>
+										<Badge variant={user.hasPassword ? "default" : "secondary"}>
+											{user.hasPassword ? "Set" : "Not Set"}
+										</Badge>
+									</div>
+									<div className="flex items-center justify-between">
+										<span className="text-sm">Passkeys</span>
+										<Badge variant="secondary">
+											0 configured
+										</Badge>
+									</div>
+								</CardContent>
+							</Card>
+
+							<Card>
+								<CardHeader>
+									<CardTitle>Connected Accounts</CardTitle>
+								</CardHeader>
+								<CardContent>
+									{user.connections.length > 0 ? (
+										<div className="space-y-2">
+											{user.connections.map((connection) => (
+												<div key={connection.id} className="flex items-center justify-between">
+													<div className="flex items-center gap-2">
+														<Badge variant="outline">{connection.providerName}</Badge>
+														<span className="text-sm font-mono">{connection.providerId}</span>
+													</div>
+													<span className="text-xs text-muted-foreground">
+														{new Date(connection.createdAt).toLocaleDateString()}
+													</span>
+												</div>
+											))}
+										</div>
+									) : (
+										<p className="text-sm text-muted-foreground">No connected accounts</p>
+									)}
+								</CardContent>
+							</Card>
+						</div>
+
+						<Card>
+							<CardHeader>
+								<CardTitle>Active Sessions</CardTitle>
+								<CardDescription>
+									Current active login sessions
+								</CardDescription>
+							</CardHeader>
+							<CardContent>
+								{activeSessions.length > 0 ? (
+									<div className="space-y-2">
+										{activeSessions.map((session) => (
+											<div key={session.id} className="flex items-center justify-between p-3 border rounded">
+												<div>
+													<p className="text-sm font-medium">Session {session.id.slice(0, 8)}...</p>
+													<p className="text-xs text-muted-foreground">
+														Created: {new Date(session.createdAt).toLocaleString()}
+													</p>
+												</div>
+												<div className="text-right">
+													<p className="text-xs text-muted-foreground">
+														Expires: {new Date(session.expirationDate).toLocaleString()}
+													</p>
+												</div>
+											</div>
+										))}
+									</div>
+								) : (
+									<p className="text-sm text-muted-foreground">No active sessions</p>
+								)}
+							</CardContent>
+						</Card>
+					</TabsContent>
+				</Tabs>
+			</div>
+
+			<BanUserDialog
+				user={user}
+				isOpen={showBanDialog}
+				onClose={() => setShowBanDialog(false)}
+			/>
+		</>
+	)
+}

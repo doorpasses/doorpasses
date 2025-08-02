@@ -251,11 +251,13 @@ export function AppSidebar({
 			avatar: rootData.user.image
 				? `/resources/images?objectKey=${rootData.user.image.objectKey}`
 				: '/avatars/user.jpg',
+			roles: rootData.user.roles,
 		}
 		: {
 			name: 'Guest',
 			email: '',
 			avatar: '/avatars/user.jpg',
+			roles: [],
 		}
 
 	return (

@@ -15,6 +15,13 @@ model User {
   name                   String?
   createdAt              DateTime                   @default(now())
   updatedAt              DateTime                   @updatedAt
+  isBanned               Boolean                    @default(false)
+  banReason              String?
+  banExpiresAt           DateTime?
+  bannedAt               DateTime?
+  bannedById             String?
+  bannedBy               User?                      @relation("UserBans", fields: [bannedById], references: [id])
+  bannedUsers            User[]                     @relation("UserBans")
   connections            Connection[]
   notes                  Note[]
   noteAccess             NoteAccess[]
