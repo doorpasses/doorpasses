@@ -6,7 +6,7 @@ import { ErrorList, Field } from '#app/components/forms.tsx'
 import { Button } from '#app/components/ui/button.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { EmailSchema } from '#app/utils/user-validation.ts'
-import { changeEmailActionIntent } from '../../routes/settings+/general'
+import { changeEmailActionIntent } from '#app/routes/app+/profile.tsx'
 
 export const ChangeEmailSchema = z.object({
 	email: EmailSchema,

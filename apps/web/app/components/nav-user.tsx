@@ -19,6 +19,7 @@ import {
 } from '#app/components/ui/sidebar'
 import { UserIcon } from './icons/user-icon'
 import { LogoutIcon } from './icons/logout-icon'
+import { BuildingIcon } from './icons/building-icon'
 
 export function NavUser({
 	user,
@@ -81,12 +82,26 @@ export function NavUser({
 								onMouseEnter={() => handleMenuItemMouseEnter('account')}
 								onMouseLeave={() => handleMenuItemMouseLeave('account')}
 							>
-								<Link to="/settings/general">
+								<Link to="/app/profile">
 									<UserIcon
 										ref={(ref: any) => (iconRefs.current['account'] = ref)}
 										size={16}
 									/>
 									Account
+								</Link>
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								asChild
+								className="gap-2"
+								onMouseEnter={() => handleMenuItemMouseEnter('organizations')}
+								onMouseLeave={() => handleMenuItemMouseLeave('organizations')}
+							>
+								<Link to="/app/organizations">
+									<BuildingIcon
+										ref={(ref: any) => (iconRefs.current['organizations'] = ref)}
+										size={16}
+									/>
+									Organizations
 								</Link>
 							</DropdownMenuItem>
 						</DropdownMenuGroup>

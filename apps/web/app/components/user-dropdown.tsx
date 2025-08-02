@@ -44,7 +44,7 @@ export function UserDropdown() {
 			<DropdownMenuPortal>
 				<DropdownMenuContent sideOffset={8} align="end">
 					<DropdownMenuItem asChild>
-						<Link prefetch="intent" to={`/settings/general`}>
+						<Link prefetch="intent" to={`/app/profile`}>
 							<Icon className="text-body-md" name="avatar">
 								Profile
 							</Icon>

@@ -42,7 +42,7 @@ export function useGlobalHotkeys(setCommandOpen: (open: boolean) => void) {
 		},
 		{
 			key: 'cmd+a,ctrl+a',
-			action: () => navigate('/settings/general'),
+			action: () => navigate('/app/profile'),
 			description: 'Go to account settings',
 		},
 		{

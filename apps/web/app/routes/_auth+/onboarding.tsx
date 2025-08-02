@@ -151,7 +151,7 @@ export async function action({ request }: Route.ActionArgs) {
 
 			const inviterName = invitation.inviter?.name || invitation.inviter?.email || 'Someone'
 			return redirectWithToast(
-				'/settings/organizations',
+				'/app/organizations',
 				{
 					title: 'Welcome!',
 					description: `Thanks for signing up! ${inviterName} has invited you to join ${invitation.organization.name}. Review the invitation below.`,
@@ -181,7 +181,7 @@ export async function action({ request }: Route.ActionArgs) {
 			if (joinedOrganizations.length > 0) {
 				// If user has pending invitations, redirect to settings/organizations to accept them
 				return redirectWithToast(
-					'/settings/organizations',
+					'/app/organizations',
 					{
 						title: 'Welcome!',
 						description: `Thanks for signing up! You have pending organization invitations.`,

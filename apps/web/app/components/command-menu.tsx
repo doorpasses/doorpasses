@@ -146,7 +146,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 				)}
 				<CommandGroup heading="Settings">
 					<CommandItem asChild>
-						<Link to="/settings/general" onClick={() => onOpenChange(false)}>
+						<Link to="/app/profile" onClick={() => onOpenChange(false)}>
 							<Icon name="person" />
 							<span>Account settings</span>
 							<CommandShortcut>⌘P</CommandShortcut>

@@ -5,7 +5,7 @@ import { Form, useRevalidator } from 'react-router'
 import { z } from 'zod'
 import { Button } from '#app/components/ui/button.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
-import { deletePasskeyActionIntent } from '../../routes/settings+/general'
+import { deletePasskeyActionIntent } from '#app/routes/app+/profile.tsx'
 
 // Registration options schema for passkeys
 const RegistrationOptionsSchema = z.object({

@@ -54,7 +54,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		// Redirect to settings/organizations where they can accept/decline
 		const inviterName = invitation.inviter?.name || invitation.inviter?.email || 'Someone'
 		return redirectWithToast(
-			'/settings/organizations',
+			'/app/organizations',
 			{
 				title: 'Organization Invitation',
 				description: `${inviterName} has invited you to join ${inviteLink.organization.name}. Review the invitation below.`,

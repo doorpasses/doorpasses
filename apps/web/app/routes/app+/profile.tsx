@@ -21,19 +21,19 @@ import { prisma } from '#app/utils/db.server.ts'
 import {
 	deleteDataAction,
 	signOutOfSessionsAction,
-} from './actions/account.actions'
-import { disconnectProviderAction } from './actions/connections.actions'
-import { changeEmailAction } from './actions/email.actions'
-import { photoAction } from './actions/photo.actions'
-import { profileUpdateAction } from './actions/profile.actions'
+} from '../settings+/actions/account.actions'
+import { disconnectProviderAction } from '../settings+/actions/connections.actions'
+import { changeEmailAction } from '../settings+/actions/email.actions'
+import { photoAction } from '../settings+/actions/photo.actions'
+import { profileUpdateAction } from '../settings+/actions/profile.actions'
 import {
 	changePasswordAction,
 	disable2FAAction,
 	enable2FAAction,
 	setPasswordAction,
-} from './actions/security.actions'
-import { twoFAVerificationType } from './profile.two-factor'
-import { twoFAVerifyVerificationType } from './profile.two-factor.verify'
+} from '../settings+/actions/security.actions'
+import { twoFAVerificationType } from '../settings+/profile.two-factor'
+import { twoFAVerifyVerificationType } from '../settings+/profile.two-factor.verify'
 
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
@@ -246,49 +246,51 @@ async function deletePasskeyAction({ formData, userId }: ProfileActionArgs) {
 	return Response.json({ status: 'success' })
 }
 
-export default function GeneralSettings() {
+export default function ProfileSettings() {
 	const data = useLoaderData()
 
 	return (
-		<AnnotatedLayout>
-			<PageTitle
-				title="Account Settings"
-				description="Manage your account settings and set e-mail preferences."
-			/>
-			<AnnotatedSection
-				title="Profile"
-				description="Update your photo and personal details here."
-			>
-				<ProfileCard user={data.user} />
-			</AnnotatedSection>
-
-			<AnnotatedSection
-				title="Security"
-				description="Manage your password and two-factor authentication settings."
-			>
-				<SecurityCard
-					hasPassword={data.hasPassword}
-					isTwoFactorEnabled={data.isTwoFactorEnabled}
-					passkeys={data.passkeys}
-					user={data.user}
-					qrCode={data.qrCode}
-					otpUri={data.otpUri}
+		<div className="flex flex-1 flex-col gap-4 m-8">
+			<AnnotatedLayout>
+				<PageTitle
+					title="Profile Settings"
+					description="Manage your account settings and set e-mail preferences."
 				/>
-			</AnnotatedSection>
+				<AnnotatedSection
+					title="Profile"
+					description="Update your photo and personal details here."
+				>
+					<ProfileCard user={data.user} />
+				</AnnotatedSection>
 
-			<AnnotatedSection
-				title="Connected accounts"
-				description="Sign up faster to your account by linking it to Google or Microsoft."
-			>
-				<ConnectionsCard user={data.user} connections={data.connections} />
-			</AnnotatedSection>
+				<AnnotatedSection
+					title="Security"
+					description="Manage your password and two-factor authentication settings."
+				>
+					<SecurityCard
+						hasPassword={data.hasPassword}
+						isTwoFactorEnabled={data.isTwoFactorEnabled}
+						passkeys={data.passkeys}
+						user={data.user}
+						qrCode={data.qrCode}
+						otpUri={data.otpUri}
+					/>
+				</AnnotatedSection>
 
-			<AnnotatedSection
-				title="Advanced"
-				description="Manage your sessions and delete your account data."
-			>
-				<AdvancedSettingsCard user={data.user} />
-			</AnnotatedSection>
-		</AnnotatedLayout>
+				<AnnotatedSection
+					title="Connected accounts"
+					description="Sign up faster to your account by linking it to Google or Microsoft."
+				>
+					<ConnectionsCard user={data.user} connections={data.connections} />
+				</AnnotatedSection>
+
+				<AnnotatedSection
+					title="Advanced"
+					description="Manage your sessions and delete your account data."
+				>
+					<AdvancedSettingsCard user={data.user} />
+				</AnnotatedSection>
+			</AnnotatedLayout>
+		</div>
 	)
 }

@@ -525,7 +525,7 @@ function Step1({ actionData }: { actionData: any }) {
 
 						<div className="flex justify-end gap-4 pt-4">
 							<Button variant="outline" asChild>
-								<Link to="/settings/organizations">Cancel</Link>
+								<Link to="/app/organizations">Cancel</Link>
 							</Button>
 							<Button type="submit">Continue</Button>
 						</div>
