@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { useLocation, useRouteLoaderData, Link } from 'react-router'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion } from 'motion/react'
 import { FoldersIcon } from '#app/components/icons/folders-icon'
 import { HomeIcon } from '#app/components/icons/home-icon'
 import { SettingsGearIcon } from '#app/components/icons/settings-gear-icon'
@@ -309,6 +309,10 @@ export function AppSidebar({
 			<div className="relative h-full">
 				{/* Account Sidebar */}
 				<motion.div
+					initial={{
+						x: isAccountRoute ? 0 : -300,
+						opacity: isAccountRoute ? 1 : 0
+					}}
 					animate={{
 						x: isAccountRoute ? 0 : -300,
 						opacity: isAccountRoute ? 1 : 0
@@ -326,6 +330,10 @@ export function AppSidebar({
 
 				{/* Organization Sidebar */}
 				<motion.div
+					initial={{
+						x: !isAccountRoute ? 0 : 300,
+						opacity: !isAccountRoute ? 1 : 0
+					}}
 					animate={{
 						x: !isAccountRoute ? 0 : 300,
 						opacity: !isAccountRoute ? 1 : 0
