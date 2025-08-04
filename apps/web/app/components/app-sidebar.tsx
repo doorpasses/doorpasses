@@ -4,6 +4,7 @@ import { useLocation, useRouteLoaderData, Link } from 'react-router'
 import { motion } from 'motion/react'
 import { FoldersIcon } from '#app/components/icons/folders-icon'
 import { HomeIcon } from '#app/components/icons/home-icon'
+import { LockOpenIcon } from '#app/components/icons/lock-open-icon.tsx'
 import { SettingsGearIcon } from '#app/components/icons/settings-gear-icon'
 import { UserIcon } from '#app/components/icons/user-icon'
 import { NavMain } from '#app/components/nav-main'
@@ -74,6 +75,7 @@ function AccountSidebar({
 	orgSlug: string | undefined
 }) {
 	const isProfileRoute = location.pathname === '/app/profile'
+	const isSecurityRoute = location.pathname === '/app/security'
 	const isOrganizationsRoute = location.pathname === '/app/organizations'
 
 	const navMain = [
@@ -88,6 +90,12 @@ function AccountSidebar({
 			url: '/app/profile',
 			isActive: isProfileRoute,
 			icon: UserIcon,
+		},
+		{
+			title: 'Security',
+			url: '/app/security',
+			isActive: isSecurityRoute,
+			icon: LockOpenIcon,
 		},
 		{
 			title: 'Organizations',
@@ -285,8 +293,9 @@ export function AppSidebar({
 
 	// Check if we're on profile or organizations routes
 	const isProfileRoute = location.pathname === '/app/profile'
+	const isSecurityRoute = location.pathname === '/app/security'
 	const isOrganizationsRoute = location.pathname === '/app/organizations'
-	const isAccountRoute = isProfileRoute || isOrganizationsRoute
+	const isAccountRoute = isProfileRoute || isSecurityRoute || isOrganizationsRoute
 
 	const userData = rootData?.user
 		? {

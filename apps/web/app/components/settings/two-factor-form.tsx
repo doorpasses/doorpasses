@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { ErrorList, OTPField } from '#app/components/forms.tsx'
 import { Button } from '#app/components/ui/button.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
-import { disable2FAActionIntent, enable2FAActionIntent } from '#app/routes/app+/profile.tsx'
+import { disable2FAActionIntent, enable2FAActionIntent } from '#app/routes/app+/security.tsx'
 
 export const Enable2FASchema = z.object({
 	code: z.string().min(6).max(6),
