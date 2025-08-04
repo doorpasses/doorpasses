@@ -198,6 +198,58 @@ export async function action({ request }: Route.ActionArgs) {
 		)
 	}
 
+	// Check for organizations with verified domains matching the user's email
+	try {
+		const emailDomain = email.split('@')[1]
+		if (emailDomain) {
+			const organizationsWithMatchingDomain = await prisma.organization.findMany({
+				where: {
+					verifiedDomain: emailDomain,
+					users: {
+						none: {
+							userId: session.userId,
+						},
+					},
+				},
+				select: {
+					id: true,
+					name: true,
+					slug: true,
+				},
+			})
+
+			if (organizationsWithMatchingDomain.length > 0) {
+				// Auto-add user to organizations with matching verified domains
+				await prisma.userOrganization.createMany({
+					data: organizationsWithMatchingDomain.map((org) => ({
+						userId: session.userId,
+						organizationId: org.id,
+						role: 'MEMBER', // Default role
+					})),
+				})
+
+				const orgNames = organizationsWithMatchingDomain.map((org) => org.name).join(', ')
+				console.log(`Auto-added user ${email} to organizations: ${orgNames} based on verified domain ${emailDomain}`)
+
+				// Redirect to organizations page to show the user they've been added
+				return redirectWithToast(
+					'/app/organizations',
+					{
+						title: 'Welcome!',
+						description: `Thanks for signing up! You've been automatically added to ${orgNames} based on your email domain.`,
+					},
+					{ headers },
+				)
+			}
+		}
+	} catch (error) {
+		// Don't fail the signup if domain-based organization joining fails
+		console.error(
+			'Error processing domain-based organization joining during signup:',
+			error,
+		)
+	}
+
 	return redirectWithToast(
 		'/organizations/create',
 		{ title: 'Welcome', description: 'Thanks for signing up!' },

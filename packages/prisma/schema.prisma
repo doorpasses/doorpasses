@@ -185,6 +185,7 @@ model Organization {
   stripeSubscriptionId   String?
   subscriptionStatus     String?
   size                   String?
+  verifiedDomain         String?
   integrations           Integration[]
   onboardingProgress     OnboardingProgress[]
   onboardingStepProgress OnboardingStepProgress[]
