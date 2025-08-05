@@ -1,9 +1,9 @@
 import { useLoaderData } from 'react-router'
-import { requireUserWithRole } from '#app/utils/permissions.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#app/components/ui/card'
 import { Badge } from '#app/components/ui/badge'
-import { IconUser, IconClock, IconShield } from '@tabler/icons-react'
+import { Icon } from '#app/components/ui/icon.tsx'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#app/components/ui/card'
+import { prisma } from '#app/utils/db.server.ts'
+import { requireUserWithRole } from '#app/utils/permissions.server.ts'
 
 export async function loader({ request }: { request: Request }) {
 	await requireUserWithRole(request, 'admin')
@@ -54,7 +54,7 @@ export async function loader({ request }: { request: Request }) {
 		take: 100 // Limit to last 100 audit logs
 	})
 
-	return Response.json({ auditLogs })
+	return { auditLogs }
 }
 
 export default function AdminAuditLogsPage() {
@@ -74,7 +74,7 @@ export default function AdminAuditLogsPage() {
 			<Card>
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2">
-						<IconShield className="h-5 w-5" />
+						<Icon name="lock" className="h-5 w-5" />
 						Impersonation Logs
 					</CardTitle>
 					<CardDescription>
@@ -82,7 +82,7 @@ export default function AdminAuditLogsPage() {
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					{auditLogs.length > 0 ? (
+					{auditLogs?.length > 0 ? (
 						<div className="space-y-4">
 							{auditLogs.map((log) => {
 								const metadata = log.metadata ? JSON.parse(log.metadata) : {} as any
@@ -120,7 +120,7 @@ export default function AdminAuditLogsPage() {
 											)}
 										</div>
 										<div className="flex items-center gap-2 text-sm text-muted-foreground">
-											<IconClock className="h-4 w-4" />
+											<Icon name="clock" className="h-4 w-4" />
 											<span>{new Date(log.createdAt).toLocaleString()}</span>
 										</div>
 									</div>
@@ -129,7 +129,7 @@ export default function AdminAuditLogsPage() {
 						</div>
 					) : (
 						<div className="text-center py-8">
-							<IconUser className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+							<Icon name="user" className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
 							<p className="text-muted-foreground">No audit logs found</p>
 						</div>
 					)}

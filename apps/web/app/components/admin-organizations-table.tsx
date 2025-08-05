@@ -1,3 +1,4 @@
+import { Icon } from '#app/components/ui/icon.tsx'
 import {
 	type ColumnDef,
 	type ColumnFiltersState,
@@ -12,19 +13,6 @@ import {
 } from '@tanstack/react-table'
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
-import { 
-	IconBuilding,
-	IconChevronDown,
-	IconChevronLeft,
-	IconChevronRight,
-	IconChevronsLeft,
-	IconChevronsRight,
-	IconSearch,
-	IconUsers,
-	IconNotes,
-	IconPlug,
-	IconX,
-} from '@tabler/icons-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '#app/components/ui/avatar'
 import { Badge } from '#app/components/ui/badge'
@@ -136,7 +124,7 @@ const columns: ColumnDef<AdminOrganization>[] = [
 							alt={org.image?.altText ?? org.name}
 						/>
 						<AvatarFallback>
-							<IconBuilding className="h-4 w-4" />
+							<Icon name="blocks" className="h-4 w-4" />
 						</AvatarFallback>
 					</Avatar>
 					<div className="flex flex-col">
@@ -172,7 +160,7 @@ const columns: ColumnDef<AdminOrganization>[] = [
 			const org = row.original
 			return (
 				<div className="flex items-center gap-2">
-					<IconUsers className="h-4 w-4 text-muted-foreground" />
+					<Icon name="user-plus" className="h-4 w-4 text-muted-foreground" />
 					<span className="text-sm">
 						{org.memberCount}
 						{org.totalMembers !== org.memberCount && (
@@ -192,7 +180,7 @@ const columns: ColumnDef<AdminOrganization>[] = [
 			const noteCount = row.original.noteCount
 			return (
 				<div className="flex items-center gap-2">
-					<IconNotes className="h-4 w-4 text-muted-foreground" />
+					<Icon name="file-text" className="h-4 w-4 text-muted-foreground" />
 					<span className="text-sm">{noteCount}</span>
 				</div>
 			)
@@ -205,7 +193,7 @@ const columns: ColumnDef<AdminOrganization>[] = [
 			const org = row.original
 			return (
 				<div className="flex items-center gap-2">
-					<IconPlug className="h-4 w-4 text-muted-foreground" />
+					<Icon name="link-2" className="h-4 w-4 text-muted-foreground" />
 					<span className="text-sm">
 						{org.activeIntegrations}
 						{org.totalIntegrations !== org.activeIntegrations && (
@@ -368,7 +356,7 @@ export function AdminOrganizationsTable({
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-2">
 					<div className="relative flex-1 max-w-sm">
-						<IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+						<Icon name="search" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 						<Input
 							placeholder="Search organizations..."
 							value={searchQuery}
@@ -416,7 +404,7 @@ export function AdminOrganizationsTable({
 							className="h-8 px-2 lg:px-3"
 						>
 							Reset
-							<IconX className="ml-2 h-4 w-4" />
+							<Icon name="x" className="ml-2 h-4 w-4" />
 						</Button>
 					)}
 				</div>
@@ -425,7 +413,7 @@ export function AdminOrganizationsTable({
 						<DropdownMenuTrigger asChild>
 							<Button variant="outline" size="sm">
 								Columns
-								<IconChevronDown className="ml-2 h-4 w-4" />
+								<Icon name="chevron-down" className="ml-2 h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="w-48">
@@ -552,7 +540,7 @@ export function AdminOrganizationsTable({
 							disabled={pagination.page === 1}
 						>
 							<span className="sr-only">Go to first page</span>
-							<IconChevronsLeft className="h-4 w-4" />
+							<Icon name="chevron-left" className="h-4 w-4" />
 						</Button>
 						<Button
 							variant="outline"
@@ -561,7 +549,7 @@ export function AdminOrganizationsTable({
 							disabled={pagination.page === 1}
 						>
 							<span className="sr-only">Go to previous page</span>
-							<IconChevronLeft className="h-4 w-4" />
+							<Icon name="chevron-left" className="h-4 w-4" />
 						</Button>
 						<Button
 							variant="outline"
@@ -570,7 +558,7 @@ export function AdminOrganizationsTable({
 							disabled={pagination.page === pagination.totalPages}
 						>
 							<span className="sr-only">Go to next page</span>
-							<IconChevronRight className="h-4 w-4" />
+							<Icon name="chevron-right" className="h-4 w-4" />
 						</Button>
 						<Button
 							variant="outline"
@@ -579,7 +567,7 @@ export function AdminOrganizationsTable({
 							disabled={pagination.page === pagination.totalPages}
 						>
 							<span className="sr-only">Go to last page</span>
-							<IconChevronsRight className="h-4 w-4" />
+							<Icon name="chevron-right" className="h-4 w-4" />
 						</Button>
 					</div>
 				</div>

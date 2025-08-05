@@ -17,20 +17,7 @@ import {
 	verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import {
-	IconChevronDown,
-	IconChevronLeft,
-	IconChevronRight,
-	IconChevronsLeft,
-	IconChevronsRight,
-	IconCircleCheckFilled,
-	IconDotsVertical,
-	IconGripVertical,
-	IconLayoutColumns,
-	IconLoader,
-	IconPlus,
-	IconTrendingUp,
-} from '@tabler/icons-react'
+import { Icon } from '#app/components/ui/icon.tsx'
 import {
 	type ColumnDef,
 	type ColumnFiltersState,
@@ -128,7 +115,7 @@ function DragHandle({ id }: { id: number }) {
 			size="icon"
 			className="text-muted-foreground size-7 hover:bg-transparent"
 		>
-			<IconGripVertical className="text-muted-foreground size-3" />
+			<Icon name="grip-vertical" className="text-muted-foreground size-3" />
 			<span className="sr-only">Drag to reorder</span>
 		</Button>
 	)
@@ -191,9 +178,9 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
 		cell: ({ row }) => (
 			<Badge variant="outline" className="text-muted-foreground px-1.5">
 				{row.original.status === 'Done' ? (
-					<IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
+					<Icon name="circle-check" className="fill-green-500 dark:fill-green-400" />
 				) : (
-					<IconLoader />
+					<Icon name="loader" />
 				)}
 				{row.original.status}
 			</Badge>
@@ -293,7 +280,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
 						className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
 						size="icon"
 					>
-						<IconDotsVertical />
+						<Icon name="more-vertical" />
 						<span className="sr-only">Open menu</span>
 					</Button>
 				</DropdownMenuTrigger>
@@ -437,10 +424,10 @@ export function DataTable({
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button variant="outline" size="sm">
-								<IconLayoutColumns />
+								<Icon name="layout-columns" />
 								<span className="hidden lg:inline">Customize Columns</span>
 								<span className="lg:hidden">Columns</span>
-								<IconChevronDown />
+								<Icon name="chevron-down" />
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="w-56">
@@ -468,7 +455,7 @@ export function DataTable({
 						</DropdownMenuContent>
 					</DropdownMenu>
 					<Button variant="outline" size="sm">
-						<IconPlus />
+						<Icon name="plus" />
 						<span className="hidden lg:inline">Add Section</span>
 					</Button>
 				</div>
@@ -570,7 +557,7 @@ export function DataTable({
 								disabled={!table.getCanPreviousPage()}
 							>
 								<span className="sr-only">Go to first page</span>
-								<IconChevronsLeft />
+								<Icon name="chevrons-left" />
 							</Button>
 							<Button
 								variant="outline"
@@ -580,7 +567,7 @@ export function DataTable({
 								disabled={!table.getCanPreviousPage()}
 							>
 								<span className="sr-only">Go to previous page</span>
-								<IconChevronLeft />
+								<Icon name="chevron-left" />
 							</Button>
 							<Button
 								variant="outline"
@@ -590,7 +577,7 @@ export function DataTable({
 								disabled={!table.getCanNextPage()}
 							>
 								<span className="sr-only">Go to next page</span>
-								<IconChevronRight />
+								<Icon name="chevron-right" />
 							</Button>
 							<Button
 								variant="outline"
@@ -600,7 +587,7 @@ export function DataTable({
 								disabled={!table.getCanNextPage()}
 							>
 								<span className="sr-only">Go to last page</span>
-								<IconChevronsRight />
+								<Icon name="chevrons-right" />
 							</Button>
 						</div>
 					</div>
@@ -709,7 +696,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
 							<div className="grid gap-2">
 								<div className="flex gap-2 leading-none font-medium">
 									Trending up by 5.2% this month{' '}
-									<IconTrendingUp className="size-4" />
+									<Icon name="trending-up" className="size-4" />
 								</div>
 								<div className="text-muted-foreground">
 									Showing total visitors for the last 6 months. This is just

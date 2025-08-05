@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Form, useSubmit } from 'react-router'
-import { IconBan, IconCalendar } from '@tabler/icons-react'
+import { Icon } from '#app/components/ui/icon.tsx'
 
 import { Button } from '#app/components/ui/button'
+import { Checkbox } from '#app/components/ui/checkbox'
 import {
 	Dialog,
 	DialogContent,
@@ -14,7 +15,6 @@ import {
 import { Input } from '#app/components/ui/input'
 import { Label } from '#app/components/ui/label'
 import { Textarea } from '#app/components/ui/textarea'
-import { Checkbox } from '#app/components/ui/checkbox'
 
 interface BanUserDialogProps {
 	user: {
@@ -51,7 +51,7 @@ export function BanUserDialog({ user, isOpen, onClose }: BanUserDialogProps) {
 			formData.append('expiresAt', expirationDate)
 		}
 
-		submit(formData, {
+		void submit(formData, {
 			method: 'POST',
 			action: `/admin/users/${user.id}/ban`,
 		})
@@ -79,7 +79,7 @@ export function BanUserDialog({ user, isOpen, onClose }: BanUserDialogProps) {
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2">
-						<IconBan className="h-5 w-5 text-destructive" />
+						<Icon name="ban" className="h-5 w-5 text-destructive" />
 						Ban User
 					</DialogTitle>
 					<DialogDescription>
@@ -125,7 +125,7 @@ export function BanUserDialog({ user, isOpen, onClose }: BanUserDialogProps) {
 						{hasExpiration && (
 							<div className="space-y-2">
 								<Label htmlFor="expiration-date" className="flex items-center gap-2">
-									<IconCalendar className="h-4 w-4" />
+									<Icon name="calendar" className="h-4 w-4" />
 									Expiration Date
 								</Label>
 								<Input
@@ -165,7 +165,7 @@ export function BanUserDialog({ user, isOpen, onClose }: BanUserDialogProps) {
 								</>
 							) : (
 								<>
-									<IconBan className="h-4 w-4" />
+									<Icon name="ban" className="h-4 w-4" />
 									Ban User
 								</>
 							)}

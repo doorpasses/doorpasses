@@ -1,23 +1,10 @@
-import { Link } from 'react-router'
-import {
-	IconBuilding,
-	IconUsers,
-	IconNotes,
-	IconPlug,
-	IconMail,
-	IconCalendar,
-	IconActivity,
-	IconSettings,
-	IconCreditCard,
-	IconShield,
-	IconClock,
-} from '@tabler/icons-react'
+import { Icon } from '#app/components/ui/icon.tsx'
 
+import { formatDistanceToNow } from 'date-fns'
 import { Avatar, AvatarFallback, AvatarImage } from '#app/components/ui/avatar'
 import { Badge } from '#app/components/ui/badge'
 import { Button } from '#app/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#app/components/ui/card'
-import { Separator } from '#app/components/ui/separator'
 import {
 	Table,
 	TableBody,
@@ -26,7 +13,6 @@ import {
 	TableHeader,
 	TableRow,
 } from '#app/components/ui/table'
-import { formatDistanceToNow } from 'date-fns'
 
 export interface AdminOrganizationDetail {
 	id: string
@@ -173,13 +159,13 @@ const getRoleBadge = (role: string) => {
 const getActivityIcon = (action: string) => {
 	switch (action.toLowerCase()) {
 		case 'created':
-			return <IconNotes className="h-4 w-4 text-green-500" />
+			return <Icon name="file-text" className="h-4 w-4 text-green-500" />
 		case 'updated':
-			return <IconSettings className="h-4 w-4 text-blue-500" />
+			return <Icon name="settings" className="h-4 w-4 text-blue-500" />
 		case 'deleted':
-			return <IconActivity className="h-4 w-4 text-red-500" />
+			return <Icon name="activity" className="h-4 w-4 text-red-500" />
 		default:
-			return <IconActivity className="h-4 w-4 text-muted-foreground" />
+			return <Icon name="activity" className="h-4 w-4 text-muted-foreground" />
 	}
 }
 
@@ -198,7 +184,7 @@ export function AdminOrganizationDetail({
 							alt={organization.image?.altText ?? organization.name}
 						/>
 						<AvatarFallback>
-							<IconBuilding className="h-8 w-8" />
+							<Icon name="blocks" className="h-8 w-8" />
 						</AvatarFallback>
 					</Avatar>
 					<div>
@@ -226,7 +212,7 @@ export function AdminOrganizationDetail({
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">Members</CardTitle>
-						<IconUsers className="h-4 w-4 text-muted-foreground" />
+						<Icon name="user-plus" className="h-4 w-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">{organization.memberCount}</div>
@@ -243,7 +229,7 @@ export function AdminOrganizationDetail({
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">Notes</CardTitle>
-						<IconNotes className="h-4 w-4 text-muted-foreground" />
+						<Icon name="file-text" className="h-4 w-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">{organization._count.notes}</div>
@@ -255,7 +241,7 @@ export function AdminOrganizationDetail({
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">Integrations</CardTitle>
-						<IconPlug className="h-4 w-4 text-muted-foreground" />
+						<Icon name="link-2" className="h-4 w-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">{organization.activeIntegrations}</div>
@@ -270,7 +256,7 @@ export function AdminOrganizationDetail({
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">Subscription</CardTitle>
-						<IconCreditCard className="h-4 w-4 text-muted-foreground" />
+						<Icon name="credit-card" className="h-4 w-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div className="flex flex-col gap-1">
@@ -290,7 +276,7 @@ export function AdminOrganizationDetail({
 				<Card>
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">
-							<IconUsers className="h-5 w-5" />
+							<Icon name="user-plus" className="h-5 w-5" />
 							Members ({organization.users.length})
 						</CardTitle>
 						<CardDescription>
@@ -355,7 +341,7 @@ export function AdminOrganizationDetail({
 				<Card>
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">
-							<IconNotes className="h-5 w-5" />
+							<Icon name="file-text" className="h-5 w-5" />
 							Recent Notes ({organization.notes.length})
 						</CardTitle>
 						<CardDescription>
@@ -372,7 +358,7 @@ export function AdminOrganizationDetail({
 												{note.title}
 											</span>
 											{!note.isPublic && (
-												<IconShield className="h-3 w-3 text-muted-foreground" />
+												<Icon name="lock" className="h-3 w-3 text-muted-foreground" />
 											)}
 										</div>
 										<div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -399,7 +385,7 @@ export function AdminOrganizationDetail({
 				<Card>
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">
-							<IconPlug className="h-5 w-5" />
+							<Icon name="link-2" className="h-5 w-5" />
 							Integrations ({organization.integrations.length})
 						</CardTitle>
 						<CardDescription>
@@ -445,7 +431,7 @@ export function AdminOrganizationDetail({
 				<Card>
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">
-							<IconActivity className="h-5 w-5" />
+							<Icon name="activity" className="h-5 w-5" />
 							Recent Activity
 						</CardTitle>
 						<CardDescription>
@@ -470,7 +456,7 @@ export function AdminOrganizationDetail({
 											</span>
 										</div>
 										<div className="flex items-center gap-2 text-xs text-muted-foreground">
-											<IconClock className="h-3 w-3" />
+											<Icon name="clock" className="h-3 w-3" />
 											<span>{formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}</span>
 										</div>
 									</div>
@@ -490,7 +476,7 @@ export function AdminOrganizationDetail({
 			<Card>
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2">
-						<IconSettings className="h-5 w-5" />
+						<Icon name="settings" className="h-5 w-5" />
 						Organization Details
 					</CardTitle>
 				</CardHeader>
@@ -498,14 +484,14 @@ export function AdminOrganizationDetail({
 					<div className="grid gap-4 md:grid-cols-2">
 						<div className="space-y-2">
 							<div className="flex items-center gap-2">
-								<IconCalendar className="h-4 w-4 text-muted-foreground" />
+								<Icon name="clock" className="h-4 w-4 text-muted-foreground" />
 								<span className="text-sm font-medium">Created:</span>
 								<span className="text-sm text-muted-foreground">
 									{new Date(organization.createdAt).toLocaleDateString()}
 								</span>
 							</div>
 							<div className="flex items-center gap-2">
-								<IconCalendar className="h-4 w-4 text-muted-foreground" />
+								<Icon name="clock" className="h-4 w-4 text-muted-foreground" />
 								<span className="text-sm font-medium">Updated:</span>
 								<span className="text-sm text-muted-foreground">
 									{new Date(organization.updatedAt).toLocaleDateString()}
@@ -515,7 +501,7 @@ export function AdminOrganizationDetail({
 						<div className="space-y-2">
 							{organization.stripeCustomerId && (
 								<div className="flex items-center gap-2">
-									<IconCreditCard className="h-4 w-4 text-muted-foreground" />
+									<Icon name="credit-card" className="h-4 w-4 text-muted-foreground" />
 									<span className="text-sm font-medium">Stripe Customer:</span>
 									<span className="text-sm text-muted-foreground font-mono">
 										{organization.stripeCustomerId}
@@ -524,7 +510,7 @@ export function AdminOrganizationDetail({
 							)}
 							{organization.stripeSubscriptionId && (
 								<div className="flex items-center gap-2">
-									<IconCreditCard className="h-4 w-4 text-muted-foreground" />
+									<Icon name="credit-card" className="h-4 w-4 text-muted-foreground" />
 									<span className="text-sm font-medium">Subscription:</span>
 									<span className="text-sm text-muted-foreground font-mono">
 										{organization.stripeSubscriptionId}
@@ -541,7 +527,7 @@ export function AdminOrganizationDetail({
 				<Card>
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">
-							<IconMail className="h-5 w-5" />
+							<Icon name="mail" className="h-5 w-5" />
 							Pending Invitations ({organization.invitations.length})
 						</CardTitle>
 						<CardDescription>

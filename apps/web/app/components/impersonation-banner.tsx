@@ -1,6 +1,6 @@
 import { Form } from 'react-router'
-import { IconAlertTriangle, IconX, IconUser } from '@tabler/icons-react'
 import { Button } from '#app/components/ui/button'
+import { Icon } from '#app/components/ui/icon.tsx'
 import { type ImpersonationInfo } from '#app/utils/impersonation.server.ts'
 
 interface ImpersonationBannerProps {
@@ -16,8 +16,8 @@ export function ImpersonationBanner({ impersonationInfo }: ImpersonationBannerPr
 			<div className="flex items-center justify-between max-w-7xl mx-auto">
 				<div className="flex items-center gap-3">
 					<div className="flex items-center gap-2 text-yellow-800">
-						<IconAlertTriangle className="h-5 w-5" />
-						<IconUser className="h-4 w-4" />
+						<Icon name="alert-triangle" className="h-5 w-5" />
+						<Icon name="user" className="h-4 w-4" />
 					</div>
 					<div className="text-sm">
 						<span className="font-medium text-yellow-900">
@@ -38,7 +38,7 @@ export function ImpersonationBanner({ impersonationInfo }: ImpersonationBannerPr
 						size="sm"
 						className="bg-white border-yellow-300 text-yellow-800 hover:bg-yellow-50 hover:border-yellow-400"
 					>
-						<IconX className="h-4 w-4 mr-1" />
+						<Icon name="x" className="h-4 w-4 mr-1" />
 						Stop Impersonation
 					</Button>
 				</Form>

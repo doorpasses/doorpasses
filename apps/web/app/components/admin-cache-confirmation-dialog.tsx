@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useFetcher } from 'react-router'
-import { IconTrash, IconRefresh, IconAlertTriangle } from '@tabler/icons-react'
+import { Badge } from '#app/components/ui/badge'
+import { Icon } from '#app/components/ui/icon.tsx'
 import { Button } from '#app/components/ui/button'
 import {
 	Dialog,
@@ -10,7 +10,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '#app/components/ui/dialog'
-import { Badge } from '#app/components/ui/badge'
 
 interface CacheConfirmationDialogProps {
 	isOpen: boolean
@@ -59,7 +58,7 @@ export function CacheConfirmationDialog({
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2">
-						<IconAlertTriangle className="h-5 w-5 text-destructive" />
+						<Icon name="alert-triangle" className="h-5 w-5 text-destructive" />
 						{title}
 					</DialogTitle>
 					<DialogDescription className="space-y-2">
@@ -109,12 +108,12 @@ export function CacheConfirmationDialog({
 					>
 						{isLoading ? (
 							<>
-								<IconRefresh className="mr-2 h-4 w-4 animate-spin" />
+								<Icon name="loader" className="mr-2 h-4 w-4 animate-spin" />
 								Processing...
 							</>
 						) : (
 							<>
-								<IconTrash className="h-4 w-4" />
+								<Icon name="trash-2" className="h-4 w-4" />
 								{confirmed ? confirmText : 'Confirm'}
 							</>
 						)}

@@ -4,7 +4,6 @@ import { HomeIcon } from '#app/components/icons/home-icon'
 import { UserIcon } from '#app/components/icons/user-icon'
 import { BuildingIcon } from '#app/components/icons/building-icon'
 import { SettingsGearIcon } from '#app/components/icons/settings-gear-icon'
-import { IconShield } from '@tabler/icons-react'
 import { NavMain } from '#app/components/nav-main'
 import { NavUser } from '#app/components/nav-user'
 import {

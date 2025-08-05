@@ -1,3 +1,4 @@
+import { Icon } from '#app/components/ui/icon.tsx'
 import {
 	type ColumnDef,
 	type ColumnFiltersState,
@@ -12,16 +13,6 @@ import {
 } from '@tanstack/react-table'
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
-import { 
-	IconBan,
-	IconChevronDown,
-	IconChevronLeft,
-	IconChevronRight,
-	IconChevronsLeft,
-	IconChevronsRight,
-	IconSearch,
-	IconX,
-} from '@tabler/icons-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '#app/components/ui/avatar'
 import { Badge } from '#app/components/ui/badge'
@@ -167,7 +158,7 @@ const columns: ColumnDef<AdminUser>[] = [
 				const isBanExpired = user.banExpiresAt && new Date(user.banExpiresAt) <= new Date()
 				return (
 					<Badge variant="destructive" className="gap-1">
-						<IconBan className="h-3 w-3" />
+						<Icon name="ban" className="h-3 w-3" />
 						{isBanExpired ? 'Ban Expired' : 'Banned'}
 					</Badge>
 				)
@@ -285,7 +276,7 @@ export function AdminUsersTable({
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-2">
 					<div className="relative flex-1 max-w-sm">
-						<IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+						<Icon name="search" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 						<Input
 							placeholder="Search users..."
 							value={searchQuery}
@@ -317,7 +308,7 @@ export function AdminUsersTable({
 							className="h-8 px-2 lg:px-3"
 						>
 							Reset
-							<IconX className="ml-2 h-4 w-4" />
+							<Icon name="x" className="ml-2 h-4 w-4" />
 						</Button>
 					)}
 				</div>
@@ -326,7 +317,7 @@ export function AdminUsersTable({
 						<DropdownMenuTrigger asChild>
 							<Button variant="outline" size="sm">
 								Columns
-								<IconChevronDown className="ml-2 h-4 w-4" />
+								<Icon name="chevron-down" className="ml-2 h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="w-48">
@@ -453,7 +444,7 @@ export function AdminUsersTable({
 							disabled={pagination.page === 1}
 						>
 							<span className="sr-only">Go to first page</span>
-							<IconChevronsLeft className="h-4 w-4" />
+							<Icon name="chevrons-left" className="h-4 w-4" />
 						</Button>
 						<Button
 							variant="outline"
@@ -462,7 +453,7 @@ export function AdminUsersTable({
 							disabled={pagination.page === 1}
 						>
 							<span className="sr-only">Go to previous page</span>
-							<IconChevronLeft className="h-4 w-4" />
+							<Icon name="chevron-left" className="h-4 w-4" />
 						</Button>
 						<Button
 							variant="outline"
@@ -471,7 +462,7 @@ export function AdminUsersTable({
 							disabled={pagination.page === pagination.totalPages}
 						>
 							<span className="sr-only">Go to next page</span>
-							<IconChevronRight className="h-4 w-4" />
+							<Icon name="chevron-right" className="h-4 w-4" />
 						</Button>
 						<Button
 							variant="outline"
@@ -480,7 +471,7 @@ export function AdminUsersTable({
 							disabled={pagination.page === pagination.totalPages}
 						>
 							<span className="sr-only">Go to last page</span>
-							<IconChevronsRight className="h-4 w-4" />
+							<Icon name="chevrons-right" className="h-4 w-4" />
 						</Button>
 					</div>
 				</div>

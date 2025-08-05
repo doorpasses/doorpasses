@@ -1,5 +1,7 @@
 import { invariantResponse } from '@epic-web/invariant'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
+import { Icon } from '#app/components/ui/icon.tsx'
+import { useState } from 'react'
 import {
 	redirect,
 	Form,
@@ -9,21 +11,20 @@ import {
 	useSubmit,
 	useLoaderData,
 } from 'react-router'
-import { useState, useEffect } from 'react'
-import { 
-	IconDatabase,
-	IconTrash,
-	IconRefresh,
-	IconSearch,
-	IconX,
-	IconChevronDown,
-} from '@tabler/icons-react'
+import { CacheConfirmationDialog } from '#app/components/admin-cache-confirmation-dialog.tsx'
 import { GeneralErrorBoundary } from '#app/components/error-boundary'
-import { Field } from '#app/components/forms.tsx'
-import { Button } from '#app/components/ui/button.tsx'
-import { Input } from '#app/components/ui/input.tsx'
+import { useToast } from '#app/components/toaster.tsx'
 import { Badge } from '#app/components/ui/badge.tsx'
+import { Button } from '#app/components/ui/button.tsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#app/components/ui/card.tsx'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from '#app/components/ui/dropdown-menu.tsx'
+import { Input } from '#app/components/ui/input.tsx'
 import {
 	Select,
 	SelectContent,
@@ -40,15 +41,6 @@ import {
 	TableRow,
 } from '#app/components/ui/table.tsx'
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from '#app/components/ui/dropdown-menu.tsx'
-import { CacheConfirmationDialog } from '#app/components/admin-cache-confirmation-dialog.tsx'
-import { useToast } from '#app/components/toaster.tsx'
-import {
 	cache,
 	lruCache,
 	getAllCacheKeysWithDetails,
@@ -64,7 +56,7 @@ import {
 	getAllInstances,
 	getInstanceInfo,
 } from '#app/utils/litefs.server.ts'
-import { useDebounce, useDoubleCheck } from '#app/utils/misc.tsx'
+import { useDebounce } from '#app/utils/misc.tsx'
 import { requireUserWithRole } from '#app/utils/permissions.server.ts'
 import { getToast, redirectWithToast } from '#app/utils/toast.server.ts'
 import { type Route } from './+types/cache.ts'
@@ -263,7 +255,7 @@ export default function CacheAdminRoute() {
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">SQLite Cache</CardTitle>
-						<IconDatabase className="h-4 w-4 text-muted-foreground" />
+						<Icon name="database" className="h-4 w-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">{data.stats.sqlite.totalKeys}</div>
@@ -275,7 +267,7 @@ export default function CacheAdminRoute() {
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">LRU Cache</CardTitle>
-						<IconDatabase className="h-4 w-4 text-muted-foreground" />
+						<Icon name="database" className="h-4 w-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">{data.stats.lru.totalKeys}</div>
@@ -287,7 +279,7 @@ export default function CacheAdminRoute() {
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">Average Size</CardTitle>
-						<IconDatabase className="h-4 w-4 text-muted-foreground" />
+						<Icon name="database" className="h-4 w-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">
@@ -301,7 +293,7 @@ export default function CacheAdminRoute() {
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">Total Entries</CardTitle>
-						<IconDatabase className="h-4 w-4 text-muted-foreground" />
+						<Icon name="database" className="h-4 w-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">
@@ -318,7 +310,7 @@ export default function CacheAdminRoute() {
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex flex-1 items-center gap-2">
 					<div className="relative flex-1 max-w-sm">
-						<IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+						<Icon name="search" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 						<Input
 							placeholder="Search cache keys..."
 							value={searchQuery}
@@ -359,7 +351,7 @@ export default function CacheAdminRoute() {
 							className="h-8 px-2 lg:px-3"
 						>
 							Reset
-							<IconX className="ml-2 h-4 w-4" />
+							<Icon name="x" className="ml-2 h-4 w-4" />
 						</Button>
 					)}
 				</div>
@@ -446,7 +438,7 @@ export default function CacheAdminRoute() {
 				{totalKeys === 0 && (
 					<Card>
 						<CardContent className="flex flex-col items-center justify-center py-12">
-							<IconDatabase className="h-12 w-12 text-muted-foreground mb-4" />
+							<Icon name="database" className="h-12 w-12 text-muted-foreground mb-4" />
 							<h3 className="text-lg font-semibold mb-2">No cache entries found</h3>
 							<p className="text-muted-foreground text-center">
 								{query 
@@ -580,7 +572,7 @@ function CacheKeyRow({
 	const isDeleting = fetcher.state !== 'idle' && fetcher.formData?.get('cacheKey') === keyInfo.key
 
 	const handleConfirm = () => {
-		fetcher.submit(
+		void fetcher.submit(
 			{
 				actionType: 'deleteKey',
 				cacheKey: keyInfo.key,
@@ -639,9 +631,9 @@ function CacheKeyRow({
 						onClick={() => setShowConfirmDialog(true)}
 					>
 						{isDeleting ? (
-							<IconRefresh className="h-4 w-4 animate-spin" />
+							<Icon name="loader" className="h-4 w-4 animate-spin" />
 						) : (
-							<IconTrash className="h-4 w-4" />
+							<Icon name="trash-2" className="h-4 w-4" />
 						)}
 					</Button>
 				</TableCell>
@@ -671,7 +663,7 @@ function CacheClearButton({ type }: { type: 'sqlite' | 'lru' }) {
 	const isClearing = fetcher.state !== 'idle' && fetcher.formData?.get('type') === type
 
 	const handleConfirm = () => {
-		fetcher.submit(
+		void fetcher.submit(
 			{
 				actionType: 'clearCache',
 				type,
@@ -690,9 +682,9 @@ function CacheClearButton({ type }: { type: 'sqlite' | 'lru' }) {
 				onClick={() => setShowConfirmDialog(true)}
 			>
 				{isClearing ? (
-					<IconRefresh className="h-4 w-4 animate-spin mr-2" />
+					<Icon name="loader" className="h-4 w-4 animate-spin mr-2" />
 				) : (
-					<IconTrash className="h-4 w-4 mr-2" />
+					<Icon name="trash-2" className="h-4 w-4 mr-2" />
 				)}
 				Clear {type.toUpperCase()}
 			</Button>
@@ -749,7 +741,7 @@ function CacheBulkActions({
 	const handleConfirm = () => {
 		if (!pendingAction) return
 
-		fetcher.submit(
+		void fetcher.submit(
 			{
 				actionType: 'bulkDelete',
 				type: pendingAction.type,
@@ -770,25 +762,25 @@ function CacheBulkActions({
 				<DropdownMenuTrigger asChild>
 					<Button variant="outline" size="sm" disabled={isDeleting}>
 						Bulk Actions ({selectedKeys.size})
-						<IconChevronDown className="ml-2 h-4 w-4" />
+						<Icon name="chevron-down" className="ml-2 h-4 w-4" />
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">
 					{sqliteKeys.length > 0 && (
 						<DropdownMenuItem onClick={() => handleBulkDelete('sqlite')}>
-							<IconTrash className="h-4 w-4" />
+							<Icon name="trash-2" className="h-4 w-4" />
 							Delete {sqliteKeys.length} SQLite keys
 						</DropdownMenuItem>
 					)}
 					{lruKeys.length > 0 && (
 						<DropdownMenuItem onClick={() => handleBulkDelete('lru')}>
-							<IconTrash className="h-4 w-4" />
+							<Icon name="trash-2" className="h-4 w-4" />
 							Delete {lruKeys.length} LRU keys
 						</DropdownMenuItem>
 					)}
 					<DropdownMenuSeparator />
 					<DropdownMenuItem onClick={onClearSelection}>
-						<IconX className="h-4 w-4" />
+						<Icon name="x" className="h-4 w-4" />
 						Clear selection
 					</DropdownMenuItem>
 				</DropdownMenuContent>

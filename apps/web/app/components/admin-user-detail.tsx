@@ -1,22 +1,8 @@
+import { Icon } from '#app/components/ui/icon.tsx'
 import { useState } from 'react'
 import { useNavigate, useSubmit } from 'react-router'
-import {
-	IconBan,
-	IconEdit,
-	IconUser,
-	IconMail,
-	IconCalendar,
-	IconBuilding,
-	IconKey,
-	IconShield,
-	IconActivity,
-	IconMessageCircle,
-	IconFileText,
-	IconExternalLink,
-	IconShieldCheck,
-	IconAlertTriangle,
-} from '@tabler/icons-react'
 
+import { BanUserDialog } from '#app/components/admin-ban-user-dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '#app/components/ui/avatar'
 import { Badge } from '#app/components/ui/badge'
 import { Button } from '#app/components/ui/button'
@@ -24,7 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#app/
 import { Separator } from '#app/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '#app/components/ui/tabs'
 import { getUserImgSrc } from '#app/utils/misc.tsx'
-import { BanUserDialog } from '#app/components/admin-ban-user-dialog'
 
 export interface AdminUserDetail {
 	id: string
@@ -126,7 +111,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 		const formData = new FormData()
 		formData.append('intent', 'lift-ban')
 
-		submit(formData, {
+		void submit(formData, {
 			method: 'POST',
 			action: `/admin/users/${user.id}/ban`,
 		})
@@ -134,7 +119,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 
 	const handleImpersonateUser = () => {
 		const formData = new FormData()
-		submit(formData, {
+		void submit(formData, {
 			method: 'POST',
 			action: `/admin/users/${user.id}/impersonate`,
 		})
@@ -184,7 +169,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 								<p className="text-muted-foreground">{user.email}</p>
 								{user.isBanned && user.banReason && (
 									<p className="text-sm text-destructive mt-1">
-										<IconAlertTriangle className="h-4 w-4 inline mr-1" />
+										<Icon name="alert-triangle" className="h-4 w-4 inline mr-1" />
 										{user.banReason}
 									</p>
 								)}
@@ -198,7 +183,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 							onClick={handleEditUser}
 							className="gap-2"
 						>
-							<IconEdit className="h-4 w-4" />
+							<Icon name="edit" className="h-4 w-4" />
 							Edit
 						</Button>
 						<Button
@@ -208,7 +193,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 							className="gap-2"
 							disabled={user.isBanned && !isBanExpired}
 						>
-							<IconUser className="h-4 w-4" />
+							<Icon name="user" className="h-4 w-4" />
 							Impersonate
 						</Button>
 						{user.isBanned ? (
@@ -218,7 +203,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 								onClick={handleLiftBan}
 								className="gap-2"
 							>
-								<IconShieldCheck className="h-4 w-4" />
+								<Icon name="shield-check" className="h-4 w-4" />
 								Lift Ban
 							</Button>
 						) : (
@@ -228,7 +213,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 								onClick={handleBanUser}
 								className="gap-2"
 							>
-								<IconBan className="h-4 w-4" />
+								<Icon name="ban" className="h-4 w-4" />
 								Ban User
 							</Button>
 						)}
@@ -240,7 +225,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 					<Card>
 						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 							<CardTitle className="text-sm font-medium">Organizations</CardTitle>
-							<IconBuilding className="h-4 w-4 text-muted-foreground" />
+							<Icon name="building" className="h-4 w-4 text-muted-foreground" />
 						</CardHeader>
 						<CardContent>
 							<div className="text-2xl font-bold">{user.organizations.length}</div>
@@ -252,7 +237,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 					<Card>
 						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 							<CardTitle className="text-sm font-medium">Active Sessions</CardTitle>
-							<IconKey className="h-4 w-4 text-muted-foreground" />
+							<Icon name="key" className="h-4 w-4 text-muted-foreground" />
 						</CardHeader>
 						<CardContent>
 							<div className="text-2xl font-bold">{activeSessions.length}</div>
@@ -264,7 +249,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 					<Card>
 						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 							<CardTitle className="text-sm font-medium">Notes Created</CardTitle>
-							<IconFileText className="h-4 w-4 text-muted-foreground" />
+							<Icon name="file-text" className="h-4 w-4 text-muted-foreground" />
 						</CardHeader>
 						<CardContent>
 							<div className="text-2xl font-bold">{user.notes.length}</div>
@@ -276,7 +261,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 					<Card>
 						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 							<CardTitle className="text-sm font-medium">Security</CardTitle>
-							<IconShield className="h-4 w-4 text-muted-foreground" />
+							<Icon name="shield" className="h-4 w-4 text-muted-foreground" />
 						</CardHeader>
 						<CardContent>
 							<div className="text-2xl font-bold">
@@ -303,7 +288,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 							<Card className="border-destructive">
 								<CardHeader>
 									<CardTitle className="flex items-center gap-2 text-destructive">
-										<IconBan className="h-5 w-5" />
+										<Icon name="ban" className="h-5 w-5" />
 										Ban Information
 									</CardTitle>
 								</CardHeader>
@@ -350,29 +335,29 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 							<Card>
 								<CardHeader>
 									<CardTitle className="flex items-center gap-2">
-										<IconUser className="h-5 w-5" />
+										<Icon name="user" className="h-5 w-5" />
 										User Information
 									</CardTitle>
 								</CardHeader>
 								<CardContent className="space-y-4">
 									<div className="grid gap-2">
 										<div className="flex items-center gap-2 text-sm">
-											<IconMail className="h-4 w-4 text-muted-foreground" />
+											<Icon name="mail" className="h-4 w-4 text-muted-foreground" />
 											<span className="font-medium">Email:</span>
 											<span>{user.email}</span>
 										</div>
 										<div className="flex items-center gap-2 text-sm">
-											<IconUser className="h-4 w-4 text-muted-foreground" />
+											<Icon name="user" className="h-4 w-4 text-muted-foreground" />
 											<span className="font-medium">Username:</span>
 											<span className="font-mono">{user.username}</span>
 										</div>
 										<div className="flex items-center gap-2 text-sm">
-											<IconCalendar className="h-4 w-4 text-muted-foreground" />
+											<Icon name="calendar" className="h-4 w-4 text-muted-foreground" />
 											<span className="font-medium">Created:</span>
 											<span>{new Date(user.createdAt).toLocaleDateString()}</span>
 										</div>
 										<div className="flex items-center gap-2 text-sm">
-											<IconCalendar className="h-4 w-4 text-muted-foreground" />
+											<Icon name="calendar" className="h-4 w-4 text-muted-foreground" />
 											<span className="font-medium">Updated:</span>
 											<span>{new Date(user.updatedAt).toLocaleDateString()}</span>
 										</div>
@@ -383,7 +368,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 							<Card>
 								<CardHeader>
 									<CardTitle className="flex items-center gap-2">
-										<IconShield className="h-5 w-5" />
+										<Icon name="shield" className="h-5 w-5" />
 										Roles & Permissions
 									</CardTitle>
 								</CardHeader>
@@ -455,7 +440,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 														size="sm"
 														onClick={() => navigate(`/admin/organizations/${membership.organization.id}`)}
 													>
-														<IconExternalLink className="h-4 w-4" />
+														<Icon name="external-link" className="h-4 w-4" />
 													</Button>
 												</div>
 											</div>
@@ -475,7 +460,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 							<Card>
 								<CardHeader>
 									<CardTitle className="flex items-center gap-2">
-										<IconMessageCircle className="h-5 w-5" />
+										<Icon name="message-circle" className="h-5 w-5" />
 										Recent Comments
 									</CardTitle>
 								</CardHeader>
@@ -502,7 +487,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 							<Card>
 								<CardHeader>
 									<CardTitle className="flex items-center gap-2">
-										<IconActivity className="h-5 w-5" />
+										<Icon name="activity" className="h-5 w-5" />
 										Recent Activity
 									</CardTitle>
 								</CardHeader>
@@ -530,7 +515,7 @@ export function UserDetailView({ user, recentActivity }: UserDetailViewProps) {
 						<Card>
 							<CardHeader>
 								<CardTitle className="flex items-center gap-2">
-									<IconFileText className="h-5 w-5" />
+									<Icon name="file-text" className="h-5 w-5" />
 									Recent Notes
 								</CardTitle>
 							</CardHeader>
