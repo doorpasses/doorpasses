@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useSpinDelay } from 'spin-delay'
 import { cn } from '#app/utils/misc.tsx'
 import { Button, type ButtonVariant } from './button.tsx'
@@ -15,59 +16,123 @@ export const StatusButton = ({
 	className,
 	children,
 	spinDelay,
+	pendingText,
+	successText,
+	errorText,
+	successDuration = 1000,
+	onStatusChange,
 	...props
 }: React.ComponentProps<'button'> &
 	ButtonVariant & {
 		status: 'pending' | 'success' | 'error' | 'idle'
 		message?: string | null
 		spinDelay?: Parameters<typeof useSpinDelay>[1]
+		pendingText?: string
+		successText?: string
+		errorText?: string
+		successDuration?: number
+		onStatusChange?: (status: 'idle') => void
 	}) => {
-	const delayedPending = useSpinDelay(status === 'pending', {
+	const [internalStatus, setInternalStatus] = useState<typeof status>(status)
+
+	// Sync internal status with prop status
+	useEffect(() => {
+		setInternalStatus(status)
+	}, [status])
+
+	// Auto-reset success state after specified duration
+	useEffect(() => {
+		if (internalStatus === 'success') {
+			const timer = setTimeout(() => {
+				setInternalStatus('idle')
+				onStatusChange?.('idle')
+			}, successDuration)
+
+			return () => clearTimeout(timer)
+		}
+	}, [internalStatus, successDuration, onStatusChange])
+
+	const delayedPending = useSpinDelay(internalStatus === 'pending', {
 		delay: 400,
 		minDuration: 300,
 		...spinDelay,
 	})
-	const companion = {
-		pending: delayedPending ? (
-			<div
-				role="status"
-				className="inline-flex size-6 items-center justify-center"
-			>
-				<Icon name="update" className="animate-spin" title="loading" />
-			</div>
-		) : null,
-		success: (
-			<div
-				role="status"
-				className="inline-flex size-6 items-center justify-center"
-			>
-				<Icon name="check" title="success" />
-			</div>
-		),
-		error: (
-			<div
-				role="status"
-				className="bg-destructive inline-flex size-6 items-center justify-center rounded-full"
-			>
-				<Icon name="x" className="text-destructive-foreground" title="error" />
-			</div>
-		),
-		idle: null,
-	}[status]
 
-	return (
-		<Button className={cn('flex justify-center gap-4', className)} {...props}>
-			<div>{children}</div>
-			{message ? (
-				<TooltipProvider>
-					<Tooltip>
-						<TooltipTrigger>{companion}</TooltipTrigger>
-						<TooltipContent>{message}</TooltipContent>
-					</Tooltip>
-				</TooltipProvider>
-			) : (
-				companion
-			)}
+	const getButtonContent = () => {
+		switch (internalStatus) {
+			case 'pending':
+				return delayedPending ? (
+					<>
+						<Icon name="loader" className="h-4 w-4 animate-spin" />
+						{pendingText || children}
+					</>
+				) : (
+					children
+				)
+			case 'success':
+				return (
+					<>
+						<Icon name="check" className="h-4 w-4" />
+						{successText || children}
+					</>
+				)
+			case 'error':
+				return (
+					<>
+						<Icon name="x" className="h-4 w-4" />
+						{errorText || children}
+					</>
+				)
+			default:
+				return children
+		}
+	}
+
+	const getButtonClassName = () => {
+		const baseClasses = 'transition-all duration-200 flex justify-center items-center'
+
+		switch (internalStatus) {
+			case 'success':
+				return cn(
+					baseClasses,
+					'bg-green-600 hover:bg-green-700 text-white hover:text-white border-green-600',
+					className
+				)
+			case 'error':
+				return cn(
+					baseClasses,
+					'bg-destructive hover:bg-destructive/90 text-white hover:text-white border-destructive',
+					className
+				)
+			default:
+				return cn(baseClasses, className)
+		}
+	}
+
+	const buttonContent = getButtonContent()
+
+	return message ? (
+		<TooltipProvider>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<Button
+						className={getButtonClassName()}
+						disabled={internalStatus === 'pending'}
+						{...props}
+					>
+						{buttonContent}
+					</Button>
+				</TooltipTrigger>
+				<TooltipContent>{message}</TooltipContent>
+			</Tooltip>
+		</TooltipProvider>
+	) : (
+		<Button
+			className={getButtonClassName()}
+			disabled={internalStatus === 'pending'}
+			{...props}
+		>
+			{buttonContent}
 		</Button>
 	)
 }
