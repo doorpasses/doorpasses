@@ -207,7 +207,7 @@ function ConnectedChannelItem({
 				status={isDisconnecting ? 'pending' : 'idle'}
 				className="text-destructive hover:text-destructive"
 			>
-				<Icon name="cross-1" className="h-3 w-3" />
+				<Icon name="x" className="h-3 w-3" />
 			</StatusButton>
 		</div>
 	)
@@ -334,7 +334,7 @@ function AddConnectionForm({
 							) : availableChannels.length === 0 ? (
 								<SelectItem value="no-channels" disabled>
 									<div className="flex items-center space-x-2">
-										<Icon name="cross-1" className="h-3 w-3" />
+										<Icon name="x" className="h-3 w-3" />
 										<span>No channels available</span>
 									</div>
 								</SelectItem>

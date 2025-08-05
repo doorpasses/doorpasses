@@ -217,7 +217,7 @@ export function ShareNoteButton({
 													className="hover:bg-destructive hover:text-destructive-foreground h-4 w-4 p-0"
 													onClick={() => removeMember(user.id)}
 												>
-													<Icon name="cross-1" className="h-3 w-3" />
+													<Icon name="x" className="h-3 w-3" />
 												</Button>
 											</Badge>
 										))}
@@ -230,7 +230,7 @@ export function ShareNoteButton({
 								<Label className="text-sm font-medium">Add Members</Label>
 								<div className="relative">
 									<Icon
-										name="magnifying-glass"
+										name="search"
 										className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform"
 									/>
 									<Input

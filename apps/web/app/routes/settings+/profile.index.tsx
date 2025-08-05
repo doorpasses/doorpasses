@@ -132,7 +132,7 @@ export default function EditUserProfile({ loaderData }: Route.ComponentProps) {
 			<div className="col-span-full flex flex-col gap-6">
 				<div>
 					<Link to="change-email">
-						<Icon name="envelope-closed">
+						<Icon name="mail">
 							Change email from {loaderData.user.email}
 						</Icon>
 					</Link>

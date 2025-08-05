@@ -127,7 +127,7 @@ export function NoteEditor({
 												})}
 											>
 												<span aria-hidden>
-													<Icon name="cross-1" />
+													<Icon name="x" />
 												</span>{' '}
 												<span className="sr-only">
 													Remove image {index + 1}

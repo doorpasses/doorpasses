@@ -138,7 +138,7 @@ export function OnboardingChecklist({
 						onClick={handleHide}
 						className="h-8 w-8 p-0"
 					>
-						<Icon name="cross-1" className="h-4 w-4" />
+						<Icon name="x" className="h-4 w-4" />
 					</Button>
 				</div>
 			</div>

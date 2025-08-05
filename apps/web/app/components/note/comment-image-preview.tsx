@@ -76,7 +76,7 @@ export function CommentImagePreview({
 						className="absolute -top-1 -right-1 h-5 w-5 p-0 opacity-0 transition-opacity group-hover:opacity-100"
 						onClick={() => onRemove(index)}
 					>
-						<Icon name="cross-1" className="h-3 w-3" />
+						<Icon name="x" className="h-3 w-3" />
 					</Button>
 				</div>
 			))}

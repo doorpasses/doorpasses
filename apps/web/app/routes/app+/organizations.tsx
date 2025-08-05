@@ -163,7 +163,7 @@ export default function OrganizationsPage() {
 					<div className="mt-4 flex items-center gap-3">
 						<div className="relative flex-1">
 							<Icon
-								name="magnifying-glass"
+								name="search"
 								className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform"
 							/>
 							<Input
@@ -188,7 +188,7 @@ export default function OrganizationsPage() {
 					<Card className="mb-6">
 						<CardHeader>
 							<CardTitle className="flex items-center gap-2">
-								<Icon name="envelope-closed" className="h-5 w-5" />
+								<Icon name="mail" className="h-5 w-5" />
 								Pending Invitations
 							</CardTitle>
 							<p className="text-muted-foreground text-sm">

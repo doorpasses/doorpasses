@@ -50,7 +50,7 @@ export const StatusButton = ({
 				className="bg-destructive inline-flex size-6 items-center justify-center rounded-full"
 			>
 				<Icon
-					name="cross-1"
+					name="x"
 					className="text-destructive-foreground"
 					title="error"
 				/>

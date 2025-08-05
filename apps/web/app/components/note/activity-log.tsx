@@ -87,7 +87,7 @@ function formatActivityMessage(log: {
 function getActivityIcon(action: string) {
 	switch (action) {
 		case 'viewed':
-			return 'magnifying-glass'
+			return 'search'
 		case 'created':
 			return 'plus'
 		case 'updated':
@@ -104,7 +104,7 @@ function getActivityIcon(action: string) {
 			return 'link-2'
 		case 'comment_added':
 		case 'comment_deleted':
-			return 'envelope-closed'
+			return 'mail'
 		default:
 			return 'clock'
 	}

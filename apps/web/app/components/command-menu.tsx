@@ -147,7 +147,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 				<CommandGroup heading="Settings">
 					<CommandItem asChild>
 						<Link to="/app/profile" onClick={() => onOpenChange(false)}>
-							<Icon name="person" />
+							<Icon name="user" />
 							<span>Account settings</span>
 							<CommandShortcut>⌘P</CommandShortcut>
 						</Link>
@@ -167,7 +167,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 							to={`/app/${orgSlug}/settings`}
 							onClick={() => onOpenChange(false)}
 						>
-							<Icon name="gear" />
+							<Icon name="settings" />
 							<span>Settings</span>
 							<CommandShortcut>⌘S</CommandShortcut>
 						</Link>

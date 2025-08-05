@@ -188,7 +188,7 @@ function Connection({
 											: (deleteFetcher.data?.status ?? 'idle')
 									}
 								>
-									<Icon name="cross-1" />
+									<Icon name="x" />
 								</StatusButton>
 							</TooltipTrigger>
 							<TooltipContent>Disconnect this account</TooltipContent>
@@ -199,7 +199,7 @@ function Connection({
 				<TooltipProvider>
 					<Tooltip open={infoOpen} onOpenChange={setInfoOpen}>
 						<TooltipTrigger onClick={() => setInfoOpen(true)}>
-							<Icon name="question-mark-circled"></Icon>
+							<Icon name="help-circle"></Icon>
 						</TooltipTrigger>
 						<TooltipContent>
 							You cannot delete your last connection unless you have a password.

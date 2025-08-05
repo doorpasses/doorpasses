@@ -85,10 +85,10 @@ export function OrganizationMembers({
 										className="text-xs"
 									>
 										{member.role === 'admin' && (
-											<Icon name="gear" className="mr-1 h-3 w-3" />
+											<Icon name="settings" className="mr-1 h-3 w-3" />
 										)}
 										{member.role === 'member' && (
-											<Icon name="person" className="mr-1 h-3 w-3" />
+											<Icon name="user" className="mr-1 h-3 w-3" />
 										)}
 										{member.role}
 									</Badge>

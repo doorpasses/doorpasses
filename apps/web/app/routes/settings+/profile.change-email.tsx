@@ -21,7 +21,7 @@ import { EmailChangeEmail } from '@repo/email'
 import { type BreadcrumbHandle } from './profile.tsx'
 
 export const handle: BreadcrumbHandle & SEOHandle = {
-	breadcrumb: <Icon name="envelope-closed">Change Email</Icon>,
+	breadcrumb: <Icon name="mail">Change Email</Icon>,
 	getSitemapEntries: () => null,
 }
 

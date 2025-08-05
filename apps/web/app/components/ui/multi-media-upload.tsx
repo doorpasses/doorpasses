@@ -330,7 +330,7 @@ function MediaPreview({
 						)}
 						{existingVideo?.status === 'failed' && (
 							<div className="absolute inset-0 flex items-center justify-center bg-red-500/50">
-								<Icon name="cross-1" className="h-6 w-6 text-white" />
+								<Icon name="x" className="h-6 w-6 text-white" />
 							</div>
 						)}
 					</div>
@@ -365,7 +365,7 @@ function MediaPreview({
 					onClick={onRemove}
 					disabled={disabled}
 				>
-					<Icon name="cross-1" className="h-4 w-4" />
+					<Icon name="x" className="h-4 w-4" />
 				</Button>
 			</div>
 		</fieldset>

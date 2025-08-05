@@ -37,14 +37,14 @@ export function NotFoundPage() {
 									className="bg-background text-muted-foreground ring-border relative z-10 hidden size-14 shrink-0 items-center justify-center rounded-xl shadow-sm ring-1 ring-inset md:flex"
 									data-featured-icon="true"
 								>
-									<Icon name="magnifying-glass" />
+									<Icon name="search" />
 								</div>
 								{/* Small Icon */}
 								<div
 									className="bg-background text-muted-foreground ring-border relative z-10 flex size-12 shrink-0 items-center justify-center rounded-lg shadow-sm ring-1 ring-inset md:hidden"
 									data-featured-icon="true"
 								>
-									<Icon name="magnifying-glass" />
+									<Icon name="search" />
 								</div>
 								{/* Large Grid SVG */}
 								<svg

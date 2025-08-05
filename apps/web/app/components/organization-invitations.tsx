@@ -171,7 +171,7 @@ export function OrganizationInvitations({
 								<Form method="POST">
 									<input type="hidden" name="intent" value="deactivate-invite-link" />
 									<Button type="submit" variant="outline">
-										<Icon name="cross-1" className="mr-2 h-4 w-4" />
+										<Icon name="x" className="mr-2 h-4 w-4" />
 										Disable
 									</Button>
 								</Form>
@@ -379,7 +379,7 @@ function InviteFieldset({
 								index,
 							})}
 						>
-							<Icon name="trash" className="h-4 w-4" />
+							<Icon name="trash-2" className="h-4 w-4" />
 						</Button>
 					)}
 				</div>

@@ -72,7 +72,7 @@ export function NotesTable({ notes }: { notes: Note[] }) {
 					<div className="flex justify-end gap-2">
 						<Button variant="ghost" size="icon" asChild>
 							<Link to={`${note.id}`} onClick={(e) => e.stopPropagation()}>
-								<Icon name="magnifying-glass" className="size-4" />
+								<Icon name="search" className="size-4" />
 							</Link>
 						</Button>
 						<Button variant="ghost" size="icon" asChild>

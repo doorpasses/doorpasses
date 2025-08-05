@@ -310,7 +310,7 @@ function ImagePreview({
 					onClick={onRemove}
 					disabled={disabled}
 				>
-					<Icon name="cross-1" className="h-4 w-4" />
+					<Icon name="x" className="h-4 w-4" />
 				</Button>
 			</div>
 		</fieldset>
