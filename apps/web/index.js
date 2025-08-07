@@ -16,7 +16,7 @@ sourceMapSupport.install({
 	},
 })
 
-if (process.env.MOCKS === 'true') {
+if (process.env.MOCKS === 'true' && process.env.DISABLE_STRIPE_MOCKS !== 'true') {
 	await import('./tests/mocks/index.ts')
 }
 

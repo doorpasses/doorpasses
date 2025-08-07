@@ -1,4 +1,3 @@
-import https from 'https'
 import { type Organization } from '@prisma/client'
 import { redirect } from 'react-router'
 import Stripe from 'stripe'
@@ -18,23 +17,12 @@ if (!process.env.STRIPE_SECRET_KEY.startsWith('sk_')) {
 	throw new Error(errorMsg)
 }
 
-// Create custom HTTP agent that matches working raw HTTP configuration
-const customAgent = new https.Agent({
-	keepAlive: true,
-	keepAliveMsecs: 1000,
-	maxSockets: 50,
-	maxFreeSockets: 10,
-	timeout: 10000,
-	rejectUnauthorized: true, // Keep SSL verification
-})
-
 let stripe: Stripe
 try {
 	stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 		apiVersion: '2024-06-20',
-		timeout: 10000, // 10 second timeout
+		timeout: 10000, // 10 second timeout (same as test)
 		maxNetworkRetries: 2,
-		httpAgent: customAgent, // Use custom agent
 	})
 } catch (error) {
 	throw error
@@ -44,14 +32,15 @@ export { stripe }
 
 export async function getPlansAndPrices() {
 	try {
-		const prices = await getStripePrices()
 		const products = await getStripeProducts()
+		const prices = await getStripePrices()
 
 		const basePlan = products.find((product) => product.name === 'Base')
 		const plusPlan = products.find((product) => product.name === 'Plus')
 
-		const basePrice = prices.find((price) => price.productId === basePlan?.id)
-		const plusPrice = prices.find((price) => price.productId === plusPlan?.id)
+		// Fetch the specific prices using the defaultPriceId from products
+		const basePrice = prices.find((price) => price.id === basePlan?.defaultPriceId)
+		let plusPrice = prices.find((price) => price.id === plusPlan?.defaultPriceId)
 
 		const result = {
 			plans: { base: basePlan, plus: plusPlan },
@@ -59,7 +48,9 @@ export async function getPlansAndPrices() {
 		}
 
 		return result
-	} catch {
+	} catch (error) {
+		console.error('Error in getPlansAndPrices:', error)
+		
 		// Return fallback data to prevent the app from hanging
 		return {
 			plans: { base: undefined, plus: undefined },
@@ -151,7 +142,7 @@ export async function createCheckoutSession(
 		success_url: `${process.env.BASE_URL}/api/stripe/checkout?session_id={CHECKOUT_SESSION_ID}&organizationId=${organization.id}`,
 		cancel_url:
 			from === 'checkout'
-				? `${process.env.BASE_URL}/app/${organization.slug}/settings`
+				? `${process.env.BASE_URL}/app/${organization.slug}/settings/billing`
 				: `${process.env.BASE_URL}/pricing`,
 		customer: organization.stripeCustomerId || customer?.id || undefined,
 		client_reference_id: userId.toString(),
@@ -309,56 +300,53 @@ export async function handleTrialEnd(subscription: Stripe.Subscription) {
 }
 
 export async function getStripePrices() {
+	
 	try {
-		const timeoutPromise = new Promise((_, reject) =>
-			setTimeout(
-				() => reject(new Error('Stripe API call timed out after 5 seconds')),
-				5000,
-			),
-		)
-
-		// Verify account exists by retrieving it
-		await Promise.race([stripe.accounts.retrieve(), timeoutPromise])
+		const prices = await stripe.prices.list({
+			active: true,
+			limit: 100,
+			type: 'recurring',
+		})
+				
+		const mappedPrices = prices.data.map((price) => ({
+			id: price.id,
+			productId: typeof price.product === 'string' ? price.product : price.product.id,
+			unitAmount: price.unit_amount,
+			currency: price.currency,
+			interval: price.recurring?.interval,
+			trialPeriodDays: price.recurring?.trial_period_days,
+		}))
+		
+		return mappedPrices
 	} catch (error: any) {
+		console.error('getStripePrices: Failed to fetch prices:', error)
 		throw new Error(
-			`Invalid Stripe API key or connectivity issue: ${error?.message || error}`,
+			`Failed to fetch Stripe prices: ${error?.message || error}`,
 		)
 	}
-
-	const prices = await stripe.prices.list({
-		expand: ['data.product'],
-		active: true,
-		type: 'recurring',
-		limit: 10, // Add limit to prevent large responses
-	})
-
-	return prices.data.map((price) => ({
-		id: price.id,
-		productId:
-			typeof price.product === 'string' ? price.product : price.product.id,
-		unitAmount: price.unit_amount,
-		currency: price.currency,
-		interval: price.recurring?.interval,
-		trialPeriodDays: price.recurring?.trial_period_days,
-	}))
 }
 
-export async function getStripeProducts() {
-	const products = await stripe.products.list({
-		active: true,
-		expand: ['data.default_price'],
-		limit: 10, // Add limit to prevent large responses
-	})
+export async function getStripeProducts() {	
+	try {
+		const products = await stripe.products.list({
+			active: true,
+			limit: 10,
+		})
 
-	return products.data.map((product) => ({
-		id: product.id,
-		name: product.name,
-		description: product.description,
-		defaultPriceId:
-			typeof product.default_price === 'string'
-				? product.default_price
-				: product.default_price?.id,
-	}))
+		const mappedProducts = products.data.map((product) => ({
+			id: product.id,
+			name: product.name,
+			description: product.description,
+			defaultPriceId: product.default_price as string | undefined,
+		}))
+		
+		return mappedProducts
+	} catch (error: any) {
+		console.error('getStripeProducts: Failed to fetch products:', error)
+		throw new Error(
+			`Failed to fetch Stripe products: ${error?.message || error}`,
+		)
+	}
 }
 
 export async function getTrialStatus(userId: string, organizationSlug: string) {
