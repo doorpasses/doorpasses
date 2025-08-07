@@ -80,6 +80,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
 	const formData = await request.formData()
 	const intent = formData.get('intent')
+	const priceId = formData.get('priceId') as string | null
 
 	if (intent === 'upgrade') {
 		const organizationWithBilling = await prisma.organization.findUnique({
@@ -105,7 +106,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			return Response.json({ error: 'Organization not found' }, { status: 404 })
 		}
 
-		return checkoutAction(request, organizationWithBilling)
+		return checkoutAction(request, organizationWithBilling, priceId ?? undefined)
 	}
 
 	if (intent === 'customer-portal') {

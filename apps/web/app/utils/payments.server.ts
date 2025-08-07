@@ -469,9 +469,15 @@ export const updateSeatQuantity = async (organizationId: string) => {
 export const checkoutAction = async (
 	request: Request,
 	organization: Organization,
+	priceIdArg?: string,
 ) => {
-	const formData = await request.formData()
-	const priceId = formData.get('priceId') as string
+	let priceId = priceIdArg
+	if (!priceId) {
+		const formData = await request.formData()
+		priceId = formData.get('priceId') as string | null
+	}
+	if (!priceId) throw new Response('priceId is required', { status: 400 })
+
 	return createCheckoutSession(request, {
 		organization,
 		priceId,
