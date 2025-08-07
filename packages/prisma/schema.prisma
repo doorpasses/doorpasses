@@ -45,13 +45,13 @@ model User {
 }
 
 model Note {
-  id        String         @id @default(cuid())
+  id        String      @id @default(cuid())
   title     String
   content   String
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
   ownerId   String
-  owner     User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner     User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   images    NoteImage[]
 
   @@index([ownerId])
@@ -194,6 +194,7 @@ model Organization {
   invitations            OrganizationInvitation[]
   inviteLinks            OrganizationInviteLink[]
   notes                  OrganizationNote[]
+  noteStatuses           OrganizationNoteStatus[]
   users                  UserOrganization[]
 }
 
@@ -280,6 +281,9 @@ model OrganizationNote {
   updatedAt              DateTime                    @updatedAt
   organizationId         String
   createdById            String
+  statusId               String? // Kanban column FK, null = Uncategorized
+  status                 OrganizationNoteStatus?     @relation(fields: [statusId], references: [id], onDelete: SetNull)
+  position               Int? // Ordering within status
   noteAccess             NoteAccess[]
   activityLogs           NoteActivityLog[]
   comments               NoteComment[]
@@ -292,15 +296,16 @@ model OrganizationNote {
   @@index([organizationId])
   @@index([createdById])
   @@index([organizationId, updatedAt])
+  @@index([organizationId, statusId, position])
 }
 
 model OrganizationNoteUpload {
   id           String           @id @default(cuid())
-  type         String           // "image" or "video"
+  type         String // "image" or "video"
   altText      String?
   objectKey    String
-  thumbnailKey String?          // Only used for videos
-  duration     Int?             // Only used for videos
+  thumbnailKey String? // Only used for videos
+  duration     Int? // Only used for videos
   fileSize     Int?
   mimeType     String?
   status       String           @default("completed") // processing, completed, failed (mainly for videos)
@@ -504,4 +509,19 @@ model OrganizationNoteFavorite {
   @@unique([userId, noteId])
   @@index([userId])
   @@index([noteId])
+}
+
+model OrganizationNoteStatus {
+  id                String             @id @default(cuid())
+  organizationId    String
+  name              String
+  position          Int?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationNotes OrganizationNote[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@index([organizationId, position])
 }

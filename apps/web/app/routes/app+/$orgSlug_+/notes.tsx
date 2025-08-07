@@ -5,7 +5,9 @@ import {
 	Link,
 	useLocation,
 	useNavigate,
+	useFetcher,
 	type LoaderFunctionArgs,
+	type ActionFunctionArgs,
 } from 'react-router'
 import { EmptyState } from '#app/components/empty-state.tsx'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
@@ -16,6 +18,7 @@ import { Sheet, SheetContent } from '#app/components/ui/sheet.tsx'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { userHasOrgAccess } from '#app/utils/organizations.server.ts'
+import { getNotesViewMode, setNotesViewMode } from '#app/utils/notes-view-cookie.server.ts'
 import { NotesCards } from './notes-cards.tsx'
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
@@ -48,6 +51,9 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 			updatedAt: true,
 			isPublic: true,
 			createdById: true,
+			statusId: true,
+			status: { select: { id: true, name: true } },
+			position: true,
 			uploads: {
 				select: {
 					id: true,
@@ -78,22 +84,62 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 				{ noteAccess: { some: { userId } } },
 			],
 		},
-		orderBy: {
-			updatedAt: 'desc',
-		},
+		orderBy: [
+			{ statusId: 'asc' },
+			{ position: 'asc' },
+			{ updatedAt: 'desc' },
+		],
 	})
 
 	const formattedNotes = notes.map((note) => ({
 		...note,
 		createdByName:
 			note.createdBy?.name || note.createdBy?.username || 'Unknown',
+		statusId: note.statusId ?? null,
+		statusName: note.status?.name ?? null,
+		position: note.position ?? null,
+		uploads: note.uploads.map(upload => ({
+			...upload,
+			thumbnailKey: upload.thumbnailKey ?? null,
+			status: upload.status ?? 'pending',
+		})),
 	}))
+
+	const statuses = await prisma.organizationNoteStatus.findMany({
+		where: { organizationId: organization.id },
+		orderBy: { position: 'asc' },
+		select: { id: true, name: true, position: true }
+	})
+
+	// Get the current view mode from cookie
+	const viewMode = await getNotesViewMode(request)
 
 	return {
 		organization,
 		notes: formattedNotes,
+		statuses,
+		viewMode,
 	}
 }
+
+export async function action({ request }: ActionFunctionArgs) {
+	const formData = await request.formData()
+	const viewMode = formData.get('viewMode') as 'cards' | 'kanban'
+
+	if (viewMode !== 'cards' && viewMode !== 'kanban') {
+		throw new Response('Invalid view mode', { status: 400 })
+	}
+
+	return new Response(null, {
+		headers: {
+			'Set-Cookie': await setNotesViewMode(viewMode),
+		},
+	})
+}
+
+import { Tabs, TabsList, TabsTrigger } from '#app/components/ui/tabs.tsx'
+import { Tooltip, TooltipTrigger, TooltipContent } from '#app/components/ui/tooltip.tsx'
+import { NotesKanbanBoard } from './notes-kanban-board.tsx'
 
 export default function NotesRoute({
 	loaderData,
@@ -113,19 +159,18 @@ export default function NotesRoute({
 			updatedAt: string
 			isPublic: boolean
 			createdById: string
-			images: Array<{
+			statusId: string | null
+			statusName: string | null
+			position: number | null
+			uploads: Array<{
 				id: string
-				altText: string | null
-				objectKey: string
-			}>
-			videos: Array<{
-				id: string
+				type: string
 				altText: string | null
 				objectKey: string
 				thumbnailKey: string | null
 				status: string
 			}>
-			createdBy: {
+			createdBy?: {
 				name: string | null
 				username: string | null
 			} | null
@@ -134,12 +179,20 @@ export default function NotesRoute({
 			}>
 			createdByName: string
 		}>
+		statuses: Array<{
+			id: string
+			name: string
+			position: number | null
+		}>
+		viewMode: 'cards' | 'kanban'
 	}
 }) {
-	const orgName = loaderData.organization.name
 	const location = useLocation()
 	const [hasOutlet, setHasOutlet] = useState(false)
 	const navigate = useNavigate()
+	const fetcher = useFetcher()
+
+	const viewMode = loaderData.viewMode
 
 	// Simple check: if we're not on the base notes route, show outlet
 	useEffect(() => {
@@ -154,16 +207,60 @@ export default function NotesRoute({
 					title={`Notes`}
 					description="You can create notes for your organization here."
 				/>
-				<Button variant="default" asChild>
-					<Link to="new">
-						<Icon name="plus">New Note</Icon>
-					</Link>
-				</Button>
+				<div className="flex items-center gap-4">
+					<Tabs
+						value={viewMode}
+						onValueChange={val => {
+							if (val === 'cards' || val === 'kanban') {
+								fetcher.submit(
+									{ viewMode: val },
+									{ method: 'POST' }
+								)
+							}
+						}}
+					>
+						<TabsList>
+							<TabsTrigger value="cards" aria-label="Cards view">
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<span>
+											<Icon name="blocks" />
+										</span>
+									</TooltipTrigger>
+									<TooltipContent>Cards</TooltipContent>
+								</Tooltip>
+							</TabsTrigger>
+							<TabsTrigger value="kanban" aria-label="Kanban board">
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<span>
+											<Icon name="menu" />
+										</span>
+									</TooltipTrigger>
+									<TooltipContent>Kanban</TooltipContent>
+								</Tooltip>
+							</TabsTrigger>
+						</TabsList>
+					</Tabs>
+					<Button variant="default" asChild>
+						<Link to="new">
+							<Icon name="plus">New Note</Icon>
+						</Link>
+					</Button>
+				</div>
 			</div>
 
 			<div className="flex-grow overflow-auto pb-4">
 				{loaderData.notes.length > 0 ? (
-					<NotesCards notes={loaderData.notes} />
+					viewMode === 'kanban' ? (
+						<NotesKanbanBoard
+							notes={loaderData.notes}
+							orgSlug={loaderData.organization.slug}
+							statuses={loaderData.statuses}
+						/>
+					) : (
+						<NotesCards notes={loaderData.notes} />
+					)
 				) : (
 					<>
 						<EmptyState
