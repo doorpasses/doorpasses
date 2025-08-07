@@ -186,6 +186,15 @@ async function makeSession(
 	responseInit?: ResponseInit,
 ) {
 	redirectTo ??= '/'
+
+	const { canUserLogin } = await import('#app/utils/auth.server.ts')
+	const allowed = await canUserLogin(userId)
+	if (!allowed) {
+		return redirect('/login?banned=true', {
+			headers: combineHeaders(responseInit?.headers, destroyRedirectTo),
+		})
+	}
+
 	const session = await prisma.session.create({
 		select: { id: true, expirationDate: true, userId: true },
 		data: {
