@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import contentScript from './content?script'
+import contentScript from './content/index.tsx?script'
 import { Button } from './components/ui/button'
 import {
   Card,

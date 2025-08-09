@@ -1,0 +1,302 @@
+@import "tailwindcss";
+
+/* Define CSS variables for Shadow DOM - these need to be on :host instead of :root */
+:host {
+	/* Custom theme variables */
+	--background: oklch(1 0 0);
+	--foreground: oklch(0.145 0 0);
+	--card: oklch(1 0 0);
+	--card-foreground: oklch(0.145 0 0);
+	--popover: oklch(1 0 0);
+	--popover-foreground: oklch(0.145 0 0);
+	--primary: oklch(0.205 0 0);
+	--primary-foreground: oklch(0.985 0 0);
+	--secondary: oklch(0.97 0 0);
+	--secondary-foreground: oklch(0.205 0 0);
+	--muted: oklch(0.97 0 0);
+	--muted-foreground: oklch(0.556 0 0);
+	--accent: oklch(0.97 0 0);
+	--accent-foreground: oklch(0.205 0 0);
+	--destructive: oklch(0.577 0.245 27.325);
+	--destructive-foreground: oklch(0.985 0 0);
+	--border: oklch(0.922 0 0);
+	--input: oklch(0.922 0 0);
+	--ring: oklch(0.708 0 0);
+	--radius: 0.5rem;
+
+	/* Tailwind internal variables */
+	--tw-border-style: solid;
+	--tw-border-width: 0;
+	--tw-border-color: currentColor;
+	--tw-bg-opacity: 1;
+	--tw-text-opacity: 1;
+	--tw-shadow: 0 0 #0000;
+	--tw-shadow-color: #0000;
+	--tw-shadow-colored: 0 0 #0000;
+	--tw-ring-offset-shadow: 0 0 #0000;
+	--tw-ring-shadow: 0 0 #0000;
+	--tw-ring-color: rgb(59 130 246 / 0.5);
+	--tw-ring-offset-width: 0px;
+	--tw-ring-offset-color: #fff;
+	--tw-ring-inset: ;
+	--tw-blur: ;
+	--tw-brightness: ;
+	--tw-contrast: ;
+	--tw-grayscale: ;
+	--tw-hue-rotate: ;
+	--tw-invert: ;
+	--tw-saturate: ;
+	--tw-sepia: ;
+	--tw-drop-shadow: ;
+	--tw-backdrop-blur: ;
+	--tw-backdrop-brightness: ;
+	--tw-backdrop-contrast: ;
+	--tw-backdrop-grayscale: ;
+	--tw-backdrop-hue-rotate: ;
+	--tw-backdrop-invert: ;
+	--tw-backdrop-opacity: ;
+	--tw-backdrop-saturate: ;
+	--tw-backdrop-sepia: ;
+	--tw-contain-size: ;
+	--tw-contain-layout: ;
+	--tw-contain-paint: ;
+	--tw-contain-style: ;
+	--tw-translate-x: 0;
+	--tw-translate-y: 0;
+	--tw-translate-z: 0;
+	--tw-rotate-x: 0;
+	--tw-rotate-y: 0;
+	--tw-rotate-z: 0;
+	--tw-skew-x: 0;
+	--tw-skew-y: 0;
+	--tw-scale-x: 1;
+	--tw-scale-y: 1;
+	--tw-scale-z: 1;
+	--tw-pan-x: ;
+	--tw-pan-y: ;
+	--tw-pinch-zoom: ;
+	--tw-scroll-snap-strictness: proximity;
+	--tw-ordinal: ;
+	--tw-slashed-zero: ;
+	--tw-numeric-figure: ;
+	--tw-numeric-spacing: ;
+	--tw-numeric-fraction: ;
+	--tw-font-feature-settings: normal;
+	--tw-font-variation-settings: normal;
+	--tw-leading: 1.5;
+	--tw-tracking: 0em;
+	--tw-ease: cubic-bezier(0.4, 0, 0.2, 1);
+	--tw-duration: 150ms;
+	--tw-delay: 0s;
+}
+
+/* Also define on the container div for better compatibility */
+.shadow-root-container {
+	/* Custom theme variables */
+	--background: oklch(1 0 0);
+	--foreground: oklch(0.145 0 0);
+	--card: oklch(1 0 0);
+	--card-foreground: oklch(0.145 0 0);
+	--popover: oklch(1 0 0);
+	--popover-foreground: oklch(0.145 0 0);
+	--primary: oklch(0.205 0 0);
+	--primary-foreground: oklch(0.985 0 0);
+	--secondary: oklch(0.97 0 0);
+	--secondary-foreground: oklch(0.205 0 0);
+	--muted: oklch(0.97 0 0);
+	--muted-foreground: oklch(0.556 0 0);
+	--accent: oklch(0.97 0 0);
+	--accent-foreground: oklch(0.205 0 0);
+	--destructive: oklch(0.577 0.245 27.325);
+	--destructive-foreground: oklch(0.985 0 0);
+	--border: oklch(0.922 0 0);
+	--input: oklch(0.922 0 0);
+	--ring: oklch(0.708 0 0);
+	--radius: 0.5rem;
+
+	/* Tailwind internal variables */
+	--tw-border-style: solid;
+	--tw-border-width: 0;
+	--tw-border-color: currentColor;
+	--tw-bg-opacity: 1;
+	--tw-text-opacity: 1;
+	--tw-shadow: 0 0 #0000;
+	--tw-shadow-color: #0000;
+	--tw-shadow-colored: 0 0 #0000;
+	--tw-ring-offset-shadow: 0 0 #0000;
+	--tw-ring-shadow: 0 0 #0000;
+	--tw-ring-color: rgb(59 130 246 / 0.5);
+	--tw-ring-offset-width: 0px;
+	--tw-ring-offset-color: #fff;
+	--tw-ring-inset: ;
+	--tw-blur: ;
+	--tw-brightness: ;
+	--tw-contrast: ;
+	--tw-grayscale: ;
+	--tw-hue-rotate: ;
+	--tw-invert: ;
+	--tw-saturate: ;
+	--tw-sepia: ;
+	--tw-drop-shadow: ;
+	--tw-backdrop-blur: ;
+	--tw-backdrop-brightness: ;
+	--tw-backdrop-contrast: ;
+	--tw-backdrop-grayscale: ;
+	--tw-backdrop-hue-rotate: ;
+	--tw-backdrop-invert: ;
+	--tw-backdrop-opacity: ;
+	--tw-backdrop-saturate: ;
+	--tw-backdrop-sepia: ;
+	--tw-contain-size: ;
+	--tw-contain-layout: ;
+	--tw-contain-paint: ;
+	--tw-contain-style: ;
+	--tw-translate-x: 0;
+	--tw-translate-y: 0;
+	--tw-translate-z: 0;
+	--tw-rotate-x: 0;
+	--tw-rotate-y: 0;
+	--tw-rotate-z: 0;
+	--tw-skew-x: 0;
+	--tw-skew-y: 0;
+	--tw-scale-x: 1;
+	--tw-scale-y: 1;
+	--tw-scale-z: 1;
+	--tw-pan-x: ;
+	--tw-pan-y: ;
+	--tw-pinch-zoom: ;
+	--tw-scroll-snap-strictness: proximity;
+	--tw-ordinal: ;
+	--tw-slashed-zero: ;
+	--tw-numeric-figure: ;
+	--tw-numeric-spacing: ;
+	--tw-numeric-fraction: ;
+	--tw-font-feature-settings: normal;
+	--tw-font-variation-settings: normal;
+	--tw-leading: 1.5;
+	--tw-tracking: 0em;
+	--tw-ease: cubic-bezier(0.4, 0, 0.2, 1);
+	--tw-duration: 150ms;
+	--tw-delay: 0s;
+}
+
+/* Dark mode support */
+.dark {
+	--background: oklch(0.145 0 0);
+	--foreground: oklch(0.985 0 0);
+	--card: oklch(0.145 0 0);
+	--card-foreground: oklch(0.985 0 0);
+	--popover: oklch(0.145 0 0);
+	--popover-foreground: oklch(0.985 0 0);
+	--primary: oklch(0.985 0 0);
+	--primary-foreground: oklch(0.205 0 0);
+	--secondary: oklch(0.269 0 0);
+	--secondary-foreground: oklch(0.985 0 0);
+	--muted: oklch(0.269 0 0);
+	--muted-foreground: oklch(0.708 0 0);
+	--accent: oklch(0.269 0 0);
+	--accent-foreground: oklch(0.985 0 0);
+	--destructive: oklch(0.396 0.141 25.723);
+	--destructive-foreground: oklch(0.637 0.237 25.331);
+	--border: oklch(0.269 0 0);
+	--input: oklch(0.269 0 0);
+	--ring: oklch(0.439 0 0);
+}
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+}
+
+@layer base {
+
+	*,
+	::before,
+	::after {
+		@apply border-border;
+		--tw-border-style: solid;
+		--tw-border-width: 0;
+		--tw-border-color: currentColor;
+		--tw-bg-opacity: 1;
+		--tw-text-opacity: 1;
+		--tw-shadow: 0 0 #0000;
+		--tw-shadow-color: #0000;
+		--tw-shadow-colored: 0 0 #0000;
+		--tw-ring-offset-shadow: 0 0 #0000;
+		--tw-ring-shadow: 0 0 #0000;
+		--tw-ring-color: rgb(59 130 246 / 0.5);
+		--tw-ring-offset-width: 0px;
+		--tw-ring-offset-color: #fff;
+		--tw-ring-inset: ;
+		--tw-blur: ;
+		--tw-brightness: ;
+		--tw-contrast: ;
+		--tw-grayscale: ;
+		--tw-hue-rotate: ;
+		--tw-invert: ;
+		--tw-saturate: ;
+		--tw-sepia: ;
+		--tw-drop-shadow: ;
+		--tw-backdrop-blur: ;
+		--tw-backdrop-brightness: ;
+		--tw-backdrop-contrast: ;
+		--tw-backdrop-grayscale: ;
+		--tw-backdrop-hue-rotate: ;
+		--tw-backdrop-invert: ;
+		--tw-backdrop-opacity: ;
+		--tw-backdrop-saturate: ;
+		--tw-backdrop-sepia: ;
+		--tw-contain-size: ;
+		--tw-contain-layout: ;
+		--tw-contain-paint: ;
+		--tw-contain-style: ;
+		--tw-translate-x: 0;
+		--tw-translate-y: 0;
+		--tw-translate-z: 0;
+		--tw-rotate-x: 0;
+		--tw-rotate-y: 0;
+		--tw-rotate-z: 0;
+		--tw-skew-x: 0;
+		--tw-skew-y: 0;
+		--tw-scale-x: 1;
+		--tw-scale-y: 1;
+		--tw-scale-z: 1;
+		--tw-pan-x: ;
+		--tw-pan-y: ;
+		--tw-pinch-zoom: ;
+		--tw-scroll-snap-strictness: proximity;
+		--tw-ordinal: ;
+		--tw-slashed-zero: ;
+		--tw-numeric-figure: ;
+		--tw-numeric-spacing: ;
+		--tw-numeric-fraction: ;
+		--tw-font-feature-settings: normal;
+		--tw-font-variation-settings: normal;
+		--tw-leading: 1.5;
+		--tw-tracking: 0em;
+		--tw-ease: cubic-bezier(0.4, 0, 0.2, 1);
+		--tw-duration: 150ms;
+		--tw-delay: 0s;
+	}
+
+	.shadow-root-container {
+		@apply bg-background text-foreground;
+	}
+}
