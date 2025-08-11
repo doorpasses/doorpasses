@@ -158,10 +158,11 @@ async function uploadVideoThumbnail(
 	videoId: string,
 	thumbnailBuffer: Buffer,
 	fileExtension: string = 'jpg',
+	organizationId: string,
 ) {
 	const fileId = createId()
 	const timestamp = Date.now()
-	const key = `users/${userId}/notes/${noteId}/videos/thumbnails/${timestamp}-${videoId}-${fileId}.${fileExtension}`
+	const key = `orgs/${organizationId}/notes/${noteId}/videos/thumbnails/${timestamp}-${videoId}-${fileId}.${fileExtension}`
 
 	// Upload thumbnail to storage
 
@@ -336,6 +337,8 @@ export const videoProcessingTask = task({
 				noteId,
 				videoId,
 				thumbnailBuffer,
+				'jpg',
+				organizationId
 			)
 
 			// Update video upload record with thumbnail and metadata

@@ -157,10 +157,11 @@ async function uploadImageThumbnail(
 	imageId: string,
 	thumbnailBuffer: Buffer,
 	fileExtension: string = 'jpg',
+	organizationId: string,
 ) {
 	const fileId = createId()
 	const timestamp = Date.now()
-	const key = `users/${userId}/notes/${noteId}/images/thumbnails/${timestamp}-${imageId}-${fileId}.${fileExtension}`
+	const key = `orgs/${organizationId}/notes/${noteId}/images/thumbnails/${timestamp}-${imageId}-${fileId}.${fileExtension}`
 
 	const thumbnailFile = {
 		type: 'image/jpeg',
@@ -365,6 +366,8 @@ export const imageProcessingTask = task({
 				noteId,
 				imageId,
 				thumbnailBuffer,
+				'jpg',
+				organizationId
 			)
 
 			// Update image upload record with thumbnail and metadata

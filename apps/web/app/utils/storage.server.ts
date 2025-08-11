@@ -101,7 +101,7 @@ export async function uploadNoteImage(
 	const fileId = createId()
 	const fileExtension = file.name.split('.').pop() || ''
 	const timestamp = Date.now()
-	const key = `users/${userId}/notes/${noteId}/images/${timestamp}-${fileId}.${fileExtension}`
+	const key = `orgs/${organizationId}/notes/${noteId}/images/${timestamp}-${fileId}.${fileExtension}`
 	return uploadToStorage(file, key, organizationId)
 }
 
@@ -114,7 +114,7 @@ export async function uploadCommentImage(
 	const fileId = createId()
 	const fileExtension = file.name.split('.').pop() || ''
 	const timestamp = Date.now()
-	const key = `users/${userId}/comments/${commentId}/images/${timestamp}-${fileId}.${fileExtension}`
+	const key = `orgs/${organizationId}/comments/${commentId}/images/${timestamp}-${fileId}.${fileExtension}`
 	return uploadToStorage(file, key, organizationId)
 }
 
@@ -127,7 +127,7 @@ export async function uploadNoteVideo(
 	const fileId = createId()
 	const fileExtension = file.name.split('.').pop() || ''
 	const timestamp = Date.now()
-	const key = `users/${userId}/notes/${noteId}/videos/${timestamp}-${fileId}.${fileExtension}`
+	const key = `orgs/${organizationId}/notes/${noteId}/videos/${timestamp}-${fileId}.${fileExtension}`
 	return uploadToStorage(file, key, organizationId)
 }
 
@@ -140,7 +140,7 @@ export async function uploadVideoThumbnail(
 ) {
 	const fileId = createId()
 	const timestamp = Date.now()
-	const key = `users/${userId}/notes/${noteId}/videos/thumbnails/${timestamp}-${videoId}-${fileId}.jpg`
+	const key = `orgs/${organizationId}/notes/${noteId}/videos/thumbnails/${timestamp}-${videoId}-${fileId}.jpg`
 
 	// Create a File-like object from the buffer
 	const thumbnailFile = new File([new Uint8Array(thumbnailBuffer)], 'thumbnail.jpg', {
