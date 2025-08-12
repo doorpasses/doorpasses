@@ -1,4 +1,5 @@
 import { invariantResponse } from '@epic-web/invariant'
+import { Portal } from '@radix-ui/react-portal'
 import { useEffect, useState } from 'react'
 import {
 	Outlet,
@@ -238,7 +239,9 @@ export default function NotesRoute({
 											<Icon name="blocks" />
 										</span>
 									</TooltipTrigger>
-									<TooltipContent>Cards</TooltipContent>
+									<Portal>
+										<TooltipContent>Cards</TooltipContent>
+									</Portal>
 								</Tooltip>
 							</TabsTrigger>
 							<TabsTrigger value="kanban" aria-label="Kanban board">
@@ -248,7 +251,9 @@ export default function NotesRoute({
 											<Icon name="menu" />
 										</span>
 									</TooltipTrigger>
-									<TooltipContent>Kanban</TooltipContent>
+									<Portal>
+										<TooltipContent>Kanban</TooltipContent>
+									</Portal>
 								</Tooltip>
 							</TabsTrigger>
 						</TabsList>

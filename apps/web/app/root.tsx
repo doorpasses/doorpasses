@@ -36,6 +36,7 @@ import { type Theme, getTheme } from './utils/theme.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
 import { storeUtmParams } from './utils/utm.server.ts'
+import { TooltipProvider } from './components/ui/tooltip.tsx'
 
 export const links: Route.LinksFunction = () => {
 	return [
@@ -285,7 +286,9 @@ function AppWithProviders() {
 					{data.impersonationInfo && (
 						<ImpersonationBanner impersonationInfo={data.impersonationInfo} />
 					)}
-					<Outlet />
+					<TooltipProvider>
+						<Outlet />
+					</TooltipProvider>
 					<EpicToaster />
 				</NovuProvider>
 			</OpenImgContextProvider>

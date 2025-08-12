@@ -3,12 +3,13 @@ import { Img } from 'openimg/react'
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate, useRouteLoaderData, useFetcher } from 'react-router'
 import { Avatar, AvatarFallback, AvatarImage } from '#app/components/ui/avatar.tsx'
-
+import { Portal } from '@radix-ui/react-portal'
 import { Button } from '#app/components/ui/button.tsx'
 import { Card, CardContent } from '#app/components/ui/card.tsx'
 import { Icon } from '#app/components/ui/icon.tsx'
 import { Input } from '#app/components/ui/input.tsx'
 import { Textarea } from '#app/components/ui/textarea.tsx'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '#app/components/ui/tooltip.tsx'
 import { getNoteImgSrc, getUserImgSrc } from '#app/utils/misc.tsx'
 import { loader } from './notes'
 
@@ -202,7 +203,7 @@ export const NoteCard = ({ note, organizationId, isEditing = false, setEditingNo
 									firstMedia.altText ||
 									(isVideo ? 'Video thumbnail' : 'Note image')
 								}
-								className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+								className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
 								width={350}
 								height={128}
 							/>
@@ -246,28 +247,7 @@ export const NoteCard = ({ note, organizationId, isEditing = false, setEditingNo
 							</div>
 						)}
 
-						{/* Priority indicator */}
-						{note.priority && (
-							<div className="flex items-center gap-1 px-1.5 py-0.5 bg-white/95 backdrop-blur-sm rounded-full shadow-sm border border-white/20">
-								{(() => {
-									switch (note.priority) {
-										case 'urgent':
-											return <Icon name="octagon-alert" className="w-3 h-3 text-red-600" />
-										case 'high':
-											return <Icon name="signal-high" className="w-3 h-3 text-red-500" />
-										case 'medium':
-											return <Icon name="signal-medium" className="w-3 h-3 text-yellow-500" />
-										case 'low':
-											return <Icon name="signal-low" className="w-3 h-3 text-green-500" />
-										default:
-											return <Icon name="minus" className="w-3 h-3 text-gray-400" />
-									}
-								})()}
-								<span className="text-gray-700 text-xs font-medium capitalize">
-									{note.priority}
-								</span>
-							</div>
-						)}
+
 					</div>
 
 					{/* Floating action buttons - only show on hover */}
@@ -275,19 +255,17 @@ export const NoteCard = ({ note, organizationId, isEditing = false, setEditingNo
 						{setEditingNote && (
 							<Button
 								size="sm"
-								variant="ghost"
+								variant="secondary"
 								onClick={handleStartEdit}
 								aria-label="Edit note"
-								className="h-7 w-7 p-0 bg-white/90 hover:bg-white text-gray-700 hover:text-gray-900 shadow-sm backdrop-blur-sm"
 							>
 								<Icon name="pencil" className="h-3 w-3" />
 							</Button>
 						)}
 						<Button
 							size="sm"
-							variant="ghost"
+							variant="secondary"
 							onClick={handleCopyLink}
-							className="h-7 w-7 p-0 bg-white/90 hover:bg-white text-gray-700 hover:text-gray-900 shadow-sm backdrop-blur-sm"
 						>
 							{copied ? (
 								<Icon name="check" className="h-3 w-3" />
@@ -364,9 +342,44 @@ export const NoteCard = ({ note, organizationId, isEditing = false, setEditingNo
 							</div>
 						) : (
 							<div className="space-y-0">
-								<h4 className="text-foreground leading-tight line-clamp-2 group-hover:text-primary transition-colors duration-200">
-									{note.title}
-								</h4>
+								<div className="flex items-center gap-2">
+									{/* Priority indicator button */}
+									{note.priority && (
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<Button
+													size="sm"
+													variant="secondary"
+													className="h-6 w-6 p-0"
+													onClick={(e) => e.stopPropagation()}
+												>
+													{(() => {
+														switch (note.priority) {
+															case 'urgent':
+																return <Icon name="octagon-alert" className="w-4 h-4 text-red-600" />
+															case 'high':
+																return <Icon name="signal-high" className="w-4 h-4 text-red-500" />
+															case 'medium':
+																return <Icon name="signal-medium" className="w-4 h-4 text-yellow-500" />
+															case 'low':
+																return <Icon name="signal-low" className="w-4 h-4 text-green-500" />
+															default:
+																return <Icon name="minus" className="w-4 h-4 text-gray-400" />
+														}
+													})()}
+												</Button>
+											</TooltipTrigger>
+											<Portal>
+											<TooltipContent>
+												<p className="capitalize">{note.priority} priority</p>
+											</TooltipContent>
+											</Portal>
+										</Tooltip>
+									)}
+									<h4 className="text-foreground text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors duration-200 flex-1">
+										{note.title}
+									</h4>
+								</div>
 								<p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
 									{note.content ? note.content.replace(/<[^>]*>/g, '').substring(0, 100) : 'No content'}
 									{note.content && note.content.replace(/<[^>]*>/g, '').length > 100 && '...'}
