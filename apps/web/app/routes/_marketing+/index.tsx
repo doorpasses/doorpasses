@@ -8,6 +8,8 @@ import {
 import { cn } from '#app/utils/misc.tsx'
 import { type Route } from './+types/index.ts'
 import { logos } from './logos/logos.ts'
+import { CookieConsentBanner } from '#app/components/privacy-banner.tsx'
+import { useRouteLoaderData } from 'react-router'
 
 export const meta: Route.MetaFunction = () => [{ title: 'Epic Notes' }]
 
@@ -29,6 +31,7 @@ const rowClasses: Record<(typeof logos)[number]['row'], string> = {
 }
 
 export default function Index() {
+	const rootData = useRouteLoaderData('root')
 	return (
 		<main className="font-poppins grid h-full place-items-center">
 			<div className="grid place-items-center px-4 py-16 xl:grid-cols-2 xl:gap-24">
@@ -97,6 +100,7 @@ export default function Index() {
 					</TooltipProvider>
 				</ul>
 			</div>
+			<CookieConsentBanner consent={rootData?.cookieConsent} />
 		</main>
 	)
 }

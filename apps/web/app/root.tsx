@@ -37,6 +37,8 @@ import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
 import { storeUtmParams } from './utils/utm.server.ts'
 import { TooltipProvider } from './components/ui/tooltip.tsx'
+import { CookieConsentBanner } from './components/privacy-banner.tsx'
+import { getCookieConsentState } from './utils/cookie-consent.server.ts'
 
 export const links: Route.LinksFunction = () => {
 	return [
@@ -184,7 +186,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	// Get impersonation info if user is an admin
 	const impersonationInfo = await getImpersonationInfo(request)
 
-	console.log('locale', locale)
+	const cookieConsent = await getCookieConsentState(request)
 
 	return data(
 		{
@@ -197,6 +199,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 			userOrganizations,
 			favoriteNotes,
 			impersonationInfo,
+			cookieConsent,
 		},
 		{
 			headers: combineHeaders(
@@ -290,6 +293,7 @@ function AppWithProviders() {
 						<Outlet />
 					</TooltipProvider>
 					<EpicToaster />
+					<CookieConsentBanner consent={data.cookieConsent} />
 				</NovuProvider>
 			</OpenImgContextProvider>
 		</HoneypotProvider>
