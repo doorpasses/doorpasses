@@ -1,5 +1,3 @@
-import { AssistantRuntimeProvider } from '@assistant-ui/react'
-import { useChatRuntime } from '@assistant-ui/react-ai-sdk'
 import { getFormProps, useForm } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
@@ -16,7 +14,7 @@ import {
 	type LoaderFunctionArgs,
 } from 'react-router'
 import { z } from 'zod'
-import { Thread } from '#app/components/assistant-ui/thread.tsx'
+import { AIChat } from '#app/components/ai-chat.tsx'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { ErrorList } from '#app/components/forms.tsx'
 import { ActivityLog } from '#app/components/note/activity-log.tsx'
@@ -69,7 +67,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 			organization: {
 				select: {
 					slug: true,
-					id: true
+					id: true,
 				},
 			},
 			noteAccess: {
@@ -1018,13 +1016,16 @@ export async function action({ request }: ActionFunctionArgs) {
 					const imageFile = formData.get(`image-${i}`) as File
 					if (imageFile && imageFile.size > 0) {
 						imagePromises.push(
-							uploadCommentImage(userId, comment.id, imageFile, note.organizationId).then(
-								(objectKey) => ({
-									commentId: comment.id,
-									objectKey,
-									altText: null,
-								}),
-							),
+							uploadCommentImage(
+								userId,
+								comment.id,
+								imageFile,
+								note.organizationId,
+							).then((objectKey) => ({
+								commentId: comment.id,
+								objectKey,
+								altText: null,
+							})),
 						)
 					}
 				}
@@ -1225,7 +1226,7 @@ type NoteLoaderData = {
 		createdById: string
 		isPublic: boolean
 		images: { altText: string | null; objectKey: string }[]
-		organization: { slug: string, id: string }
+		organization: { slug: string; id: string }
 		noteAccess: Array<{
 			id: string
 			user: {
@@ -1315,10 +1316,6 @@ export default function NoteRoute() {
 		availableIntegrations,
 	} = useLoaderData() as NoteLoaderData
 
-	const runtime = useChatRuntime({
-		api: `/api/ai/chat?noteId=${note.id}`,
-	})
-
 	// Add ref for auto-focusing
 	const sectionRef = useRef<HTMLElement>(null)
 	const [activeTab, setActiveTab] = useState('overview')
@@ -1402,9 +1399,17 @@ export default function NoteRoute() {
 									.filter((upload) => upload.type === 'image')
 									.map((image) => (
 										<li key={image.objectKey}>
-											<a href={getNoteImgSrc(image.objectKey, note.organization.id)}>
+											<a
+												href={getNoteImgSrc(
+													image.objectKey,
+													note.organization.id,
+												)}
+											>
 												<Img
-													src={getNoteImgSrc(image.objectKey, note.organization.id)}
+													src={getNoteImgSrc(
+														image.objectKey,
+														note.organization.id,
+													)}
 													alt={image.altText ?? ''}
 													className="size-32 rounded-lg object-cover"
 													width={512}
@@ -1424,7 +1429,10 @@ export default function NoteRoute() {
 										<li key={video.objectKey}>
 											<div className="relative">
 												<Img
-													src={getNoteImgSrc(video.thumbnailKey!, note.organization.id)}
+													src={getNoteImgSrc(
+														video.thumbnailKey!,
+														note.organization.id,
+													)}
 													alt={video.altText ?? 'Video thumbnail'}
 													className="size-32 rounded-lg object-cover"
 													width={512}
@@ -1473,13 +1481,8 @@ export default function NoteRoute() {
 						<ActivityLog activityLogs={activityLogs} />
 					</TabsContent>
 
-					<TabsContent
-						value="ai-assistant"
-						className="flex-1 overflow-y-auto px-6 pt-2 pb-8"
-					>
-						<AssistantRuntimeProvider runtime={runtime}>
-							<Thread />
-						</AssistantRuntimeProvider>
+					<TabsContent value="ai-assistant" className="flex-1 overflow-hidden">
+						<AIChat noteId={note.id} />
 					</TabsContent>
 				</Tabs>
 

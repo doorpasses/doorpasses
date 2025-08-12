@@ -19,8 +19,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	invariantResponse(organization, 'Organization not found', { status: 404 })
 
-
-	return {organizationId: organization.id }
+	return { organizationId: organization.id }
 }
 
 export default function NewNote() {
