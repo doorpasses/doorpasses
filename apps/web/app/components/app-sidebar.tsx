@@ -36,6 +36,7 @@ import { Logo } from './icons/logo'
 import { MessageSquareMoreIcon } from './icons/message-square-more'
 import { UserRoundPlusIcon } from './icons/user-round-plus'
 import { NavSecondary } from './nav-secondary'
+import { Icon } from './ui/icon'
 
 // Upgrade Account Card Component
 function UpgradeAccountCard({
@@ -186,6 +187,12 @@ function OrganizationSidebar({
 			url: `/app/${orgSlug}/notes`,
 			isActive: location.pathname.includes(`/app/${orgSlug}/notes`),
 			icon: FoldersIcon,
+		},
+		{
+			title: 'MCP Server',
+			url: `/app/${orgSlug}/mcp`,
+			isActive: location.pathname.includes(`/app/${orgSlug}/mcp`),
+			icon: () => <Icon name="mcp" className="width-4 height-4" />,
 		},
 		{
 			title: 'Settings',

@@ -45,6 +45,7 @@ model User {
   Feedback               Feedback[]
   blacklistedIps         IpAddress[]                @relation("IpBlacklists")
   ipAddressUsers         IpAddressUser[]
+  apiKeys                ApiKey[]
 }
 
 model Note {
@@ -201,6 +202,7 @@ model Organization {
   users                  UserOrganization[]
   s3Config               OrganizationS3Config?
   Feedback               Feedback[]
+  apiKeys                ApiKey[]
 }
 
 model UserOrganization {
@@ -601,4 +603,21 @@ model IpAddressUser {
   @@unique([userId, ipAddressId])
   @@index([userId])
   @@index([ipAddressId])
+}
+
+model ApiKey {
+  id             String       @id @default(cuid())
+  key            String       @unique
+  name           String
+  userId         String
+  organizationId String
+  createdAt      DateTime     @default(now())
+  lastUsedAt     DateTime?
+  expiresAt      DateTime?
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([key])
 }

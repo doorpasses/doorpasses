@@ -536,7 +536,6 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 
 	if (intent === 'update-note-sharing') {
-
 		const submission = parseWithZod(formData, {
 			schema: ShareNoteSchema,
 		})
@@ -759,7 +758,6 @@ export async function action({ request }: ActionFunctionArgs) {
 			usersToRemove,
 		}
 
-
 		// Validate the parsed data
 		const validationResult = BatchUpdateNoteAccessSchema.safeParse(parsedData)
 		if (!validationResult.success) {
@@ -824,7 +822,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			// Use a transaction to ensure all operations succeed or fail together
 			await prisma.$transaction(async (tx) => {
-
 				// Update public/private status if changed
 				if (isPublic !== note.isPublic) {
 					await tx.organizationNote.update({

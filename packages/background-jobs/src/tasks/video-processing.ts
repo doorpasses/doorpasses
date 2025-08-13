@@ -296,7 +296,9 @@ export const videoProcessingTask = task({
 						!videoStream.height ||
 						!videoStream.duration
 					) {
-						reject(new Error('Could not determine video dimensions or duration'))
+						reject(
+							new Error('Could not determine video dimensions or duration'),
+						)
 						return
 					}
 
@@ -315,7 +317,10 @@ export const videoProcessingTask = task({
 			const thumbnailHeight = Math.round(thumbnailWidth / aspectRatio)
 			const thumbnailSize = `${thumbnailWidth}x${thumbnailHeight}`
 			const gifDuration = Math.min(videoMetadata.duration, 3) // 3 second GIF max
-			const gifStartTime = Math.max(0, videoMetadata.duration / 2 - gifDuration / 2) // Center the GIF
+			const gifStartTime = Math.max(
+				0,
+				videoMetadata.duration / 2 - gifDuration / 2,
+			) // Center the GIF
 
 			logger.info('Processing video thumbnail', {
 				videoId,

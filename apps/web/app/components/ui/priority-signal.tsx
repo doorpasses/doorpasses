@@ -8,7 +8,8 @@ interface PrioritySignalProps {
 
 export function PrioritySignal({ priority, className }: PrioritySignalProps) {
 	const theme = useTheme()
-	const fill = theme === 'dark' ? 'lch(65.87% 0 0)' : 'lch(39.286% 1 282.863 / 1)'
+	const fill =
+		theme === 'dark' ? 'lch(65.87% 0 0)' : 'lch(39.286% 1 282.863 / 1)'
 	const getColorAndOpacity = (barIndex: number) => {
 		switch (priority) {
 			case 'low':

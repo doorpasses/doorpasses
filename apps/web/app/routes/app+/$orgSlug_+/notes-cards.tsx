@@ -209,129 +209,138 @@ export const NoteCard = ({
 	return (
 		<div className="group h-full">
 			<Card
-				className="relative h-full overflow-hidden transition-all border-none group-hover:bg-muted/30 shadow-[0px_1px_1px_0px_rgba(0,0,0,0.05),0px_1px_1px_0px_rgba(255,252,240,0.5)_inset,0px_0px_0px_1px_hsla(0,0%,100%,0.1)_inset,0px_0px_1px_0px_rgba(28,27,26,0.5)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(0,0,0,0.1),0_2px_2px_0_rgba(0,0,0,0.1),0_4px_4px_0_rgba(0,0,0,0.1),0_8px_8px_0_rgba(0,0,0,0.1)] rounded-3xl cursor-pointer py-0"
+				className="group-hover:bg-muted/30 relative h-full cursor-pointer overflow-hidden rounded-3xl border-none py-0 shadow-[0px_1px_1px_0px_rgba(0,0,0,0.05),0px_1px_1px_0px_rgba(255,252,240,0.5)_inset,0px_0px_0px_1px_hsla(0,0%,100%,0.1)_inset,0px_0px_1px_0px_rgba(28,27,26,0.5)] transition-all dark:shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(0,0,0,0.1),0_2px_2px_0_rgba(0,0,0,0.1),0_4px_4px_0_rgba(0,0,0,0.1),0_8px_8px_0_rgba(0,0,0,0.1)]"
 				onClick={handleCardClick}
 			>
 				{/* Background gradient overlay */}
-				<div className="absolute inset-0 bg-gradient-to-br opacity-30 group-hover:opacity-40 transition-opacity duration-500 ease-out pointer-events-none" />
+				<div className="pointer-events-none absolute inset-0 bg-gradient-to-br opacity-30 transition-opacity duration-500 ease-out group-hover:opacity-40" />
 
 				<CardContent className="relative flex h-full flex-col px-2 pt-2 pb-3">
 					{/* Enhanced Media Header */}
-					{!isKanbanView && <div className="relative h-[160px] w-full rounded-[16px] mb-2 shadow-[0px_1px_1px_0px_rgba(0,0,0,0.05),0px_1px_1px_0px_rgba(255,252,240,0.5)_inset,0px_0px_0px_1px_hsla(0,0%,100%,0.1)_inset,0px_0px_1px_0px_rgba(28,27,26,0.5)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(0,0,0,0.1),0_2px_2px_0_rgba(0,0,0,0.1),0_4px_4px_0_rgba(0,0,0,0.1),0_8px_8px_0_rgba(0,0,0,0.1)]">
-						{firstMedia ? (
-							<>
-								<Img
-									src={
-										isVideo && firstVideo?.thumbnailKey
-											? getNoteImgSrc(firstVideo.thumbnailKey, organizationId)
-											: firstImage
-												? getNoteImgSrc(firstImage.objectKey, organizationId)
-												: ''
-									}
-									alt={
-										firstMedia.altText ||
-										(isVideo ? 'Video thumbnail' : 'Note image')
-									}
-									className="rounded-[16px] object-cover absolute h-full w-full inset-0 transition-all duration-300"
-									width={200}
-									height={200}
-								/>
+					{!isKanbanView && (
+						<div className="relative mb-2 h-[160px] w-full rounded-[16px] shadow-[0px_1px_1px_0px_rgba(0,0,0,0.05),0px_1px_1px_0px_rgba(255,252,240,0.5)_inset,0px_0px_0px_1px_hsla(0,0%,100%,0.1)_inset,0px_0px_1px_0px_rgba(28,27,26,0.5)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(0,0,0,0.1),0_2px_2px_0_rgba(0,0,0,0.1),0_4px_4px_0_rgba(0,0,0,0.1),0_8px_8px_0_rgba(0,0,0,0.1)]">
+							{firstMedia ? (
+								<>
+									<Img
+										src={
+											isVideo && firstVideo?.thumbnailKey
+												? getNoteImgSrc(firstVideo.thumbnailKey, organizationId)
+												: firstImage
+													? getNoteImgSrc(firstImage.objectKey, organizationId)
+													: ''
+										}
+										alt={
+											firstMedia.altText ||
+											(isVideo ? 'Video thumbnail' : 'Note image')
+										}
+										className="absolute inset-0 h-full w-full rounded-[16px] object-cover transition-all duration-300"
+										width={200}
+										height={200}
+									/>
 
-								{/* Enhanced overlay structure */}
-								<div className="absolute inset-0 rounded-[16px]">
-									<div className="absolute inset-0 rounded-[16px] shadow-[0px_0px_0px_1px_rgba(0,0,0,.07),0px_0px_0px_3px_#fff,0px_0px_0px_4px_rgba(0,0,0,.08)] dark:shadow-[0px_0px_0px_1px_rgba(0,0,0,.07),0px_0px_0px_3px_rgba(100,100,100,0.3),0px_0px_0px_4px_rgba(0,0,0,.08)]" />
-									<div className="absolute inset-0 rounded-[16px] dark:shadow-[0px_1px_1px_0px_rgba(0,0,0,0.15),0px_1px_1px_0px_rgba(0,0,0,0.15)_inset,0px_0px_0px_1px_rgba(0,0,0,0.15)_inset,0px_0px_1px_0px_rgba(0,0,0,0.15)]" />
-								</div>
+									{/* Enhanced overlay structure */}
+									<div className="absolute inset-0 rounded-[16px]">
+										<div className="absolute inset-0 rounded-[16px] shadow-[0px_0px_0px_1px_rgba(0,0,0,.07),0px_0px_0px_3px_#fff,0px_0px_0px_4px_rgba(0,0,0,.08)] dark:shadow-[0px_0px_0px_1px_rgba(0,0,0,.07),0px_0px_0px_3px_rgba(100,100,100,0.3),0px_0px_0px_4px_rgba(0,0,0,.08)]" />
+										<div className="absolute inset-0 rounded-[16px] dark:shadow-[0px_1px_1px_0px_rgba(0,0,0,0.15),0px_1px_1px_0px_rgba(0,0,0,0.15)_inset,0px_0px_0px_1px_rgba(0,0,0,0.15)_inset,0px_0px_1px_0px_rgba(0,0,0,0.15)]" />
+									</div>
 
-								{/* Video play overlay */}
-								{isVideo && (
-									<div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-[16px]">
-										<div className="rounded-full bg-black/20 p-3 backdrop-blur-sm">
-											<Icon name="arrow-right" className="h-5 w-5 text-white" />
+									{/* Video play overlay */}
+									{isVideo && (
+										<div className="absolute inset-0 flex items-center justify-center rounded-[16px] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+											<div className="rounded-full bg-black/20 p-3 backdrop-blur-sm">
+												<Icon
+													name="arrow-right"
+													className="h-5 w-5 text-white"
+												/>
+											</div>
 										</div>
+									)}
+								</>
+							) : (
+								<div className="from-primary/5 to-primary/10 flex h-full items-center justify-center rounded-[16px] bg-gradient-to-br">
+									<Icon name="file-text" className="text-primary/40 h-8 w-8" />
+								</div>
+							)}
+
+							{/* Card action buttons - styled like attachment count */}
+							<div className="absolute -top-[1px] -right-[1px] z-10 flex transition-all duration-300">
+								{setEditingNote && (
+									<div className="pointer-events-auto">
+										<Tooltip delayDuration={0}>
+											<TooltipTrigger asChild>
+												<button
+													className="bg-background text-background-foreground flex items-center gap-1.5 rounded-bl-md border-b border-l border-black/10 px-2 py-1.5"
+													onClick={handleStartEdit}
+												>
+													<Icon name="pencil" className="h-3.5 w-3.5" />
+												</button>
+											</TooltipTrigger>
+											<Portal>
+												<TooltipContent>
+													<p>Quick edit</p>
+												</TooltipContent>
+											</Portal>
+										</Tooltip>
 									</div>
 								)}
-							</>
-						) : (
-							<div className="rounded-[16px] from-primary/5 to-primary/10 flex h-full items-center justify-center bg-gradient-to-br">
-								<Icon name="file-text" className="text-primary/40 h-8 w-8" />
-							</div>
-						)}
-
-						{/* Card action buttons - styled like attachment count */}
-						<div className="absolute duration-300 flex -right-[1px] -top-[1px] transition-all z-10">
-							{setEditingNote && (
 								<div className="pointer-events-auto">
-									<Tooltip delayDuration={0}>
+									<Tooltip
+										delayDuration={0}
+										open={tooltipOpen}
+										onOpenChange={setTooltipOpen}
+									>
 										<TooltipTrigger asChild>
 											<button
-												className="bg-background text-background-foreground flex gap-1.5 items-center px-2 py-1.5 rounded-bl-md border-l border-b border-black/10"
-												onClick={handleStartEdit}
+												className="bg-background text-background-foreground flex items-center gap-1.5 rounded-tr-[16px] border-b border-l border-black/10 px-2 py-1.5"
+												onClick={handleCopyLink}
 											>
-												<Icon name="pencil" className="h-3.5 w-3.5" />
+												{copied ? (
+													<Icon name="check" className="h-3.5 w-3.5" />
+												) : (
+													<Icon name="copy" className="h-3.5 w-3.5" />
+												)}
 											</button>
 										</TooltipTrigger>
 										<Portal>
 											<TooltipContent>
-												<p>Quick edit</p>
+												<p>{copied ? 'Link copied!' : 'Copy link'}</p>
 											</TooltipContent>
 										</Portal>
 									</Tooltip>
 								</div>
-							)}
-							<div className="pointer-events-auto">
-								<Tooltip delayDuration={0} open={tooltipOpen} onOpenChange={setTooltipOpen}>
-									<TooltipTrigger asChild>
-										<button
-											className="bg-background text-background-foreground flex gap-1.5 items-center px-2 py-1.5 rounded-tr-[16px] border-l border-b border-black/10"
-											onClick={handleCopyLink}
-										>
-											{copied ? (
-												<Icon name="check" className="h-3.5 w-3.5" />
-											) : (
-												<Icon name="copy" className="h-3.5 w-3.5" />
-											)}
-										</button>
-									</TooltipTrigger>
-									<Portal>
-										<TooltipContent>
-											<p>{copied ? 'Link copied!' : 'Copy link'}</p>
-										</TooltipContent>
-									</Portal>
-								</Tooltip>
 							</div>
-						</div>
 
-						{/* Status indicator - positioned over image */}
-						{!isKanbanView && note.status && (
-							<div className="absolute top-[-1px] left-[-1px] z-10 pointer-events-none">
-								<div className="bg-background flex items-center gap-1.5 rounded-br rounded-tl-xl border-r border-b px-2 py-1 border-black/10">
-									{(() => {
-										const status =
-											typeof note.status === 'string'
-												? { name: note.status, color: '#6b7280' }
-												: (note.status as { name: string; color?: string })
-										const color = status.color || '#6b7280'
-										return (
-											<div
-												className="h-1.5 w-1.5 rounded-full"
-												style={{ backgroundColor: color }}
-											/>
-										)
-									})()}
-									<span className="text-background-foreground text-xs font-medium">
+							{/* Status indicator - positioned over image */}
+							{!isKanbanView && note.status && (
+								<div className="pointer-events-none absolute top-[-1px] left-[-1px] z-10">
+									<div className="bg-background flex items-center gap-1.5 rounded-tl-xl rounded-br border-r border-b border-black/10 px-2 py-1">
 										{(() => {
-											const statusName =
+											const status =
 												typeof note.status === 'string'
-													? note.status
-													: (note.status as { name: string })?.name
-											return statusName ? statusName.replace('-', ' ') : ''
+													? { name: note.status, color: '#6b7280' }
+													: (note.status as { name: string; color?: string })
+											const color = status.color || '#6b7280'
+											return (
+												<div
+													className="h-1.5 w-1.5 rounded-full"
+													style={{ backgroundColor: color }}
+												/>
+											)
 										})()}
-									</span>
+										<span className="text-background-foreground text-xs font-medium">
+											{(() => {
+												const statusName =
+													typeof note.status === 'string'
+														? note.status
+														: (note.status as { name: string })?.name
+												return statusName ? statusName.replace('-', ' ') : ''
+											})()}
+										</span>
+									</div>
 								</div>
-							</div>
-						)}
-					</div>}
+							)}
+						</div>
+					)}
 
 					{/* Title and Content Section */}
 					{isEditing ? (
@@ -345,7 +354,7 @@ export const NoteCard = ({
 									className="h-8 flex-1 px-2 font-semibold"
 									placeholder="Note title..."
 								/>
-								<div className="flex gap-1 items-center">
+								<div className="flex items-center gap-1">
 									<Button
 										size="icon"
 										onClick={handleSaveEdit}
@@ -371,7 +380,7 @@ export const NoteCard = ({
 								onChange={(e) => setEditContent(e.target.value)}
 								onKeyDown={handleKeyDown}
 								placeholder="Note content..."
-								className="min-h-16 max-h-20 resize-none text-sm"
+								className="max-h-20 min-h-16 resize-none text-sm"
 								rows={2}
 							/>
 						</div>
@@ -394,7 +403,7 @@ export const NoteCard = ({
 															return (
 																<Icon
 																	name="octagon-alert"
-																	className="h-4 w-4 text-muted-foreground stroke-3"
+																	className="text-muted-foreground h-4 w-4 stroke-3"
 																/>
 															)
 														case 'high':
@@ -422,7 +431,7 @@ export const NoteCard = ({
 															return (
 																<Icon
 																	name="minus"
-																	className="h-4 w-4 text-muted-foreground stroke-3"
+																	className="text-muted-foreground h-4 w-4 stroke-3"
 																/>
 															)
 													}
@@ -436,13 +445,13 @@ export const NoteCard = ({
 										</Portal>
 									</Tooltip>
 								)}
-								<h3 className="text-lg font-semibold leading-tight flex-1">
+								<h3 className="flex-1 text-lg leading-tight font-semibold">
 									{note.title}
 								</h3>
 							</div>
 							{/* Content preview */}
 							{note.content && (
-								<p className="text-muted-foreground text-sm leading-relaxed line-clamp-2">
+								<p className="text-muted-foreground line-clamp-2 text-sm leading-relaxed">
 									{note.content.replace(/<[^>]*>/g, '').substring(0, 120)}
 									{note.content.replace(/<[^>]*>/g, '').length > 120 && '...'}
 								</p>
@@ -452,7 +461,7 @@ export const NoteCard = ({
 
 					{/* Tags section */}
 					{tags && tags.length > 0 && (
-						<div className="flex flex-wrap gap-1 px-1 mt-2">
+						<div className="mt-2 flex flex-wrap gap-1 px-1">
 							{tags.slice(0, 2).map((tag: any, index: number) => (
 								<span
 									key={index}
@@ -470,7 +479,7 @@ export const NoteCard = ({
 					)}
 
 					{/* Footer */}
-					<div className="mt-auto pt-2 px-1 font-mono">
+					<div className="mt-auto px-1 pt-2 font-mono">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-2">
 								<Avatar className="h-5 w-5">
