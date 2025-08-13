@@ -213,7 +213,7 @@ export default function NotesRoute({
 
 	return (
 		<div className="m-8 flex h-full flex-col">
-			<div className="flex items-center justify-between pb-8">
+			<div className="flex items-center justify-between pb-4">
 				<PageTitle
 					title={`Notes`}
 					description="You can create notes for your organization here."
