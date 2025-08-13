@@ -175,11 +175,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
 	//subscriber id = org id + customner id
 	const subscriberId = `${organization.id}-${userId}`
-	console.log(subscriberId)
-	console.log('trigger initiated')
 
 	try {
-		console.log('testWorkflow.id', testWorkflow.id)
 		await novu.trigger({
 			workflowId: 'demo-verify-otp',
 			to: {

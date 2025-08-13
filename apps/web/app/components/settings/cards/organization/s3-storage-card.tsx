@@ -108,10 +108,7 @@ function Switch({
 				ref={switchRef}
 				name={name}
 				checked={control.value === 'on' ? true : false}
-				onCheckedChange={(checked) => {
-					console.log(checked)
-					control.change(checked ? 'on' : 'off')
-				}}
+				onCheckedChange={(checked) => control.change(checked ? 'on' : 'off')}
 				onBlur={() => control.blur()}
 			/>
 		</>

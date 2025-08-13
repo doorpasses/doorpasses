@@ -233,9 +233,6 @@ export async function action({ request }: Route.ActionArgs) {
 				const orgNames = organizationsWithMatchingDomain
 					.map((org) => org.name)
 					.join(', ')
-				console.log(
-					`Auto-added user ${email} to organizations: ${orgNames} based on verified domain ${emailDomain}`,
-				)
 
 				// Redirect to organizations page to show the user they've been added
 				return redirectWithToast(

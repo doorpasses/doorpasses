@@ -32,8 +32,6 @@ export async function action({ request }: ActionFunctionArgs) {
 		return new Response('Invalid signature', { status: 400 })
 	}
 
-	console.log(`Received Stripe webhook: ${event.type}`)
-
 	try {
 		switch (event.type) {
 			case 'customer.subscription.created':

@@ -4,7 +4,6 @@ import { setCookieConsentState } from '#app/utils/cookie-consent.server.ts'
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()
 	const consent = formData.get('consent') === 'true'
-	console.log('')
 	const cookie = await setCookieConsentState(consent)
 
 	const headers = new Headers()

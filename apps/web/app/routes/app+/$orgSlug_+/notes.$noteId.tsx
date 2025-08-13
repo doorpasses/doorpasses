@@ -536,18 +536,12 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 
 	if (intent === 'update-note-sharing') {
-		console.log('Received update-note-sharing intent', {
-			formData: Object.fromEntries(formData),
-		})
 
 		const submission = parseWithZod(formData, {
 			schema: ShareNoteSchema,
 		})
 
-		console.log('Submission result:', submission)
-
 		if (submission.status !== 'success') {
-			console.log('Submission failed:', submission)
 			return data(
 				{ result: submission.reply() },
 				{ status: submission.status === 'error' ? 400 : 200 },
@@ -555,8 +549,6 @@ export async function action({ request }: ActionFunctionArgs) {
 		}
 
 		const { noteId, isPublic } = submission.value
-		console.log('Parsed values:', { noteId, isPublic })
-
 		// Get the note to verify access
 		const note = await prisma.organizationNote.findFirst({
 			select: { organizationId: true, createdById: true },
@@ -573,7 +565,6 @@ export async function action({ request }: ActionFunctionArgs) {
 		}
 
 		try {
-			console.log('Updating note with:', { noteId, isPublic })
 			await prisma.organizationNote.update({
 				where: { id: noteId },
 				data: { isPublic },
@@ -594,7 +585,6 @@ export async function action({ request }: ActionFunctionArgs) {
 				metadata: { isPublic },
 			})
 
-			console.log('Successfully updated note sharing')
 			return data({ result: { status: 'success' } })
 		} catch (error) {
 			console.error('Error updating note sharing:', error)
@@ -757,8 +747,6 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 
 	if (intent === 'batch-update-note-access') {
-		console.log('Received batch-update-note-access intent')
-
 		// Manually parse the arrays since FormData can have multiple values with same key
 		const usersToAdd = formData.getAll('usersToAdd') as string[]
 		const usersToRemove = formData.getAll('usersToRemove') as string[]
@@ -771,12 +759,10 @@ export async function action({ request }: ActionFunctionArgs) {
 			usersToRemove,
 		}
 
-		console.log('Parsed form data:', parsedData)
 
 		// Validate the parsed data
 		const validationResult = BatchUpdateNoteAccessSchema.safeParse(parsedData)
 		if (!validationResult.success) {
-			console.log('Validation failed:', validationResult.error)
 			return data(
 				{ result: { status: 'error', error: 'Invalid form data' } },
 				{ status: 400 },
@@ -789,12 +775,6 @@ export async function action({ request }: ActionFunctionArgs) {
 			usersToAdd: validUsersToAdd,
 			usersToRemove: validUsersToRemove,
 		} = validationResult.data
-		console.log('Validated data:', {
-			noteId,
-			isPublic,
-			validUsersToAdd,
-			validUsersToRemove,
-		})
 
 		// Get the note to verify access
 		const note = await prisma.organizationNote.findFirst({
@@ -811,41 +791,54 @@ export async function action({ request }: ActionFunctionArgs) {
 			throw new Response('Not authorized', { status: 403 })
 		}
 
+		// Perform validations outside of the transaction
+		let confirmedUserIdsToAdd: string[] = []
+		if (validUsersToAdd.length > 0 && !isPublic) {
+			const orgMembers = await prisma.userOrganization.findMany({
+				where: {
+					userId: { in: validUsersToAdd },
+					organizationId: note.organizationId,
+					active: true,
+				},
+				select: { userId: true },
+			})
+			confirmedUserIdsToAdd = orgMembers.map((member) => member.userId)
+			const invalidUsers = validUsersToAdd.filter(
+				(id) => !confirmedUserIdsToAdd.includes(id),
+			)
+			if (invalidUsers.length > 0) {
+				return data(
+					{
+						result: {
+							status: 'error',
+							error: `Some users are not members of this organization: ${invalidUsers.join(', ')}`,
+						},
+					},
+					{ status: 400 },
+				)
+			}
+		}
+
 		try {
+			let sharingChanged = false
+
 			// Use a transaction to ensure all operations succeed or fail together
 			await prisma.$transaction(async (tx) => {
-				console.log(
-					'Starting transaction. Current note.isPublic:',
-					note.isPublic,
-					'New isPublic:',
-					isPublic,
-				)
 
 				// Update public/private status if changed
 				if (isPublic !== note.isPublic) {
-					console.log('Updating note public status to:', isPublic)
 					await tx.organizationNote.update({
 						where: { id: noteId },
 						data: { isPublic },
 					})
 
-					// Log sharing change activity
-					await logNoteActivity({
-						noteId,
-						userId,
-						action: 'sharing_changed',
-						metadata: { isPublic },
-					})
+					sharingChanged = true
 
 					// If making note public, remove all specific access entries
 					if (isPublic) {
-						console.log('Making note public, removing all access entries')
 						await tx.noteAccess.deleteMany({
 							where: { noteId },
 						})
-						console.log(
-							'Successfully made note public and removed access entries',
-						)
 						return // No need to process user additions/removals if making public
 					}
 				}
@@ -859,42 +852,22 @@ export async function action({ request }: ActionFunctionArgs) {
 						},
 					})
 
-					// Log access revoked for each user
-					for (const targetUserId of validUsersToRemove) {
-						await logNoteActivity({
-							noteId,
-							userId,
-							action: 'access_revoked',
-							targetUserId,
-						})
+					// Log access revoked for each user in a batch
+					const revokedLogs = validUsersToRemove.map((targetUserId) => ({
+						noteId,
+						userId,
+						action: 'access_revoked' as const,
+						targetUserId,
+					}))
+					if (revokedLogs.length > 0) {
+						await tx.noteActivityLog.createMany({ data: revokedLogs })
 					}
 				}
 
 				// Add users (only if note is private)
-				if (validUsersToAdd.length > 0 && !isPublic) {
-					// Verify all target users are in the organization
-					const validOrgMembers = await tx.userOrganization.findMany({
-						where: {
-							userId: { in: validUsersToAdd },
-							organizationId: note.organizationId,
-							active: true,
-						},
-						select: { userId: true },
-					})
-
-					const validUserIds = validOrgMembers.map((member) => member.userId)
-					const invalidUsers = validUsersToAdd.filter(
-						(id) => !validUserIds.includes(id),
-					)
-
-					if (invalidUsers.length > 0) {
-						throw new Error(
-							`Some users are not members of this organization: ${invalidUsers.join(', ')}`,
-						)
-					}
-
-					// Create access entries for valid users, handling duplicates manually
-					for (const targetUserId of validUserIds) {
+				if (confirmedUserIdsToAdd.length > 0 && !isPublic) {
+					// Use upsert for each user to handle duplicates gracefully
+					for (const targetUserId of confirmedUserIdsToAdd) {
 						await tx.noteAccess.upsert({
 							where: {
 								noteId_userId: {
@@ -902,25 +875,37 @@ export async function action({ request }: ActionFunctionArgs) {
 									userId: targetUserId,
 								},
 							},
-							update: {},
+							update: {}, // No updates needed if it already exists
 							create: {
 								noteId,
 								userId: targetUserId,
 							},
 						})
+					}
 
-						// Log access granted for each user
-						await logNoteActivity({
-							noteId,
-							userId,
-							action: 'access_granted',
-							targetUserId,
-						})
+					// Log access granted for each user in a batch
+					const grantedLogs = confirmedUserIdsToAdd.map((targetUserId) => ({
+						noteId,
+						userId,
+						action: 'access_granted' as const,
+						targetUserId,
+					}))
+					if (grantedLogs.length > 0) {
+						await tx.noteActivityLog.createMany({ data: grantedLogs })
 					}
 				}
 			})
 
-			console.log('Batch update completed successfully')
+			// Log sharing change activity outside of transaction
+			if (sharingChanged) {
+				await logNoteActivity({
+					noteId,
+					userId,
+					action: 'sharing_changed',
+					metadata: { isPublic },
+				})
+			}
+
 			return data({ result: { status: 'success' } })
 		} catch (error) {
 			console.error('Error in batch update note access:', error)

@@ -259,16 +259,16 @@ export const NoteCard = ({
 						)}
 
 						{/* Card action buttons - styled like attachment count */}
-						<div className="absolute top-1 right-1 flex gap-1 opacity-0 transition-all duration-300 group-hover:opacity-100 z-10">
+						<div className="absolute duration-300 flex -right-[1px] -top-[1px] transition-all z-10">
 							{setEditingNote && (
 								<div className="pointer-events-auto">
 									<Tooltip delayDuration={0}>
 										<TooltipTrigger asChild>
 											<button
-												className="flex items-center bg-white/90 flex items-center gap-1.5 rounded border px-2 py-1.5 shadow-lg backdrop-blur-lg border-black/30 text-black"
+												className="bg-background text-background-foreground flex gap-1.5 items-center px-2 py-1.5 rounded-bl-md border-l border-b border-black/10"
 												onClick={handleStartEdit}
 											>
-												<Icon name="pencil" className="h-3 w-3" />
+												<Icon name="pencil" className="h-3.5 w-3.5" />
 											</button>
 										</TooltipTrigger>
 										<Portal>
@@ -283,13 +283,13 @@ export const NoteCard = ({
 								<Tooltip delayDuration={0} open={tooltipOpen} onOpenChange={setTooltipOpen}>
 									<TooltipTrigger asChild>
 										<button
-											className="flex items-center bg-white/90 flex items-center gap-1.5 rounded rounded-tr-xl border px-2 py-1.5 shadow-lg backdrop-blur-sm border-black/30 text-black"
+											className="bg-background text-background-foreground flex gap-1.5 items-center px-2 py-1.5 rounded-tr-[16px] border-l border-b border-black/10"
 											onClick={handleCopyLink}
 										>
 											{copied ? (
-												<Icon name="check" className="h-3 w-3" />
+												<Icon name="check" className="h-3.5 w-3.5" />
 											) : (
-												<Icon name="copy" className="h-3 w-3" />
+												<Icon name="copy" className="h-3.5 w-3.5" />
 											)}
 										</button>
 									</TooltipTrigger>
@@ -304,8 +304,8 @@ export const NoteCard = ({
 
 						{/* Status indicator - positioned over image */}
 						{!isKanbanView && note.status && (
-							<div className="absolute top-1 left-1 z-10 pointer-events-none">
-								<div className="bg-white/90 flex items-center gap-1.5 rounded rounded-tl-xl border px-2 py-1 shadow-sm backdrop-blur-sm border-black/30">
+							<div className="absolute top-[-1px] left-[-1px] z-10 pointer-events-none">
+								<div className="bg-background flex items-center gap-1.5 rounded-br rounded-tl-xl border-r border-b px-2 py-1 border-black/10">
 									{(() => {
 										const status =
 											typeof note.status === 'string'
@@ -319,7 +319,7 @@ export const NoteCard = ({
 											/>
 										)
 									})()}
-									<span className="text-black text-xs font-medium">
+									<span className="text-background-foreground text-xs font-medium">
 										{(() => {
 											const statusName =
 												typeof note.status === 'string'
@@ -470,7 +470,7 @@ export const NoteCard = ({
 					)}
 
 					{/* Footer */}
-					<div className="mt-auto pt-3 px-1">
+					<div className="mt-auto pt-3 px-1 font-mono">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-2">
 								<Avatar className="h-5 w-5">
@@ -490,7 +490,7 @@ export const NoteCard = ({
 									{createdBy.split(' ')[0]}
 								</span>
 							</div>
-							<span className="text-muted-foreground text-xs">
+							<span className="text-muted-foreground text-xs tracking-tighter">
 								{timeAgo}
 							</span>
 						</div>

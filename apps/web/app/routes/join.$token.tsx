@@ -7,8 +7,6 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	const userId = await getUserId(request)
 	const token = params.token
 
-	console.log(userId, token)
-
 	if (!token) {
 		throw new Response('Invalid invitation link', { status: 400 })
 	}
@@ -22,8 +20,6 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 			token,
 			userId,
 		)
-
-		console.log(organization, alreadyMember)
 
 		if (alreadyMember) {
 			return redirectWithToast(`/app/${organization.slug}`, {
