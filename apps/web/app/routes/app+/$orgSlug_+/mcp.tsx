@@ -172,7 +172,7 @@ function CodeBlock({
 
 	return (
 		<div className="relative">
-			<div className="overflow-x-auto rounded bg-gray-100 p-4 font-mono text-sm">
+			<div className="overflow-x-auto rounded bg-muted p-4 font-mono text-sm">
 				<pre>{code}</pre>
 			</div>
 			<Button
@@ -538,8 +538,8 @@ function SetupInstructionsCard({
 					{
 						command: 'npx',
 						args: [
-							'@modelcontextprotocol/server-fetch',
-							`${serverUrl}?apiKey=YOUR_API_KEY_HERE`,
+							'epic-notes-mcp',
+							`YOUR_API_KEY_HERE`,
 						],
 						env: {},
 					},
@@ -556,8 +556,8 @@ function SetupInstructionsCard({
 					{
 						command: 'npx',
 						args: [
-							'@modelcontextprotocol/server-fetch',
-							`${serverUrl}?apiKey=YOUR_API_KEY_HERE`,
+							'epic-notes-mcp',
+							`YOUR_API_KEY_HERE`,
 						],
 						disabled: false,
 						autoApprove: ['find_user', 'get_user_notes'],

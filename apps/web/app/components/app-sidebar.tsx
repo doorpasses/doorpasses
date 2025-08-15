@@ -36,7 +36,7 @@ import { Logo } from './icons/logo'
 import { MessageSquareMoreIcon } from './icons/message-square-more'
 import { UserRoundPlusIcon } from './icons/user-round-plus'
 import { NavSecondary } from './nav-secondary'
-import { Icon } from './ui/icon'
+import { McpIcon } from './icons/mcp-icon'
 
 // Upgrade Account Card Component
 function UpgradeAccountCard({
@@ -192,7 +192,7 @@ function OrganizationSidebar({
 			title: 'MCP Server',
 			url: `/app/${orgSlug}/mcp`,
 			isActive: location.pathname.includes(`/app/${orgSlug}/mcp`),
-			icon: () => <Icon name="mcp" className="width-4 height-4" />,
+			icon: McpIcon
 		},
 		{
 			title: 'Settings',
@@ -327,19 +327,19 @@ export function AppSidebar({
 
 	const userData = rootData?.user
 		? {
-				name: rootData.user.name || rootData.user.username || 'User',
-				email: rootData.user.username,
-				avatar: rootData.user.image
-					? `/resources/images?objectKey=${rootData.user.image.objectKey}`
-					: '/avatars/user.jpg',
-				roles: rootData.user.roles,
-			}
+			name: rootData.user.name || rootData.user.username || 'User',
+			email: rootData.user.username,
+			avatar: rootData.user.image
+				? `/resources/images?objectKey=${rootData.user.image.objectKey}`
+				: '/avatars/user.jpg',
+			roles: rootData.user.roles,
+		}
 		: {
-				name: 'Guest',
-				email: '',
-				avatar: '/avatars/user.jpg',
-				roles: [],
-			}
+			name: 'Guest',
+			email: '',
+			avatar: '/avatars/user.jpg',
+			roles: [],
+		}
 
 	return (
 		<Sidebar collapsible="offcanvas" {...props} className="overflow-hidden">
