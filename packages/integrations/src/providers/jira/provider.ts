@@ -387,9 +387,7 @@ export class JiraProvider extends BaseIntegrationProvider {
 					`Failed to fetch bot user details: ${response.statusText}`,
 				)
 			}
-
 			const botUser = await response.json() as JiraUser
-			return botUser
 		})
 	}
 
@@ -442,6 +440,7 @@ export class JiraProvider extends BaseIntegrationProvider {
 				}
 
 				const permissions = await permissionResponse.json() as any[]
+
 				const hasCreatePermission = permissions.some(
 					(p: any) =>
 						p.permission === 'CREATE_ISSUES' && p.havePermission === true,
@@ -732,7 +731,7 @@ export class JiraProvider extends BaseIntegrationProvider {
 			throw new Error(`Failed to get issue types: ${response.statusText}`)
 		}
 
-		const data = await response.json()
+		const data = (await response.json()) as any
 
 		const project = (data as any).projects?.[0]
 		if (!project || !project.issuetypes) {
@@ -797,7 +796,7 @@ export class JiraProvider extends BaseIntegrationProvider {
 				throw new Error(`Failed to fetch user details: ${response.statusText}`)
 			}
 
-			return response.json()
+			return (await response.json()) as JiraCurrentUserResponse
 		})
 	}
 
@@ -849,7 +848,7 @@ export class JiraProvider extends BaseIntegrationProvider {
 				throw new Error(`Failed to search users: ${response.statusText}`)
 			}
 
-			return response.json()
+			return (await response.json()) as JiraUser[]
 		})
 	}
 
