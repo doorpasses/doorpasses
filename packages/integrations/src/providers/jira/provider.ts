@@ -388,6 +388,7 @@ export class JiraProvider extends BaseIntegrationProvider {
 				)
 			}
 			const botUser = await response.json() as JiraUser
+			return botUser
 		})
 	}
 
