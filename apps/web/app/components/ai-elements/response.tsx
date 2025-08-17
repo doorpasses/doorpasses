@@ -151,7 +151,7 @@ function parseIncompleteMarkdown(text: string): string {
 }
 
 // Create a hardened version of ReactMarkdown
-const HardenedMarkdown = hardenReactMarkdown ? hardenReactMarkdown(ReactMarkdown) : ReactMarkdown
+const HardenedMarkdown = typeof hardenReactMarkdown === 'function' ? hardenReactMarkdown(ReactMarkdown) : ReactMarkdown
 
 export type ResponseProps = HTMLAttributes<HTMLDivElement> & {
 	options?: Options
