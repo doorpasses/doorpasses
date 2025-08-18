@@ -1,7 +1,12 @@
 import { useState } from 'react'
 import { Form } from 'react-router'
 import { Button } from '#app/components/ui/button'
-import { Card, CardContent } from '#app/components/ui/card'
+import {
+	Card,
+	CardContent,
+	CardHeader,
+	CardTitle,
+} from '#app/components/ui/card'
 import { Checkbox } from '#app/components/ui/checkbox'
 import {
 	Dialog,
@@ -34,17 +39,13 @@ export default function DangerZoneCard({
 	}
 
 	return (
-		<Card className="border-destructive/20">
+		<Card className="border-destructive/20 bg-destructive/5 dark:bg-destructive/30">
+			<CardHeader>
+				<CardTitle>
+					All your data will be permanently removed from our servers.
+				</CardTitle>
+			</CardHeader>
 			<CardContent className="space-y-4">
-				<div className="border-destructive/20 bg-destructive/5 rounded-md border p-4">
-					<h4 className="text-destructive mb-2 font-medium">
-						Deleting your organization is irreversible
-					</h4>
-					<p className="text-muted-foreground text-sm">
-						All your data will be permanently removed from our servers.
-					</p>
-				</div>
-
 				<Dialog open={isOpen} onOpenChange={setIsOpen}>
 					<DialogTrigger asChild>
 						<Button variant="destructive">Delete organization</Button>

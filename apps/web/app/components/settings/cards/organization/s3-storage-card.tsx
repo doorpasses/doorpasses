@@ -285,6 +285,7 @@ export function S3StorageCard({
 			</CardContent>
 			<CardFooter className="justify-end">
 				<StatusButton
+					size="sm"
 					form={form.id}
 					type="submit"
 					variant="default"
