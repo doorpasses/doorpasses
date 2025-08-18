@@ -58,7 +58,7 @@ export default function FavoriteNotes({
 
 	return (
 		<SidebarGroup className="group-data-[collapsible=icon]:hidden">
-			<SidebarGroupLabel>
+			<SidebarGroupLabel className="flex items-center gap-2">
 				<Icon name="star" className="h-4 w-4" />
 				Favorites
 			</SidebarGroupLabel>
@@ -92,7 +92,7 @@ export default function FavoriteNotes({
 							>
 								<DropdownMenuItem asChild className="gap-2">
 									<Link to={`/app/${orgSlug}/notes/${favorite.note.id}`}>
-										<Icon name="link-2" />
+										<Icon name="folder" />
 										<span>Open</span>
 									</Link>
 								</DropdownMenuItem>
