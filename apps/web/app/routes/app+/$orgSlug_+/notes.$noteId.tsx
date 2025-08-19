@@ -146,7 +146,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 					},
 				},
 			},
-			orderBy: { createdAt: 'asc' },
+			orderBy: { createdAt: 'desc' },
 		}),
 	])
 
@@ -165,12 +165,31 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 			if (comment.parentId) {
 				const parent = commentMap.get(comment.parentId)
 				if (parent) {
+					console.log(
+						`Adding ${comment.content.substring(0, 30)}... as reply to ${parent.content.substring(0, 30)}...`,
+					)
 					parent.replies.push(commentMap.get(comment.id))
+				} else {
+					console.log(
+						`Warning: Parent ${comment.parentId} not found for comment ${comment.id}`,
+					)
 				}
 			} else {
+				console.log(
+					`Adding ${comment.content.substring(0, 30)}... as root comment`,
+				)
 				rootComments.push(commentMap.get(comment.id))
 			}
 		})
+
+		console.log(
+			'Final organized structure:',
+			rootComments.map((c) => ({
+				content: c.content.substring(0, 30) + '...',
+				repliesCount: c.replies.length,
+				replies: c.replies.map((r: any) => r.content.substring(0, 30) + '...'),
+			})),
+		)
 
 		return rootComments
 	}
@@ -1378,7 +1397,7 @@ export default function NoteRoute() {
 
 					<TabsContent
 						value="overview"
-						className="flex-1 overflow-y-auto px-6 pt-4 pb-8 bg-muted/20"
+						className="bg-muted/20 flex-1 overflow-y-auto px-6 pt-4 pb-8"
 					>
 						{/* Media Uploads */}
 						{note.uploads.length > 0 && (
@@ -1451,25 +1470,28 @@ export default function NoteRoute() {
 
 					<TabsContent
 						value="comments"
-						className="flex-1 overflow-y-auto px-6 pt-4 pb-8 bg-muted/20"
+						className="bg-muted/20 flex-1 overflow-y-auto px-6 pt-4 pb-8"
 					>
 						<CommentsSection
 							noteId={note.id}
 							comments={comments}
 							currentUserId={currentUserId}
 							users={mentionUsers}
-							organizationId={note.id}
+							organizationId={note.organization.id}
 						/>
 					</TabsContent>
 
 					<TabsContent
 						value="activity"
-						className="flex-1 overflow-y-auto px-6 pt-4 pb-8 bg-muted/20"
+						className="bg-muted/20 flex-1 overflow-y-auto px-6 pt-4 pb-8"
 					>
 						<ActivityLog activityLogs={activityLogs} />
 					</TabsContent>
 
-					<TabsContent value="ai-assistant" className="flex-1 overflow-hidden bg-muted/20">
+					<TabsContent
+						value="ai-assistant"
+						className="bg-muted/20 flex-1 overflow-hidden"
+					>
 						<AIChat noteId={note.id} />
 					</TabsContent>
 				</Tabs>

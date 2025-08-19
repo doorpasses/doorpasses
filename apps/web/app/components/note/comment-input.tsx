@@ -108,9 +108,9 @@ const CommentInput: React.FC<CommentInputProps> = ({
 	}
 
 	return (
-		<Card 
+		<Card
 			className={cn(
-				'w-full focus-within:ring-ring transition-all focus-within:ring-2 focus-within:ring-offset-2',
+				'focus-within:ring-ring w-full transition-all focus-within:ring-2 focus-within:ring-offset-2',
 				className,
 			)}
 			onKeyDown={handleKeyDown}

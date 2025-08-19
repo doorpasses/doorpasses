@@ -73,9 +73,38 @@ export function CommentItem({
 	const maxDepth = 3 // Limit nesting depth
 
 	return (
-		<div className={`${depth > 0 ? 'border-border ml-6 border-l pl-4' : ''}`}>
-			<div className="group relative">
-				<div className="flex items-start gap-3 py-2">
+		<div className="relative">
+			{/* Vertical line extending down from this comment if it has replies */}
+			{comment.replies.length <= maxDepth && (
+				<div
+					className="border-border dark:border-muted absolute w-px rounded-bl-lg border-l"
+					style={{
+						left: `${depth * 2 + 1}rem`,
+						top: '2.5rem',
+						bottom: '0',
+						width: '1rem',
+					}}
+				/>
+			)}
+
+			{/* Horizontal connection line for replies */}
+			{depth > 0 && (
+				<div
+					className="border-border dark:border-muted absolute h-px rounded-bl-lg border-b"
+					style={{
+						left: `${(depth - 1) * 2 + 1}rem`,
+						top: '0rem',
+						width: '1rem',
+						height: '1rem',
+					}}
+				/>
+			)}
+
+			<div className="group relative pt-2">
+				<div
+					className="flex items-start gap-3 transition-colors duration-150"
+					style={{ marginLeft: depth > 0 ? `${depth * 2}rem` : '0' }}
+				>
 					<Avatar className="h-8 w-8 flex-shrink-0">
 						<AvatarImage
 							src={getUserImgSrc(comment.user.image?.objectKey)}
@@ -100,7 +129,7 @@ export function CommentItem({
 								<Button
 									variant="ghost"
 									size="sm"
-									className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100"
+									className="absolute top-0 right-0 h-8 w-8 p-0 opacity-0 group-hover:opacity-100"
 									onClick={handleDelete}
 									disabled={isDeleting}
 								>
@@ -110,7 +139,7 @@ export function CommentItem({
 						</div>
 
 						<div
-							className="text-foreground prose prose-sm prose-p:my-1 max-w-none text-sm leading-relaxed tracking-wider"
+							className="text-foreground prose prose-sm prose-p:my-1 mb-2 max-w-none text-sm leading-relaxed tracking-wider"
 							dangerouslySetInnerHTML={{ __html: comment.content }}
 						/>
 
@@ -136,40 +165,13 @@ export function CommentItem({
 								))}
 							</div>
 						)}
-
-						<div className="mt-2 flex items-center gap-2">
-							{depth < maxDepth && (
-								<Button
-									variant="ghost"
-									size="sm"
-									onClick={() => setShowReplyForm(!showReplyForm)}
-									className="text-muted-foreground hover:text-foreground h-auto px-0 py-1 text-xs"
-								>
-									<Icon name="paper-plane" className="mr-1 h-3 w-3" />
-									Reply
-								</Button>
-							)}
-						</div>
-
-						{showReplyForm && (
-							<div className="mt-4">
-								<CommentInput
-									users={users}
-									onSubmit={handleReply}
-									value=""
-									reply
-									onCancel={() => setShowReplyForm(false)}
-									placeholder="Write a reply..."
-								/>
-							</div>
-						)}
 					</div>
 				</div>
 			</div>
 
 			{/* Render replies */}
 			{comment.replies.length > 0 && (
-				<div className="mt-2">
+				<div className="mb-8 space-y-3">
 					{comment.replies.map((reply) => (
 						<CommentItem
 							key={reply.id}
@@ -183,6 +185,46 @@ export function CommentItem({
 							onDelete={onDelete}
 						/>
 					))}
+				</div>
+			)}
+			{/* Reply button for all comments */}
+			{depth < maxDepth && !showReplyForm && (
+				<div className="relative mt-2 flex items-center gap-2">
+					<>
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={() => setShowReplyForm(!showReplyForm)}
+							className="text-muted-foreground hover:text-foreground absolute h-auto px-0 py-1 text-xs"
+							style={{ marginLeft: `${depth * 2 + 2}rem` }}
+						>
+							<Icon name="paper-plane" className="mr-1 h-3 w-3" />
+							Reply
+						</Button>
+						<div
+							className="border-border dark:border-muted absolute h-px rounded-bl-lg border-b"
+							style={{
+								left: `${depth * 2 + 1}rem`,
+								top: '-16px',
+								width: '1rem',
+								height: '1rem',
+							}}
+						/>
+					</>
+				</div>
+			)}
+
+			{/* Reply form for all comments */}
+			{showReplyForm && (
+				<div style={{ marginLeft: `${depth * 2 + 2}rem` }}>
+					<CommentInput
+						users={users}
+						onSubmit={handleReply}
+						value=""
+						reply
+						onCancel={() => setShowReplyForm(false)}
+						placeholder="Write a reply..."
+					/>
 				</div>
 			)}
 		</div>

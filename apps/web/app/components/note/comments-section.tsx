@@ -167,7 +167,7 @@ export function CommentsSection({
 			</div>
 
 			{/* Display comments */}
-			<div className="space-y-2">
+			<div className="flex flex-col space-y-2">
 				{organizedComments.length > 0 ? (
 					organizedComments.map((comment) => (
 						<CommentItem
