@@ -1350,7 +1350,7 @@ export default function NoteRoute() {
 				<Tabs
 					value={activeTab}
 					onValueChange={setActiveTab}
-					className="flex min-h-0 flex-1 flex-col"
+					className="flex min-h-0 flex-1 flex-col gap-0"
 				>
 					<TabsList className="w-full rounded-none">
 						<TabsTrigger value="overview" className="flex-1 gap-2">
@@ -1378,7 +1378,7 @@ export default function NoteRoute() {
 
 					<TabsContent
 						value="overview"
-						className="flex-1 overflow-y-auto px-6 pt-2 pb-8"
+						className="flex-1 overflow-y-auto px-6 pt-4 pb-8 bg-muted/20"
 					>
 						{/* Media Uploads */}
 						{note.uploads.length > 0 && (
@@ -1451,7 +1451,7 @@ export default function NoteRoute() {
 
 					<TabsContent
 						value="comments"
-						className="flex-1 overflow-y-auto px-6 pt-2 pb-8"
+						className="flex-1 overflow-y-auto px-6 pt-4 pb-8 bg-muted/20"
 					>
 						<CommentsSection
 							noteId={note.id}
@@ -1464,12 +1464,12 @@ export default function NoteRoute() {
 
 					<TabsContent
 						value="activity"
-						className="flex-1 overflow-y-auto px-6 pt-2 pb-8"
+						className="flex-1 overflow-y-auto px-6 pt-4 pb-8 bg-muted/20"
 					>
 						<ActivityLog activityLogs={activityLogs} />
 					</TabsContent>
 
-					<TabsContent value="ai-assistant" className="flex-1 overflow-hidden">
+					<TabsContent value="ai-assistant" className="flex-1 overflow-hidden bg-muted/20">
 						<AIChat noteId={note.id} />
 					</TabsContent>
 				</Tabs>

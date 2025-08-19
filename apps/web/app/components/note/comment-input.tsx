@@ -5,6 +5,7 @@ import StarterKit from '@tiptap/starter-kit'
 import React, { useEffect, useState } from 'react'
 import { cn } from '#app/utils/misc.js'
 import { Button } from '../ui/button'
+import { Card, CardContent, CardFooter } from '../ui/card'
 import { CommentImagePreview } from './comment-image-preview'
 import { CommentImageUpload } from './comment-image-upload'
 import { EmojiPickerButton } from './emoji-picker-button'
@@ -107,14 +108,14 @@ const CommentInput: React.FC<CommentInputProps> = ({
 	}
 
 	return (
-		<div
+		<Card 
 			className={cn(
-				'bg-card text-card-foreground focus-within:ring-ring w-full rounded-lg border shadow-xs transition-all focus-within:ring-2 focus-within:ring-offset-2',
+				'w-full focus-within:ring-ring transition-all focus-within:ring-2 focus-within:ring-offset-2',
 				className,
 			)}
 			onKeyDown={handleKeyDown}
 		>
-			<div className="px-4 py-3">
+			<CardContent className="p-4">
 				<EditorContent
 					editor={editor}
 					className="min-h-[60px] focus:outline-none"
@@ -128,8 +129,8 @@ const CommentInput: React.FC<CommentInputProps> = ({
 						/>
 					</div>
 				)}
-			</div>
-			<div className="bg-muted/30 flex items-center justify-between border-t px-4 py-2">
+			</CardContent>
+			<CardFooter className="flex items-center justify-between">
 				<div className="flex items-center">
 					<CommentImageUpload
 						onImagesSelected={handleImagesSelected}
@@ -168,8 +169,8 @@ const CommentInput: React.FC<CommentInputProps> = ({
 						{reply ? 'Reply' : 'Comment'}
 					</Button>
 				</div>
-			</div>
-		</div>
+			</CardFooter>
+		</Card>
 	)
 }
 

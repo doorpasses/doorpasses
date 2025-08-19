@@ -7,7 +7,7 @@ function Card({ className, ...props }: React.ComponentProps<'div'>) {
 		<section
 			data-slot="card"
 			className={cn(
-				'group bg-muted/50 dark:bg-background flex flex-col rounded-2xl py-1',
+				'group bg-muted dark:bg-background flex flex-col rounded-2xl py-1',
 				className,
 			)}
 			{...props}
@@ -107,7 +107,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
 	return (
 		<footer
 			data-slot="card-footer"
-			className={cn('flex px-5 py-2', className)}
+			className={cn('flex px-5 py-3 pb-1.5', className)}
 			{...props}
 		/>
 	)
