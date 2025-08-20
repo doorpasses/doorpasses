@@ -216,7 +216,11 @@ async function profileUpdateAction({ userId, formData }: ProfileActionArgs) {
 	}
 }
 
-function UpdateProfile({ loaderData }: { loaderData: Route.ComponentProps['loaderData'] }) {
+function UpdateProfile({
+	loaderData,
+}: {
+	loaderData: Route.ComponentProps['loaderData']
+}) {
 	const fetcher = useFetcher<typeof profileUpdateAction>()
 
 	const [form, fields] = useForm({

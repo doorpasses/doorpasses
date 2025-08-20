@@ -6,14 +6,14 @@ interface PrioritySignalProps {
 	theme?: 'light' | 'dark'
 }
 
-export function PrioritySignal({ 
-	priority, 
-	className, 
-	theme = 'light' 
+export function PrioritySignal({
+	priority,
+	className,
+	theme = 'light',
 }: PrioritySignalProps) {
 	const fill =
 		theme === 'dark' ? 'lch(65.87% 0 0)' : 'lch(39.286% 1 282.863 / 1)'
-	
+
 	const getColorAndOpacity = (barIndex: number) => {
 		switch (priority) {
 			case 'low':

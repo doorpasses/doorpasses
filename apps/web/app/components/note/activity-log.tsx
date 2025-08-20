@@ -152,7 +152,7 @@ export function ActivityLog({ activityLogs }: ActivityLogProps) {
 
 						<div className="flex items-start gap-3">
 							<div
-								className={`border-background bg-background relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-1 text-muted-foreground bg-muted border-border`}
+								className={`border-background bg-background text-muted-foreground bg-muted border-border relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-1`}
 							>
 								<Icon
 									name={getActivityIcon(log.action)}
@@ -165,8 +165,7 @@ export function ActivityLog({ activityLogs }: ActivityLogProps) {
 									dangerouslySetInnerHTML={{
 										__html: formatActivityMessage(log),
 									}}
-								>
-								</p>
+								></p>
 								<p className="text-muted-foreground mt-1 mb-4 text-xs">
 									{formatDistanceToNow(new Date(log.createdAt), {
 										addSuffix: true,

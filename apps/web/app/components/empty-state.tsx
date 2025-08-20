@@ -32,11 +32,37 @@ export function EmptyState({
 				className,
 			)}
 		>
-			<div className="p-14 bg-background dark:bg-muted/50 rounded-xl hover:dark:bg-muted/70 group transition duration-500 hover:duration-200">
-			<div className="isolate flex justify-center">
-				{icons.length === 3 ? (
-					<>
-						<div className="bg-background ring-border relative top-1.5 left-2.5 grid size-12 -rotate-6 place-items-center rounded-xl shadow-lg ring-1 transition duration-500 group-hover:-translate-x-5 group-hover:-translate-y-0.5 group-hover:-rotate-12 group-hover:duration-200">
+			<div className="bg-background dark:bg-muted/50 hover:dark:bg-muted/70 group rounded-xl p-14 transition duration-500 hover:duration-200">
+				<div className="isolate flex justify-center">
+					{icons.length === 3 ? (
+						<>
+							<div className="bg-background ring-border relative top-1.5 left-2.5 grid size-12 -rotate-6 place-items-center rounded-xl shadow-lg ring-1 transition duration-500 group-hover:-translate-x-5 group-hover:-translate-y-0.5 group-hover:-rotate-12 group-hover:duration-200">
+								{icons[0] && (
+									<Icon
+										name={icons[0]}
+										className="text-muted-foreground h-6 w-6"
+									/>
+								)}
+							</div>
+							<div className="bg-background ring-border relative z-10 grid size-12 place-items-center rounded-xl shadow-lg ring-1 transition duration-500 group-hover:-translate-y-0.5 group-hover:duration-200">
+								{icons[1] && (
+									<Icon
+										name={icons[1]}
+										className="text-muted-foreground h-6 w-6"
+									/>
+								)}
+							</div>
+							<div className="bg-background ring-border relative top-1.5 right-2.5 grid size-12 rotate-6 place-items-center rounded-xl shadow-lg ring-1 transition duration-500 group-hover:translate-x-5 group-hover:-translate-y-0.5 group-hover:rotate-12 group-hover:duration-200">
+								{icons[2] && (
+									<Icon
+										name={icons[2]}
+										className="text-muted-foreground h-6 w-6"
+									/>
+								)}
+							</div>
+						</>
+					) : (
+						<div className="bg-background ring-border grid size-12 place-items-center rounded-xl shadow-lg ring-1 transition duration-500 group-hover:-translate-y-0.5 group-hover:duration-200">
 							{icons[0] && (
 								<Icon
 									name={icons[0]}
@@ -44,40 +70,20 @@ export function EmptyState({
 								/>
 							)}
 						</div>
-						<div className="bg-background ring-border relative z-10 grid size-12 place-items-center rounded-xl shadow-lg ring-1 transition duration-500 group-hover:-translate-y-0.5 group-hover:duration-200">
-							{icons[1] && (
-								<Icon
-									name={icons[1]}
-									className="text-muted-foreground h-6 w-6"
-								/>
-							)}
-						</div>
-						<div className="bg-background ring-border relative top-1.5 right-2.5 grid size-12 rotate-6 place-items-center rounded-xl shadow-lg ring-1 transition duration-500 group-hover:translate-x-5 group-hover:-translate-y-0.5 group-hover:rotate-12 group-hover:duration-200">
-							{icons[2] && (
-								<Icon
-									name={icons[2]}
-									className="text-muted-foreground h-6 w-6"
-								/>
-							)}
-						</div>
-					</>
-				) : (
-					<div className="bg-background ring-border grid size-12 place-items-center rounded-xl shadow-lg ring-1 transition duration-500 group-hover:-translate-y-0.5 group-hover:duration-200">
-						{icons[0] && (
-							<Icon name={icons[0]} className="text-muted-foreground h-6 w-6" />
-						)}
-					</div>
+					)}
+				</div>
+				<h2 className="text-foreground mt-6 font-medium">{title}</h2>
+				<p className="text-muted-foreground mt-1 text-sm whitespace-pre-line">
+					{description}
+				</p>
+				{action && (
+					<Button
+						asChild
+						className={cn('mt-4', 'shadow-sm active:shadow-none')}
+					>
+						<Link to={action.href}>{action.label}</Link>
+					</Button>
 				)}
-			</div>
-			<h2 className="text-foreground mt-6 font-medium">{title}</h2>
-			<p className="text-muted-foreground mt-1 text-sm whitespace-pre-line">
-				{description}
-			</p>
-			{action && (
-				<Button asChild className={cn('mt-4', 'shadow-sm active:shadow-none')}>
-					<Link to={action.href}>{action.label}</Link>
-				</Button>
-			)}
 			</div>
 		</div>
 	)

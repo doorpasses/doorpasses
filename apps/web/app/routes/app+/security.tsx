@@ -2,10 +2,7 @@ import { generateTOTP, getTOTPAuthUri } from '@epic-web/totp'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import * as QRCode from 'qrcode'
 import { AnnotatedLayout, AnnotatedSection, PageTitle } from '@repo/ui'
-import {
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from 'react-router'
+import { type ActionFunctionArgs, type LoaderFunctionArgs } from 'react-router'
 import { AdvancedSettingsCard } from '#app/components/settings/cards/advanced-settings-card.tsx'
 import { ConnectionsCard } from '#app/components/settings/cards/connections-card.tsx'
 import { SecurityCard } from '#app/components/settings/cards/security-card.tsx'

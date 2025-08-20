@@ -1,5 +1,11 @@
 import { Connections } from '#app/components/settings/connections.tsx'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/ui'
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from '@repo/ui'
 
 export const disconnectProviderActionIntent = 'disconnect-provider'
 

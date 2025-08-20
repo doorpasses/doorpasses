@@ -5,10 +5,7 @@ import { data, redirect, Form, Link } from 'react-router'
 import { ErrorList, Field } from '#app/components/forms.tsx'
 
 import { Button, Icon, StatusButton } from '@repo/ui'
-import {
-	getPasswordHash,
-	requireUserId,
-} from '#app/utils/auth.server.ts'
+import { getPasswordHash, requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { PasswordAndConfirmPasswordSchema } from '#app/utils/user-validation.ts'

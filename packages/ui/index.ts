@@ -27,15 +27,38 @@ export { Progress } from './components/progress'
 export { Avatar, AvatarImage, AvatarFallback } from './components/avatar'
 
 // Interactive components
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './components/tooltip'
-export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor } from './components/popover'
-export { Collapsible, CollapsibleTrigger, CollapsibleContent } from './components/collapsible'
-export { HoverCard, HoverCardTrigger, HoverCardContent } from './components/hover-card'
+export {
+	Tooltip,
+	TooltipTrigger,
+	TooltipContent,
+	TooltipProvider,
+} from './components/tooltip'
+export {
+	Popover,
+	PopoverTrigger,
+	PopoverContent,
+	PopoverAnchor,
+} from './components/popover'
+export {
+	Collapsible,
+	CollapsibleTrigger,
+	CollapsibleContent,
+} from './components/collapsible'
+export {
+	HoverCard,
+	HoverCardTrigger,
+	HoverCardContent,
+} from './components/hover-card'
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/tabs'
 export { Toggle, toggleVariants } from './components/toggle'
 
 // Advanced form components
-export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from './components/input-otp'
+export {
+	InputOTP,
+	InputOTPGroup,
+	InputOTPSlot,
+	InputOTPSeparator,
+} from './components/input-otp'
 
 // Layout utilities
 export { ScrollArea, ScrollBar } from './components/scroll-area'
@@ -68,7 +91,10 @@ export {
 } from './components/select'
 
 // Layout and structure components
-export { AnnotatedLayout, AnnotatedSection } from './components/annotated-layout'
+export {
+	AnnotatedLayout,
+	AnnotatedSection,
+} from './components/annotated-layout'
 export {
 	Table,
 	TableHeader,
@@ -113,7 +139,10 @@ export { EpicToaster } from './components/sonner'
 export { PageTitle } from './components/page-title'
 export { ColorPicker } from './components/color-picker'
 export { StatusButton } from './components/status-button'
-export { SquarePenIcon, type SquarePenIconHandle } from './components/square-pen-icon'
+export {
+	SquarePenIcon,
+	type SquarePenIconHandle,
+} from './components/square-pen-icon'
 export { PrioritySignal } from './components/priority-signal'
 export { ImageCropper, centerAspectCrop } from './components/image-cropper'
 
@@ -212,11 +241,7 @@ export {
 } from './components/sidebar'
 
 // Icon system
-export { 
-	Icon, 
-	type IconName,
-	type IconSize 
-} from './components/icon'
+export { Icon, type IconName, type IconSize } from './components/icon'
 
 // Export utilities
 export { cn } from './utils/cn'

@@ -1,7 +1,13 @@
 'use client'
 
 import { type ComponentProps } from 'react'
-import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@repo/ui'
+import {
+	Button,
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from '@repo/ui'
 
 import { cn } from '#app/utils/misc'
 

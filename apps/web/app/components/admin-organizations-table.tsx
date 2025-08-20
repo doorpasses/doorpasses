@@ -33,7 +33,7 @@ import {
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-	Icon
+	Icon,
 } from '@repo/ui'
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'

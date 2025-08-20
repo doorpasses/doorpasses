@@ -6,12 +6,7 @@ import { SettingsGearIcon } from '#app/components/icons/settings-gear-icon'
 import { UserIcon } from '#app/components/icons/user-icon'
 import { NavMain } from '#app/components/nav-main'
 import { NavUser } from '#app/components/nav-user'
-import {
-	Sidebar,
-	SidebarContent,
-	SidebarFooter,
-	SidebarHeader,
-} from '@repo/ui'
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@repo/ui'
 import { type loader as rootLoader } from '#app/root.tsx'
 import { GlobeIcon } from './icons/globe-icon'
 import { Logo } from './icons/logo'

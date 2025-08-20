@@ -3,7 +3,14 @@ import { useState, useRef } from 'react'
 
 import { OrganizationPhotoForm } from '#app/components/settings/organization-photo-form.tsx'
 
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Icon } from '@repo/ui'
+import {
+	Button,
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	Icon,
+} from '@repo/ui'
 
 export const uploadOrgPhotoActionIntent = 'upload-org-photo'
 export const deleteOrgPhotoActionIntent = 'delete-org-photo'

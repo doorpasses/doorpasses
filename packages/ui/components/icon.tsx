@@ -32,11 +32,11 @@ interface IconProps extends SVGProps<SVGSVGElement> {
 
 /**
  * Icon component that uses the generated sprite from the UI package.
- * 
+ *
  * Renders an SVG icon. The icon defaults to the size of the font. To make it
  * align vertically with neighboring text, you can pass the text as a child of
  * the icon and it will be automatically aligned.
- * 
+ *
  * Pass `title` prop to the `Icon` component to get `<title>` element rendered
  * in the SVG container for accessibility.
  */

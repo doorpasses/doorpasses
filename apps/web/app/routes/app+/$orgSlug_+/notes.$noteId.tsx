@@ -12,7 +12,7 @@ import {
 	TabsTrigger,
 	TabsContent,
 	SheetHeader,
-	SheetTitle,	
+	SheetTitle,
 	Icon,
 	StatusButton,
 } from '@repo/ui'

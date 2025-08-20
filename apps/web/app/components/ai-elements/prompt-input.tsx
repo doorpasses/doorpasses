@@ -1,7 +1,15 @@
 'use client'
 
 import { Loader2Icon, SendIcon, SquareIcon, XIcon } from 'lucide-react'
-import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from '@repo/ui'
+import {
+	Button,
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+	Textarea,
+} from '@repo/ui'
 import {
 	type ComponentProps,
 	type HTMLAttributes,

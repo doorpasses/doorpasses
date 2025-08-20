@@ -75,9 +75,7 @@ function BreadcrumbSeparator({
 			className={cn('[&>svg]:size-3.5', className)}
 			{...props}
 		>
-			{children ?? (
-				<Icon name="chevron-right" />
-			)}
+			{children ?? <Icon name="chevron-right" />}
 		</li>
 	)
 }
@@ -86,7 +84,6 @@ function BreadcrumbEllipsis({
 	className,
 	...props
 }: React.ComponentProps<'span'>) {
-
 	return (
 		<span
 			data-slot="breadcrumb-ellipsis"

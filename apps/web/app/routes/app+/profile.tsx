@@ -1,10 +1,7 @@
 import { parseFormData } from '@mjackson/form-data-parser'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { AnnotatedLayout, AnnotatedSection, PageTitle } from '@repo/ui'
-import {
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-} from 'react-router'
+import { type ActionFunctionArgs, type LoaderFunctionArgs } from 'react-router'
 import { ProfileCard } from '#app/components/settings/cards/profile-card.tsx'
 
 import { requireUserId } from '#app/utils/auth.server.ts'

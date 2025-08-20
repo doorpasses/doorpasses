@@ -1,5 +1,13 @@
 import { useLoaderData } from 'react-router'
-import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, Icon } from '@repo/ui'
+import {
+	Badge,
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+	Icon,
+} from '@repo/ui'
 
 import { prisma } from '#app/utils/db.server.ts'
 import { requireUserWithRole } from '#app/utils/permissions.server.ts'

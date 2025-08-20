@@ -17,11 +17,7 @@ import {
 } from './dialog'
 import { Icon } from './icon'
 
-function ImageCropperProvider({
-	children,
-}: {
-	children: React.ReactNode
-}) {
+function ImageCropperProvider({ children }: { children: React.ReactNode }) {
 	return <>{children}</>
 }
 

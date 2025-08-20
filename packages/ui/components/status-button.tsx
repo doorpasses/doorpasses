@@ -10,7 +10,9 @@ import {
 } from './tooltip'
 import { Icon } from './icon'
 
-interface StatusButtonProps extends React.ComponentProps<'button'>, ButtonVariant {
+interface StatusButtonProps
+	extends React.ComponentProps<'button'>,
+		ButtonVariant {
 	status: 'pending' | 'success' | 'error' | 'idle'
 	message?: string | null
 	spinDelay?: Parameters<typeof useSpinDelay>[1]

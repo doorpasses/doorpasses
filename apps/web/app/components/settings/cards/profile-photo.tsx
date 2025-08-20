@@ -4,7 +4,14 @@ import { useState, useRef } from 'react'
 import { ProfilePhotoForm } from '#app/components/settings/profile-photo-form.tsx'
 
 import { getUserImgSrc } from '#app/utils/misc.tsx'
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Icon } from '@repo/ui'
+import {
+	Button,
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	Icon,
+} from '@repo/ui'
 
 export const uploadPhotoActionIntent = 'upload-photo'
 export const deletePhotoActionIntent = 'delete-photo'

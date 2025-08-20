@@ -1,5 +1,12 @@
 import { useLoaderData } from 'react-router'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui'
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '@repo/ui'
 import { type Feedback, type Organization, type User } from '@prisma/client'
 
 import { prisma } from '#app/utils/db.server'

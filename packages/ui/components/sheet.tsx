@@ -56,7 +56,6 @@ function SheetContent({
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
 	side?: 'top' | 'right' | 'bottom' | 'left'
 }) {
-
 	return (
 		<SheetPortal>
 			<SheetOverlay />
