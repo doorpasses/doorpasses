@@ -46,6 +46,7 @@ model User {
   blacklistedIps         IpAddress[]                @relation("IpBlacklists")
   ipAddressUsers         IpAddressUser[]
   apiKeys                ApiKey[]
+  configFlags            ConfigFlag[]
 }
 
 model Note {
@@ -205,6 +206,7 @@ model Organization {
   s3Config               OrganizationS3Config?
   Feedback               Feedback[]
   apiKeys                ApiKey[]
+  configFlags            ConfigFlag[]
 }
 
 model OrganizationRole {
@@ -644,4 +646,29 @@ model ApiKey {
   @@index([userId])
   @@index([organizationId])
   @@index([key])
+}
+
+enum ConfigFlagLevel {
+  system
+  organization
+  user
+}
+
+model ConfigFlag {
+  id             String          @id @default(cuid())
+  key            String
+  value          Json
+  level          ConfigFlagLevel
+  organizationId String?
+  userId         String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([key, level, organizationId, userId])
+  @@index([key])
+  @@index([level])
+  @@index([organizationId])
+  @@index([userId])
 }

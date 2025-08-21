@@ -69,6 +69,12 @@ export function AdminSidebar({
 			isActive: location.pathname.startsWith('/admin/feedback'),
 			icon: MessageSquareMoreIcon,
 		},
+		{
+			title: 'Feature Flags',
+			url: '/admin/feature-flags',
+			isActive: location.pathname.startsWith('/admin/feature-flags'),
+			icon: SettingsGearIcon,
+		},
 	]
 
 	// User data for NavUser component
