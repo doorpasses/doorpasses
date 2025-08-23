@@ -1,9 +1,20 @@
 import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Card, CardHeader, CardContent, CardTitle, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, Switch } from '@repo/ui'
 import { useState } from 'react'
 import { useFetcher, useLoaderData } from 'react-router'
-import { type loader } from '#app/routes/admin+/feature-flags'
+import { type loader } from '#app/routes/_admin+/feature-flags'
 
-function FeatureFlagDialog({ flag, children }: { flag?: any, children: React.ReactNode }) {
+type ConfigFlag = {
+  id: string
+  key: string
+  value: any
+  level: 'system' | 'organization' | 'user'
+  organizationId?: string | null
+  userId?: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+function FeatureFlagDialog({ flag, children }: { flag?: ConfigFlag, children: React.ReactNode }) {
   const fetcher = useFetcher()
   const [level, setLevel] = useState(flag?.level ?? 'system')
   const [type, setType] = useState(typeof flag?.value === 'number' ? 'number' : typeof flag?.value === 'boolean' ? 'boolean' : 'string')
@@ -52,7 +63,7 @@ function FeatureFlagDialog({ flag, children }: { flag?: any, children: React.Rea
               />
             )}
             
-            <Select name="level" required defaultValue={flag?.level} onValueChange={setLevel}>
+            <Select name="level" required defaultValue={flag?.level} onValueChange={(value) => setLevel(value as 'system' | 'organization' | 'user')}>
               <SelectTrigger>
                 <SelectValue placeholder="Level" />
               </SelectTrigger>
