@@ -127,15 +127,23 @@ const columns: ColumnDef<AdminUser>[] = [
 		header: 'Organizations',
 		cell: ({ row }) => {
 			const orgs = row.original.organizations
-			if (orgs.length === 0) {
+			if (!orgs || orgs.length === 0) {
 				return <span className="text-muted-foreground">None</span>
 			}
-			if (orgs.length === 1) {
-				return <Badge variant="secondary">{orgs[0]?.organization.name}</Badge>
+
+			// Get the first valid organization
+			const firstOrg = orgs.find(org => org?.organization?.name)
+			if (!firstOrg) {
+				return <span className="text-muted-foreground">None</span>
 			}
+
+			if (orgs.length === 1) {
+				return <Badge variant="secondary">{firstOrg.organization.name}</Badge>
+			}
+
 			return (
 				<div className="flex items-center gap-1">
-					<Badge variant="secondary">{orgs[0]?.organization.name}</Badge>
+					<Badge variant="secondary">{firstOrg.organization.name}</Badge>
 					{orgs.length > 1 && (
 						<Badge variant="outline">+{orgs.length - 1}</Badge>
 					)}
