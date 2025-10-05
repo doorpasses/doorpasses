@@ -28,6 +28,8 @@ test('Users can add 2FA to their account and use it when logging in', async ({
 		page.getByRole('textbox', { name: /Authentication Code/i }),
 	).toBeVisible()
 
+	await main.getByRole('tab', {  name: /Setup key/i }).click()
+
 	// Wait for the OTP URI element to be available before accessing its text
 	const otpUriElement = page.getByLabel(/One-time Password URI/i)
 	await expect(otpUriElement).toBeVisible()
@@ -45,7 +47,7 @@ test('Users can add 2FA to their account and use it when logging in', async ({
 			})
 		).otp,
 	)
-	await page.getByRole('button', { name: /Enable 2FA/i }).click()
+	await page.getByRole('button', { name: /Confirm/i }).click()
 	// Wait specifically for the dialog heading (level 2) to be hidden, not the main page heading
 	await expect(
 		page.getByRole('heading', { name: 'Two-Factor Authentication', level: 2 }),
@@ -59,6 +61,7 @@ test('Users can add 2FA to their account and use it when logging in', async ({
 		.first()
 		.click()
 	await page.getByRole('button', { name: /log out/i }).click()
+	await expect(page.getByRole('link', { name: /login/i })).toBeVisible()
 
 	await page.goto('/login')
 	await expect(page).toHaveURL(`/login`)
@@ -79,10 +82,10 @@ test('Users can add 2FA to their account and use it when logging in', async ({
 
 	await page.getByRole('button', { name: /verify/i }).click()
 
-	await expect(page).toHaveURL('/organizations/create')
+	await expect(page).toHaveURL('/')
 
 	// Navigate to the app to verify the user is properly logged in
-	await page.goto('/')
+	await page.goto('/app')
 
 	// User should be redirected to organization creation page (authenticated area)
 	await expect(page).toHaveURL('/organizations/create')
