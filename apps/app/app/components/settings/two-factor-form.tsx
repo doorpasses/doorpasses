@@ -115,7 +115,7 @@ export function TwoFactorForm({
 							<TabsContent value="setup-key" className="mt-4">
 								{otpUri && (
 									<div className="bg-muted rounded-md p-4">
-										<pre className="font-mono text-xs break-all whitespace-pre-wrap">
+										<pre className="font-mono text-xs break-all whitespace-pre-wrap" aria-label="One-time Password URI">
 											{otpUri}
 										</pre>
 									</div>
