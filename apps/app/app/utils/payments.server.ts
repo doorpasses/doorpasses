@@ -238,8 +238,8 @@ export async function createCheckoutSession(
 			...(trialConfig.creditCardRequired === 'manual'
 				? {}
 				: {
-					trial_period_days: trialConfig.trialDays,
-				}),
+						trial_period_days: trialConfig.trialDays,
+					}),
 		},
 		payment_method_collection:
 			trialConfig.creditCardRequired === 'stripe' ? 'if_required' : 'always',
@@ -596,7 +596,9 @@ export const customerPortalAction = async (
 	return redirect(portalSession.url)
 }
 
-export async function getOrganizationInvoices(organization: { stripeCustomerId: string | null }) {
+export async function getOrganizationInvoices(organization: {
+	stripeCustomerId: string | null
+}) {
 	if (!organization.stripeCustomerId) {
 		return []
 	}

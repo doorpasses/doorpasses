@@ -12,12 +12,7 @@ import { useLocalSearchParams, router } from 'expo-router'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import {
-	Screen,
-	Button,
-	ErrorText,
-	LoadingOverlay,
-} from '../../components/ui'
+import { Screen, Button, ErrorText, LoadingOverlay } from '../../components/ui'
 import { useVerify } from '../../lib/auth/hooks'
 import { navigateToSignIn } from '../../lib/navigation'
 import { dismissKeyboard } from '../../lib/keyboard/keyboard-utils'
@@ -175,9 +170,7 @@ export default function VerifyCodeScreen() {
 							name="code"
 							render={({ field: { onChange, value } }) => (
 								<View style={styles.otpContainer}>
-									<Text style={styles.otpLabel}>
-										Enter 6-character code:
-									</Text>
+									<Text style={styles.otpLabel}>Enter 6-character code:</Text>
 									<TextInput
 										style={[
 											styles.singleOtpInput,
@@ -217,9 +210,7 @@ export default function VerifyCodeScreen() {
 							</ErrorText>
 						)}
 
-						{error && (
-							<ErrorText style={styles.errorText}>{error}</ErrorText>
-						)}
+						{error && <ErrorText style={styles.errorText}>{error}</ErrorText>}
 
 						<View style={styles.actionsContainer}>
 							<Button
@@ -231,8 +222,8 @@ export default function VerifyCodeScreen() {
 							</Button>
 
 							<Text style={styles.helpText}>
-								Didn't receive the code? Check your spam folder or request a
-								new one.
+								Didn't receive the code? Check your spam folder or request a new
+								one.
 							</Text>
 
 							<Button
@@ -256,9 +247,7 @@ export default function VerifyCodeScreen() {
 					<Text style={styles.footerSeparator}>•</Text>
 
 					<TouchableOpacity onPress={handleGoToSignIn}>
-						<Text style={styles.footerLinkText}>
-							Already have an account?
-						</Text>
+						<Text style={styles.footerLinkText}>Already have an account?</Text>
 					</TouchableOpacity>
 				</View>
 			</ScrollView>

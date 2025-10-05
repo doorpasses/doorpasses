@@ -69,10 +69,6 @@ export function DeleteData() {
 
 	return (
 		<div className="flex items-center justify-between">
-			<div className="flex items-center">
-				<Icon name="trash-2" className="mr-2" />
-				<span>Delete all your data and account</span>
-			</div>
 			<fetcher.Form method="POST">
 				<StatusButton
 					{...dc.getButtonProps({
@@ -83,6 +79,7 @@ export function DeleteData() {
 					variant={dc.doubleCheck ? 'destructive' : 'outline'}
 					status={fetcher.state !== 'idle' ? 'pending' : 'idle'}
 				>
+					<Icon name="trash-2" />
 					{dc.doubleCheck ? 'Are you sure?' : 'Delete account'}
 				</StatusButton>
 			</fetcher.Form>

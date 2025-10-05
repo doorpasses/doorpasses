@@ -132,7 +132,7 @@ const columns: ColumnDef<AdminUser>[] = [
 			}
 
 			// Get the first valid organization
-			const firstOrg = orgs.find(org => org?.organization?.name)
+			const firstOrg = orgs.find((org) => org?.organization?.name)
 			if (!firstOrg) {
 				return <span className="text-muted-foreground">None</span>
 			}

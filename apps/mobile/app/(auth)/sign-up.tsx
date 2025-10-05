@@ -192,9 +192,7 @@ export default function SignUpScreen() {
 
 					{/* Error Display */}
 					{currentError && (
-						<ErrorText style={styles.errorContainer}>
-							{currentError}
-						</ErrorText>
+						<ErrorText style={styles.errorContainer}>{currentError}</ErrorText>
 					)}
 
 					{/* Signup Form */}
@@ -219,9 +217,7 @@ export default function SignUpScreen() {
 									/>
 								)}
 							/>
-							{errors.email && (
-								<ErrorText>{errors.email.message}</ErrorText>
-							)}
+							{errors.email && <ErrorText>{errors.email.message}</ErrorText>}
 						</View>
 
 						{/* Submit Button */}

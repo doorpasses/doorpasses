@@ -10,12 +10,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import {
-	Screen,
-	Input,
-	Button,
-	ErrorText,
-} from '../../components/ui'
+import { Screen, Input, Button, ErrorText } from '../../components/ui'
 import { navigateToSignIn } from '../../lib/navigation'
 
 const ForgotPasswordSchema = z.object({
@@ -98,9 +93,7 @@ export default function ForgotPasswordScreen() {
 									/>
 								)}
 							/>
-							{errors.email && (
-								<ErrorText>{errors.email.message}</ErrorText>
-							)}
+							{errors.email && <ErrorText>{errors.email.message}</ErrorText>}
 						</View>
 
 						<Button

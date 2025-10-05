@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react'
+import { cn } from '../utils/cn'
 
 interface AnnotatedLayoutProps {
 	children: ReactNode
@@ -11,12 +12,16 @@ export function AnnotatedLayout({ children }: AnnotatedLayoutProps) {
 }
 
 interface AnnotatedSectionProps {
+	className?: string
 	children: ReactNode
 }
 
-export function AnnotatedSection({ children }: AnnotatedSectionProps) {
+export function AnnotatedSection({
+	className,
+	children,
+}: AnnotatedSectionProps) {
 	return (
-		<div className="grid grid-cols-1 gap-2 lg:grid-cols-3">
+		<div className={cn('grid grid-cols-1 gap-2 lg:grid-cols-3', className)}>
 			<div className="lg:col-span-2">{children}</div>
 		</div>
 	)

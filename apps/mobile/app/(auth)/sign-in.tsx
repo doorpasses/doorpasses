@@ -171,8 +171,8 @@ export default function SignInScreen() {
 								<Text style={styles.bannedTitle}>Account Suspended</Text>
 							</View>
 							<Text style={styles.bannedMessage}>
-								Your account has been suspended. Please contact support if
-								you believe this is an error.
+								Your account has been suspended. Please contact support if you
+								believe this is an error.
 							</Text>
 							<TouchableOpacity
 								style={styles.supportButton}
@@ -183,9 +183,7 @@ export default function SignInScreen() {
 									)
 								}
 							>
-								<Text style={styles.supportButtonText}>
-									Contact Support
-								</Text>
+								<Text style={styles.supportButtonText}>Contact Support</Text>
 							</TouchableOpacity>
 						</View>
 					)}
@@ -210,9 +208,7 @@ export default function SignInScreen() {
 
 					{/* Error Display */}
 					{currentError && (
-						<ErrorText style={styles.errorContainer}>
-							{currentError}
-						</ErrorText>
+						<ErrorText style={styles.errorContainer}>{currentError}</ErrorText>
 					)}
 
 					{/* Login Form */}

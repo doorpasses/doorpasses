@@ -247,11 +247,11 @@ export default function NotificationBell() {
 		}
 
 		novu.on('notifications.notification_received', listener)
-		novu.on("notifications.unread_count_changed", listener);
+		novu.on('notifications.unread_count_changed', listener)
 
 		return () => {
 			novu.off('notifications.notification_received', listener)
-			novu.off("notifications.unread_count_changed", listener);
+			novu.off('notifications.unread_count_changed', listener)
 		}
 	}, [novu, refetch])
 

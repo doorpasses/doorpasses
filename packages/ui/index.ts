@@ -241,5 +241,7 @@ export {
 // Icon system
 export { Icon, type IconName, type IconSize } from './components/icon'
 
+export { Divider } from './components/divider'
+
 // Export utilities
 export { cn } from './utils/cn'

@@ -124,10 +124,7 @@ export function SecurityCard({
 									{isTwoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}
 								</Button>
 							</DialogTrigger>
-							<DialogContent>
-								<DialogHeader>
-									<DialogTitle>Two-Factor Authentication</DialogTitle>
-								</DialogHeader>
+							<DialogContent className="max-w-2xl">
 								<TwoFactorForm
 									isTwoFactorEnabled={isTwoFactorEnabled}
 									qrCode={qrCode}

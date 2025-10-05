@@ -84,7 +84,7 @@ export class GoogleProvider implements AuthProvider {
 						email: '', // Would need to be stored from initial auth
 						name: '',
 						picture: '',
-					}
+					},
 				}
 				return result
 			},
@@ -92,7 +92,8 @@ export class GoogleProvider implements AuthProvider {
 		})
 
 		return {
-			displayName: result.success && result.data.name ? result.data.name : 'Google User',
+			displayName:
+				result.success && result.data.name ? result.data.name : 'Google User',
 			link: null, // Google doesn't have public profile URLs like GitHub
 		} as const
 	}

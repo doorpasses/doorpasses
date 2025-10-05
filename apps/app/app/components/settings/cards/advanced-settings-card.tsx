@@ -7,13 +7,9 @@ import {
 	CardTitle,
 	Icon,
 } from '@repo/ui'
-import {
-	DeleteData,
-	SignOutOfSessions,
-} from '#app/components/settings/account-management.tsx'
+import { SignOutOfSessions } from '#app/components/settings/account-management.tsx'
 
 export const signOutOfSessionsActionIntent = 'sign-out-of-sessions'
-export const deleteDataActionIntent = 'delete-data'
 
 interface AdvancedSettingsCardProps {
 	user: {
@@ -31,7 +27,7 @@ export function AdvancedSettingsCard({ user }: AdvancedSettingsCardProps) {
 			<CardHeader>
 				<CardTitle>Advanced Settings</CardTitle>
 				<CardDescription>
-					Manage your sessions and delete your account data.
+					Manage your sessions and download your data.
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -48,7 +44,6 @@ export function AdvancedSettingsCard({ user }: AdvancedSettingsCardProps) {
 						</Link>
 					</div>
 					<SignOutOfSessions data={{ user }} />
-					<DeleteData />
 				</div>
 			</CardContent>
 		</Card>

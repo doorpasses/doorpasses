@@ -1,10 +1,11 @@
 import { generateTOTP, getTOTPAuthUri } from '@epic-web/totp'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import * as QRCode from 'qrcode'
-import { AnnotatedLayout, AnnotatedSection, PageTitle } from '@repo/ui'
+import { AnnotatedLayout, AnnotatedSection, Divider, PageTitle } from '@repo/ui'
 import { type ActionFunctionArgs, type LoaderFunctionArgs } from 'react-router'
 import { AdvancedSettingsCard } from '#app/components/settings/cards/advanced-settings-card.tsx'
 import { ConnectionsCard } from '#app/components/settings/cards/connections-card.tsx'
+import { DangerCard } from '#app/components/settings/cards/danger-card.tsx'
 import { SecurityCard } from '#app/components/settings/cards/security-card.tsx'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
@@ -227,6 +228,11 @@ export default function SecuritySettings() {
 
 				<AnnotatedSection>
 					<AdvancedSettingsCard user={data.user} />
+				</AnnotatedSection>
+
+				<AnnotatedSection>
+					<Divider className="mt-2" />
+					<DangerCard user={data.user} />
 				</AnnotatedSection>
 			</AnnotatedLayout>
 		</div>

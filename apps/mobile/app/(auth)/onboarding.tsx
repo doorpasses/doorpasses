@@ -217,9 +217,7 @@ export default function OnboardingScreen() {
 										autoCapitalize="none"
 										autoCorrect={false}
 										returnKeyType="next"
-										onSubmitEditing={() =>
-											confirmPasswordRef.current?.focus()
-										}
+										onSubmitEditing={() => confirmPasswordRef.current?.focus()}
 										error={!!errors.password}
 										rightIcon={
 											<TouchableOpacity
@@ -311,9 +309,7 @@ export default function OnboardingScreen() {
 							/>
 						</View>
 
-						{error && (
-							<ErrorText style={styles.formError}>{error}</ErrorText>
-						)}
+						{error && <ErrorText style={styles.formError}>{error}</ErrorText>}
 
 						<Button
 							onPress={handleSubmit(onSubmit)}
@@ -328,9 +324,7 @@ export default function OnboardingScreen() {
 				{/* Footer */}
 				<View style={styles.footer}>
 					<TouchableOpacity onPress={handleBackToVerification}>
-						<Text style={styles.footerLinkText}>
-							Back to verification
-						</Text>
+						<Text style={styles.footerLinkText}>Back to verification</Text>
 					</TouchableOpacity>
 				</View>
 			</ScrollView>

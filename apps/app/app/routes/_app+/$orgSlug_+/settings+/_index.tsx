@@ -1,5 +1,5 @@
 import { parseWithZod } from '@conform-to/zod'
-import { AnnotatedLayout, AnnotatedSection } from '@repo/ui'
+import { AnnotatedLayout, AnnotatedSection, Divider } from '@repo/ui'
 import { invariant } from '@epic-web/invariant'
 import { parseFormData } from '@mjackson/form-data-parser'
 import {
@@ -32,7 +32,10 @@ import { requireUserId } from '#app/utils/auth.server'
 import { prisma } from '#app/utils/db.server'
 import { encrypt } from '#app/utils/encryption.server'
 import { markStepCompleted } from '#app/utils/onboarding'
-import { updateSeatQuantity, deleteSubscription } from '#app/utils/payments.server'
+import {
+	updateSeatQuantity,
+	deleteSubscription,
+} from '#app/utils/payments.server'
 import {
 	uploadOrganizationImage,
 	testS3Connection,
@@ -423,9 +426,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			if (organization.stripeSubscriptionId) {
 				try {
 					await deleteSubscription(organization.stripeSubscriptionId)
-					console.log(`Cancelled subscription: ${organization.stripeSubscriptionId}`)
+					console.log(
+						`Cancelled subscription: ${organization.stripeSubscriptionId}`,
+					)
 				} catch (error) {
-					console.error('Error cancelling subscription during organization deletion:', error)
+					console.error(
+						'Error cancelling subscription during organization deletion:',
+						error,
+					)
 					// Don't fail the deletion if subscription cancellation fails
 				}
 			}
@@ -600,6 +608,7 @@ export default function GeneralSettings() {
 			</AnnotatedSection>
 
 			<AnnotatedSection>
+				<Divider className="mt-2" />
 				<DangerZoneCard organization={organization} />
 			</AnnotatedSection>
 		</AnnotatedLayout>

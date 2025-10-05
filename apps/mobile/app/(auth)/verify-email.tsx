@@ -8,11 +8,7 @@ import {
 	Alert,
 } from 'react-native'
 import { useLocalSearchParams } from 'expo-router'
-import {
-	Screen,
-	Button,
-	ErrorText,
-} from '../../components/ui'
+import { Screen, Button, ErrorText } from '../../components/ui'
 import { navigateToSignIn } from '../../lib/navigation'
 
 export default function VerifyEmailScreen() {
@@ -124,14 +120,11 @@ export default function VerifyEmailScreen() {
 						<Text style={styles.successIcon}>✅</Text>
 						<Text style={styles.title}>Email Verified!</Text>
 						<Text style={styles.subtitle}>
-							Your email has been successfully verified. You can now sign in
-							to your account.
+							Your email has been successfully verified. You can now sign in to
+							your account.
 						</Text>
 
-						<Button
-							onPress={handleBackToSignIn}
-							style={styles.actionButton}
-						>
+						<Button onPress={handleBackToSignIn} style={styles.actionButton}>
 							Continue to Sign In
 						</Button>
 					</View>
@@ -166,8 +159,8 @@ export default function VerifyEmailScreen() {
 
 					<View style={styles.actionsContainer}>
 						<Text style={styles.helpText}>
-							Didn't receive the email? Check your spam folder or request a
-							new one.
+							Didn't receive the email? Check your spam folder or request a new
+							one.
 						</Text>
 
 						{email && (
