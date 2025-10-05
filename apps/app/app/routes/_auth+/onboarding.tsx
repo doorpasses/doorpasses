@@ -4,7 +4,11 @@ import { data, redirect, Form, useSearchParams } from 'react-router'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 
 import { z } from 'zod'
-import { CheckboxField, ErrorList, convertErrorsToFieldFormat } from '#app/components/forms.tsx'
+import {
+	CheckboxField,
+	ErrorList,
+	convertErrorsToFieldFormat,
+} from '#app/components/forms.tsx'
 
 import {
 	checkIsCommonPassword,
@@ -324,7 +328,9 @@ export default function OnboardingRoute({
 				<Form method="POST" {...getFormProps(form)}>
 					<HoneypotInputs />
 					<FieldGroup>
-						<Field data-invalid={fields.username.errors?.length ? true : undefined}>
+						<Field
+							data-invalid={fields.username.errors?.length ? true : undefined}
+						>
 							<FieldLabel htmlFor={fields.username.id}>Username</FieldLabel>
 							<Input
 								{...getInputProps(fields.username, { type: 'text' })}
@@ -333,7 +339,9 @@ export default function OnboardingRoute({
 								required
 								aria-invalid={fields.username.errors?.length ? true : undefined}
 							/>
-							<FieldError errors={convertErrorsToFieldFormat(fields.username.errors)} />
+							<FieldError
+								errors={convertErrorsToFieldFormat(fields.username.errors)}
+							/>
 						</Field>
 
 						<Field data-invalid={fields.name.errors?.length ? true : undefined}>
@@ -345,10 +353,14 @@ export default function OnboardingRoute({
 								required
 								aria-invalid={fields.name.errors?.length ? true : undefined}
 							/>
-							<FieldError errors={convertErrorsToFieldFormat(fields.name.errors)} />
+							<FieldError
+								errors={convertErrorsToFieldFormat(fields.name.errors)}
+							/>
 						</Field>
 
-						<Field data-invalid={fields.password.errors?.length ? true : undefined}>
+						<Field
+							data-invalid={fields.password.errors?.length ? true : undefined}
+						>
 							<FieldLabel htmlFor={fields.password.id}>Password</FieldLabel>
 							<Input
 								{...getInputProps(fields.password, { type: 'password' })}
@@ -357,10 +369,16 @@ export default function OnboardingRoute({
 								required
 								aria-invalid={fields.password.errors?.length ? true : undefined}
 							/>
-							<FieldError errors={convertErrorsToFieldFormat(fields.password.errors)} />
+							<FieldError
+								errors={convertErrorsToFieldFormat(fields.password.errors)}
+							/>
 						</Field>
 
-						<Field data-invalid={fields.confirmPassword.errors?.length ? true : undefined}>
+						<Field
+							data-invalid={
+								fields.confirmPassword.errors?.length ? true : undefined
+							}
+						>
 							<FieldLabel htmlFor={fields.confirmPassword.id}>
 								Confirm Password
 							</FieldLabel>
@@ -371,35 +389,56 @@ export default function OnboardingRoute({
 								autoComplete="new-password"
 								placeholder="Confirm your password"
 								required
-								aria-invalid={fields.confirmPassword.errors?.length ? true : undefined}
+								aria-invalid={
+									fields.confirmPassword.errors?.length ? true : undefined
+								}
 							/>
-							<FieldError errors={convertErrorsToFieldFormat(fields.confirmPassword.errors)} />
+							<FieldError
+								errors={convertErrorsToFieldFormat(
+									fields.confirmPassword.errors,
+								)}
+							/>
 						</Field>
 
 						<FieldGroup>
 							<Field orientation="horizontal">
 								<Checkbox
 									{...(() => {
-										const { type, ...props } = getInputProps(fields.agreeToTermsOfServiceAndPrivacyPolicy, { type: 'checkbox' })
+										const { type, ...props } = getInputProps(
+											fields.agreeToTermsOfServiceAndPrivacyPolicy,
+											{ type: 'checkbox' },
+										)
 										return props
 									})()}
 									id={fields.agreeToTermsOfServiceAndPrivacyPolicy.id}
 								/>
-								<FieldLabel htmlFor={fields.agreeToTermsOfServiceAndPrivacyPolicy.id} className="font-normal">
+								<FieldLabel
+									htmlFor={fields.agreeToTermsOfServiceAndPrivacyPolicy.id}
+									className="font-normal"
+								>
 									I agree to the Terms of Service and Privacy Policy
 								</FieldLabel>
 							</Field>
-							<FieldError errors={convertErrorsToFieldFormat(fields.agreeToTermsOfServiceAndPrivacyPolicy.errors)} />
+							<FieldError
+								errors={convertErrorsToFieldFormat(
+									fields.agreeToTermsOfServiceAndPrivacyPolicy.errors,
+								)}
+							/>
 
 							<Field orientation="horizontal">
 								<Checkbox
 									{...(() => {
-										const { type, ...props } = getInputProps(fields.remember, { type: 'checkbox' })
+										const { type, ...props } = getInputProps(fields.remember, {
+											type: 'checkbox',
+										})
 										return props
 									})()}
 									id={fields.remember.id}
 								/>
-								<FieldLabel htmlFor={fields.remember.id} className="font-normal">
+								<FieldLabel
+									htmlFor={fields.remember.id}
+									className="font-normal"
+								>
 									Remember me
 								</FieldLabel>
 							</Field>

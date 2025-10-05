@@ -5,7 +5,10 @@ import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { Img } from 'openimg/react'
 import { data, Link, useFetcher } from 'react-router'
 import { z } from 'zod'
-import { ErrorList, convertErrorsToFieldFormat } from '#app/components/forms.tsx'
+import {
+	ErrorList,
+	convertErrorsToFieldFormat,
+} from '#app/components/forms.tsx'
 
 import { requireUserId, sessionKey } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
@@ -15,7 +18,16 @@ import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { NameSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { type Route } from './+types/profile.index.ts'
 import { twoFAVerificationType } from './profile.two-factor.tsx'
-import { Button, Icon, StatusButton, Field, FieldLabel, FieldError, FieldGroup, Input } from '@repo/ui'
+import {
+	Button,
+	Icon,
+	StatusButton,
+	Field,
+	FieldLabel,
+	FieldError,
+	FieldGroup,
+	Input,
+} from '@repo/ui'
 
 export const handle: SEOHandle = {
 	getSitemapEntries: () => null,
@@ -240,7 +252,7 @@ function UpdateProfile({
 		<fetcher.Form method="POST" {...getFormProps(form)}>
 			<FieldGroup>
 				<div className="grid grid-cols-6 gap-x-10">
-					<Field 
+					<Field
 						className="col-span-3"
 						data-invalid={fields.username.errors?.length ? true : undefined}
 					>
@@ -249,10 +261,12 @@ function UpdateProfile({
 							{...getInputProps(fields.username, { type: 'text' })}
 							aria-invalid={fields.username.errors?.length ? true : undefined}
 						/>
-						<FieldError errors={convertErrorsToFieldFormat(fields.username.errors)} />
+						<FieldError
+							errors={convertErrorsToFieldFormat(fields.username.errors)}
+						/>
 					</Field>
-					
-					<Field 
+
+					<Field
 						className="col-span-3"
 						data-invalid={fields.name.errors?.length ? true : undefined}
 					>
@@ -261,7 +275,9 @@ function UpdateProfile({
 							{...getInputProps(fields.name, { type: 'text' })}
 							aria-invalid={fields.name.errors?.length ? true : undefined}
 						/>
-						<FieldError errors={convertErrorsToFieldFormat(fields.name.errors)} />
+						<FieldError
+							errors={convertErrorsToFieldFormat(fields.name.errors)}
+						/>
 					</Field>
 				</div>
 

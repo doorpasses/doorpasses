@@ -68,9 +68,7 @@ export default function TeamSizeCard({
 				<input {...getInputProps(fields.organizationId, { type: 'hidden' })} />
 				<CardContent>
 					<Field data-invalid={fields.size.errors?.length ? true : undefined}>
-						<FieldLabel htmlFor={fields.size.id}>
-							Organization Size
-						</FieldLabel>
+						<FieldLabel htmlFor={fields.size.id}>Organization Size</FieldLabel>
 						<Select
 							name={fields.size.name}
 							defaultValue={organization.size || ''}
@@ -86,7 +84,9 @@ export default function TeamSizeCard({
 								))}
 							</SelectContent>
 						</Select>
-						<FieldError errors={convertErrorsToFieldFormat(fields.size.errors)} />
+						<FieldError
+							errors={convertErrorsToFieldFormat(fields.size.errors)}
+						/>
 					</Field>
 					<ErrorList errors={form.errors} id={form.errorId} />
 				</CardContent>

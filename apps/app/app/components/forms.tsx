@@ -20,9 +20,7 @@ export type ListOfErrors = Array<string | null | undefined> | null | undefined
 // Helper function to convert error arrays to FieldError format
 export function convertErrorsToFieldFormat(errors?: ListOfErrors) {
 	if (!errors) return undefined
-	return errors
-		.filter(Boolean)
-		.map((error) => ({ message: error as string }))
+	return errors.filter(Boolean).map((error) => ({ message: error as string }))
 }
 
 export function ErrorList({
@@ -64,11 +62,7 @@ export function Field({
 	return (
 		<UIField className={className} data-invalid={hasErrors}>
 			<FieldLabel htmlFor={id} {...labelProps} />
-			<Input
-				id={id}
-				aria-invalid={hasErrors}
-				{...inputProps}
-			/>
+			<Input id={id} aria-invalid={hasErrors} {...inputProps} />
 			<FieldError errors={convertErrorsToFieldFormat(errors)} />
 		</UIField>
 	)
@@ -134,11 +128,7 @@ export function TextareaField({
 	return (
 		<UIField className={className} data-invalid={hasErrors}>
 			<FieldLabel htmlFor={id} {...labelProps} />
-			<Textarea
-				id={id}
-				aria-invalid={hasErrors}
-				{...textareaProps}
-			/>
+			<Textarea id={id} aria-invalid={hasErrors} {...textareaProps} />
 			<FieldError errors={convertErrorsToFieldFormat(errors)} />
 		</UIField>
 	)
@@ -172,7 +162,11 @@ export function CheckboxField({
 	const hasErrors = errors?.length ? true : undefined
 
 	return (
-		<UIField className={className} orientation="horizontal" data-invalid={hasErrors}>
+		<UIField
+			className={className}
+			orientation="horizontal"
+			data-invalid={hasErrors}
+		>
 			<Checkbox
 				{...checkboxProps}
 				id={id}

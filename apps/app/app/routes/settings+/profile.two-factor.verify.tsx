@@ -4,7 +4,11 @@ import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import * as QRCode from 'qrcode'
 import { data, redirect, Form, useNavigation } from 'react-router'
 import { z } from 'zod'
-import { ErrorList, OTPField, convertErrorsToFieldFormat } from '#app/components/forms.tsx'
+import {
+	ErrorList,
+	OTPField,
+	convertErrorsToFieldFormat,
+} from '#app/components/forms.tsx'
 import { isCodeValid } from '#app/routes/_auth+/verify.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'

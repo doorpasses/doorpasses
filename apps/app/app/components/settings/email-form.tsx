@@ -2,11 +2,22 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { useFetcher } from 'react-router'
 import { z } from 'zod'
-import { ErrorList, convertErrorsToFieldFormat } from '#app/components/forms.tsx'
+import {
+	ErrorList,
+	convertErrorsToFieldFormat,
+} from '#app/components/forms.tsx'
 
 import { changeEmailActionIntent } from '#app/routes/_app+/profile.tsx'
 import { EmailSchema } from '#app/utils/user-validation.ts'
-import { Button, StatusButton, Field, FieldLabel, FieldError, FieldGroup, Input } from '@repo/ui'
+import {
+	Button,
+	StatusButton,
+	Field,
+	FieldLabel,
+	FieldError,
+	FieldGroup,
+	Input,
+} from '@repo/ui'
 
 export const ChangeEmailSchema = z.object({
 	email: EmailSchema,
@@ -59,7 +70,9 @@ export function EmailChangeForm({
 						autoComplete="email"
 						aria-invalid={fields.email.errors?.length ? true : undefined}
 					/>
-					<FieldError errors={convertErrorsToFieldFormat(fields.email.errors)} />
+					<FieldError
+						errors={convertErrorsToFieldFormat(fields.email.errors)}
+					/>
 				</Field>
 				<ErrorList id={form.errorId} errors={form.errors} />
 				<div className="mt-4 flex justify-end gap-2">

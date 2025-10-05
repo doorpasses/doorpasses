@@ -3,7 +3,10 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { data, redirect, Form } from 'react-router'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
-import { ErrorList, convertErrorsToFieldFormat } from '#app/components/forms.tsx'
+import {
+	ErrorList,
+	convertErrorsToFieldFormat,
+} from '#app/components/forms.tsx'
 
 import {
 	checkIsCommonPassword,
@@ -121,7 +124,9 @@ export default function ResetPasswordPage({
 			<CardContent>
 				<Form method="POST" {...getFormProps(form)}>
 					<FieldGroup>
-						<Field data-invalid={fields.password.errors?.length ? true : undefined}>
+						<Field
+							data-invalid={fields.password.errors?.length ? true : undefined}
+						>
 							<FieldLabel htmlFor={fields.password.id}>New Password</FieldLabel>
 							<Input
 								{...getInputProps(fields.password, { type: 'password' })}
@@ -131,10 +136,16 @@ export default function ResetPasswordPage({
 								required
 								aria-invalid={fields.password.errors?.length ? true : undefined}
 							/>
-							<FieldError errors={convertErrorsToFieldFormat(fields.password.errors)} />
+							<FieldError
+								errors={convertErrorsToFieldFormat(fields.password.errors)}
+							/>
 						</Field>
 
-						<Field data-invalid={fields.confirmPassword.errors?.length ? true : undefined}>
+						<Field
+							data-invalid={
+								fields.confirmPassword.errors?.length ? true : undefined
+							}
+						>
 							<FieldLabel htmlFor={fields.confirmPassword.id}>
 								Confirm Password
 							</FieldLabel>
@@ -145,9 +156,15 @@ export default function ResetPasswordPage({
 								autoComplete="new-password"
 								placeholder="Confirm your new password"
 								required
-								aria-invalid={fields.confirmPassword.errors?.length ? true : undefined}
+								aria-invalid={
+									fields.confirmPassword.errors?.length ? true : undefined
+								}
 							/>
-							<FieldError errors={convertErrorsToFieldFormat(fields.confirmPassword.errors)} />
+							<FieldError
+								errors={convertErrorsToFieldFormat(
+									fields.confirmPassword.errors,
+								)}
+							/>
 						</Field>
 
 						<ErrorList errors={form.errors} id={form.errorId} />

@@ -262,9 +262,7 @@ function CreateApiKeyModal({
 				<Form onSubmit={handleSubmit} className="space-y-4">
 					<div className="space-y-2">
 						<FieldGroup>
-							<FieldLabel htmlFor="api-key-name">
-								Key Name
-							</FieldLabel>
+							<FieldLabel htmlFor="api-key-name">Key Name</FieldLabel>
 							<Input
 								id="api-key-name"
 								placeholder="e.g., Claude Desktop, Kiro IDE"

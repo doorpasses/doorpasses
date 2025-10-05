@@ -258,31 +258,28 @@ export {
 } from './components/field'
 
 export {
-  Item,
-  ItemMedia,
-  ItemContent,
-  ItemActions,
-  ItemGroup,
-  ItemSeparator,
-  ItemTitle,
-  ItemDescription,
-  ItemHeader,
-  ItemFooter,
+	Item,
+	ItemMedia,
+	ItemContent,
+	ItemActions,
+	ItemGroup,
+	ItemSeparator,
+	ItemTitle,
+	ItemDescription,
+	ItemHeader,
+	ItemFooter,
 } from './components/item'
 
 export {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupText,
-  InputGroupInput,
-  InputGroupTextarea,
+	InputGroup,
+	InputGroupAddon,
+	InputGroupButton,
+	InputGroupText,
+	InputGroupInput,
+	InputGroupTextarea,
 } from './components/input-group'
 
-export {
-	Kbd,
-	KbdGroup,
-} from './components/kbd'
+export { Kbd, KbdGroup } from './components/kbd'
 
 // Export utilities
 export { cn } from './utils/cn'

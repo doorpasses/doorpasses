@@ -3,9 +3,21 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { data, redirect, Form, Link } from 'react-router'
 import { z } from 'zod'
-import { ErrorList, convertErrorsToFieldFormat } from '#app/components/forms.tsx'
+import {
+	ErrorList,
+	convertErrorsToFieldFormat,
+} from '#app/components/forms.tsx'
 
-import { Button, Icon, StatusButton, Field, FieldLabel, FieldError, FieldGroup, Input } from '@repo/ui'
+import {
+	Button,
+	Icon,
+	StatusButton,
+	Field,
+	FieldLabel,
+	FieldError,
+	FieldGroup,
+	Input,
+} from '@repo/ui'
 import {
 	checkIsCommonPassword,
 	getPasswordHash,
@@ -139,36 +151,62 @@ export default function ChangePasswordRoute({
 	return (
 		<Form method="POST" {...getFormProps(form)} className="mx-auto max-w-md">
 			<FieldGroup>
-				<Field data-invalid={fields.currentPassword.errors?.length ? true : undefined}>
-					<FieldLabel htmlFor={fields.currentPassword.id}>Current Password</FieldLabel>
+				<Field
+					data-invalid={
+						fields.currentPassword.errors?.length ? true : undefined
+					}
+				>
+					<FieldLabel htmlFor={fields.currentPassword.id}>
+						Current Password
+					</FieldLabel>
 					<Input
 						{...getInputProps(fields.currentPassword, { type: 'password' })}
 						autoComplete="current-password"
-						aria-invalid={fields.currentPassword.errors?.length ? true : undefined}
+						aria-invalid={
+							fields.currentPassword.errors?.length ? true : undefined
+						}
 					/>
-					<FieldError errors={convertErrorsToFieldFormat(fields.currentPassword.errors)} />
+					<FieldError
+						errors={convertErrorsToFieldFormat(fields.currentPassword.errors)}
+					/>
 				</Field>
-				
-				<Field data-invalid={fields.newPassword.errors?.length ? true : undefined}>
+
+				<Field
+					data-invalid={fields.newPassword.errors?.length ? true : undefined}
+				>
 					<FieldLabel htmlFor={fields.newPassword.id}>New Password</FieldLabel>
 					<Input
 						{...getInputProps(fields.newPassword, { type: 'password' })}
 						autoComplete="new-password"
 						aria-invalid={fields.newPassword.errors?.length ? true : undefined}
 					/>
-					<FieldError errors={convertErrorsToFieldFormat(fields.newPassword.errors)} />
+					<FieldError
+						errors={convertErrorsToFieldFormat(fields.newPassword.errors)}
+					/>
 				</Field>
-				
-				<Field data-invalid={fields.confirmNewPassword.errors?.length ? true : undefined}>
-					<FieldLabel htmlFor={fields.confirmNewPassword.id}>Confirm New Password</FieldLabel>
+
+				<Field
+					data-invalid={
+						fields.confirmNewPassword.errors?.length ? true : undefined
+					}
+				>
+					<FieldLabel htmlFor={fields.confirmNewPassword.id}>
+						Confirm New Password
+					</FieldLabel>
 					<Input
 						{...getInputProps(fields.confirmNewPassword, { type: 'password' })}
 						autoComplete="new-password"
-						aria-invalid={fields.confirmNewPassword.errors?.length ? true : undefined}
+						aria-invalid={
+							fields.confirmNewPassword.errors?.length ? true : undefined
+						}
 					/>
-					<FieldError errors={convertErrorsToFieldFormat(fields.confirmNewPassword.errors)} />
+					<FieldError
+						errors={convertErrorsToFieldFormat(
+							fields.confirmNewPassword.errors,
+						)}
+					/>
 				</Field>
-				
+
 				<ErrorList id={form.errorId} errors={form.errors} />
 				<div className="grid w-full grid-cols-2 gap-6">
 					<Button variant="secondary" asChild>

@@ -9,7 +9,11 @@ import { data, Form, Link, useNavigate, useSearchParams } from 'react-router'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
-import { CheckboxField, ErrorList, convertErrorsToFieldFormat } from '#app/components/forms.tsx'
+import {
+	CheckboxField,
+	ErrorList,
+	convertErrorsToFieldFormat,
+} from '#app/components/forms.tsx'
 import {
 	Card,
 	CardContent,
@@ -211,19 +215,27 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
 
 						{/* Email/Username Login Form */}
 						<FieldGroup>
-							<Field data-invalid={fields.username.errors?.length ? true : undefined}>
+							<Field
+								data-invalid={fields.username.errors?.length ? true : undefined}
+							>
 								<FieldLabel htmlFor={fields.username.id}>Username</FieldLabel>
 								<Input
 									{...getInputProps(fields.username, { type: 'text' })}
 									autoFocus
 									autoComplete="username"
 									placeholder="Enter your username"
-									aria-invalid={fields.username.errors?.length ? true : undefined}
+									aria-invalid={
+										fields.username.errors?.length ? true : undefined
+									}
 								/>
-								<FieldError errors={convertErrorsToFieldFormat(fields.username.errors)} />
+								<FieldError
+									errors={convertErrorsToFieldFormat(fields.username.errors)}
+								/>
 							</Field>
 
-							<Field data-invalid={fields.password.errors?.length ? true : undefined}>
+							<Field
+								data-invalid={fields.password.errors?.length ? true : undefined}
+							>
 								<div className="flex items-center">
 									<FieldLabel htmlFor={fields.password.id}>Password</FieldLabel>
 									<Link
@@ -239,20 +251,29 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
 									})}
 									autoComplete="current-password"
 									placeholder="Enter your password"
-									aria-invalid={fields.password.errors?.length ? true : undefined}
+									aria-invalid={
+										fields.password.errors?.length ? true : undefined
+									}
 								/>
-								<FieldError errors={convertErrorsToFieldFormat(fields.password.errors)} />
+								<FieldError
+									errors={convertErrorsToFieldFormat(fields.password.errors)}
+								/>
 							</Field>
 
 							<Field orientation="horizontal">
 								<Checkbox
 									{...(() => {
-										const { type, ...props } = getInputProps(fields.remember, { type: 'checkbox' })
+										const { type, ...props } = getInputProps(fields.remember, {
+											type: 'checkbox',
+										})
 										return props
 									})()}
 									id={fields.remember.id}
 								/>
-								<FieldLabel htmlFor={fields.remember.id} className="font-normal">
+								<FieldLabel
+									htmlFor={fields.remember.id}
+									className="font-normal"
+								>
 									Remember me
 								</FieldLabel>
 							</Field>

@@ -367,16 +367,21 @@ function InviteFieldset({
 
 	return (
 		<div>
-			<fieldset className="w-full mb-2" {...getFieldsetProps(meta)}>
+			<fieldset className="mb-2 w-full" {...getFieldsetProps(meta)}>
 				<InputGroup className="w-full">
 					<InputGroupInput
 						{...emailProps}
 						placeholder="Enter email address"
 						aria-label="Email"
-						aria-invalid={inviteFields.email.errors?.length ? 'true' : undefined}
+						aria-invalid={
+							inviteFields.email.errors?.length ? 'true' : undefined
+						}
 					/>
 
-					<InputGroupAddon className="gap-0 py-1 pr-1.5 rounded-r-lg" align="inline-end">
+					<InputGroupAddon
+						className="gap-0 rounded-r-lg py-1 pr-1.5"
+						align="inline-end"
+					>
 						<Select
 							name={inviteFields.role.name}
 							value={role.value}
@@ -389,7 +394,7 @@ function InviteFieldset({
 								}
 							}}
 						>
-							<SelectTrigger className="h-auto border-l border-r-none border-1 rounded-r-md bg-transparent shadow-none focus:ring-0">
+							<SelectTrigger className="border-r-none h-auto rounded-r-md border-1 border-l bg-transparent shadow-none focus:ring-0">
 								<SelectValue>
 									{roles.find((r) => r.value === role.value)?.label}
 								</SelectValue>

@@ -14,7 +14,10 @@ import {
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
-import { ErrorList, convertErrorsToFieldFormat } from '#app/components/forms.tsx'
+import {
+	ErrorList,
+	convertErrorsToFieldFormat,
+} from '#app/components/forms.tsx'
 import {
 	Card,
 	CardContent,
@@ -197,7 +200,11 @@ export default function ForgotPasswordRoute() {
 				<Form method="POST" {...getFormProps(form)}>
 					<HoneypotInputs />
 					<FieldGroup>
-						<Field data-invalid={fields.usernameOrEmail.errors?.length ? true : undefined}>
+						<Field
+							data-invalid={
+								fields.usernameOrEmail.errors?.length ? true : undefined
+							}
+						>
 							<FieldLabel htmlFor={fields.usernameOrEmail.id}>
 								Username or Email
 							</FieldLabel>
@@ -206,9 +213,15 @@ export default function ForgotPasswordRoute() {
 								autoFocus
 								placeholder="Enter your username or email"
 								required
-								aria-invalid={fields.usernameOrEmail.errors?.length ? true : undefined}
+								aria-invalid={
+									fields.usernameOrEmail.errors?.length ? true : undefined
+								}
 							/>
-							<FieldError errors={convertErrorsToFieldFormat(fields.usernameOrEmail.errors)} />
+							<FieldError
+								errors={convertErrorsToFieldFormat(
+									fields.usernameOrEmail.errors,
+								)}
+							/>
 						</Field>
 
 						<ErrorList errors={form.errors} id={form.errorId} />

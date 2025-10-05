@@ -4,7 +4,10 @@ import { useState } from 'react'
 import { useFetcher } from 'react-router'
 
 import { z } from 'zod'
-import { ErrorList, convertErrorsToFieldFormat } from '#app/components/forms.tsx'
+import {
+	ErrorList,
+	convertErrorsToFieldFormat,
+} from '#app/components/forms.tsx'
 import { EmailChangeForm } from '#app/components/settings/email-form.tsx'
 
 import { NameSchema, UsernameSchema } from '#app/utils/user-validation.ts'
@@ -79,24 +82,36 @@ export function ProfileCard({ user }: ProfileCardProps) {
 					<div className="flex-grow">
 						<fetcher.Form method="POST" {...getFormProps(form)}>
 							<FieldGroup>
-								<Field data-invalid={fields.name.errors?.length ? true : undefined}>
+								<Field
+									data-invalid={fields.name.errors?.length ? true : undefined}
+								>
 									<FieldLabel htmlFor={fields.name.id}>Name</FieldLabel>
 									<Input
 										{...getInputProps(fields.name, { type: 'text' })}
 										aria-invalid={fields.name.errors?.length ? true : undefined}
 									/>
-									<FieldError errors={convertErrorsToFieldFormat(fields.name.errors)} />
+									<FieldError
+										errors={convertErrorsToFieldFormat(fields.name.errors)}
+									/>
 								</Field>
-								
-								<Field data-invalid={fields.username.errors?.length ? true : undefined}>
+
+								<Field
+									data-invalid={
+										fields.username.errors?.length ? true : undefined
+									}
+								>
 									<FieldLabel htmlFor={fields.username.id}>Username</FieldLabel>
 									<Input
 										{...getInputProps(fields.username, { type: 'text' })}
-										aria-invalid={fields.username.errors?.length ? true : undefined}
+										aria-invalid={
+											fields.username.errors?.length ? true : undefined
+										}
 									/>
-									<FieldError errors={convertErrorsToFieldFormat(fields.username.errors)} />
+									<FieldError
+										errors={convertErrorsToFieldFormat(fields.username.errors)}
+									/>
 								</Field>
-								
+
 								<div className="flex flex-col gap-1.5">
 									<label
 										htmlFor="email"

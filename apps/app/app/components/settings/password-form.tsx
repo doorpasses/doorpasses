@@ -2,9 +2,20 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { useFetcher } from 'react-router'
 import { z } from 'zod'
-import { ErrorList, convertErrorsToFieldFormat } from '#app/components/forms.tsx'
+import {
+	ErrorList,
+	convertErrorsToFieldFormat,
+} from '#app/components/forms.tsx'
 
-import { Button, StatusButton, Field, FieldLabel, FieldError, FieldGroup, Input } from '@repo/ui'
+import {
+	Button,
+	StatusButton,
+	Field,
+	FieldLabel,
+	FieldError,
+	FieldGroup,
+	Input,
+} from '@repo/ui'
 import { setPasswordActionIntent } from '#app/routes/_app+/security.tsx'
 import {
 	PasswordSchema,
@@ -66,33 +77,77 @@ export function PasswordForm({
 
 			<FieldGroup>
 				{hasPassword && (
-					<Field data-invalid={fields.currentPassword?.errors?.length ? true : undefined}>
-						<FieldLabel htmlFor={fields.currentPassword.id}>Current Password</FieldLabel>
+					<Field
+						data-invalid={
+							fields.currentPassword?.errors?.length ? true : undefined
+						}
+					>
+						<FieldLabel htmlFor={fields.currentPassword.id}>
+							Current Password
+						</FieldLabel>
 						<Input
 							{...getInputProps(fields.currentPassword, { type: 'password' })}
 							autoComplete="current-password"
-							aria-invalid={fields.currentPassword?.errors?.length ? true : undefined}
+							aria-invalid={
+								fields.currentPassword?.errors?.length ? true : undefined
+							}
 						/>
-						<FieldError errors={convertErrorsToFieldFormat(fields.currentPassword?.errors)} />
+						<FieldError
+							errors={convertErrorsToFieldFormat(
+								fields.currentPassword?.errors,
+							)}
+						/>
 					</Field>
 				)}
 
-				<Field data-invalid={(hasPassword ? fields.newPassword : fields.password)?.errors?.length ? true : undefined}>
-					<FieldLabel htmlFor={(hasPassword ? fields.newPassword : fields.password).id}>
+				<Field
+					data-invalid={
+						(hasPassword ? fields.newPassword : fields.password)?.errors?.length
+							? true
+							: undefined
+					}
+				>
+					<FieldLabel
+						htmlFor={(hasPassword ? fields.newPassword : fields.password).id}
+					>
 						{hasPassword ? 'New Password' : 'Password'}
 					</FieldLabel>
 					<Input
-						{...getInputProps(hasPassword ? fields.newPassword : fields.password, {
-							type: 'password',
-						})}
+						{...getInputProps(
+							hasPassword ? fields.newPassword : fields.password,
+							{
+								type: 'password',
+							},
+						)}
 						autoComplete="new-password"
-						aria-invalid={(hasPassword ? fields.newPassword : fields.password)?.errors?.length ? true : undefined}
+						aria-invalid={
+							(hasPassword ? fields.newPassword : fields.password)?.errors
+								?.length
+								? true
+								: undefined
+						}
 					/>
-					<FieldError errors={convertErrorsToFieldFormat((hasPassword ? fields.newPassword : fields.password)?.errors)} />
+					<FieldError
+						errors={convertErrorsToFieldFormat(
+							(hasPassword ? fields.newPassword : fields.password)?.errors,
+						)}
+					/>
 				</Field>
 
-				<Field data-invalid={(hasPassword ? fields.confirmNewPassword : fields.confirmPassword)?.errors?.length ? true : undefined}>
-					<FieldLabel htmlFor={(hasPassword ? fields.confirmNewPassword : fields.confirmPassword).id}>
+				<Field
+					data-invalid={
+						(hasPassword ? fields.confirmNewPassword : fields.confirmPassword)
+							?.errors?.length
+							? true
+							: undefined
+					}
+				>
+					<FieldLabel
+						htmlFor={
+							(hasPassword ? fields.confirmNewPassword : fields.confirmPassword)
+								.id
+						}
+					>
 						{hasPassword ? 'Confirm New Password' : 'Confirm Password'}
 					</FieldLabel>
 					<Input
@@ -103,9 +158,19 @@ export function PasswordForm({
 							},
 						)}
 						autoComplete="new-password"
-						aria-invalid={(hasPassword ? fields.confirmNewPassword : fields.confirmPassword)?.errors?.length ? true : undefined}
+						aria-invalid={
+							(hasPassword ? fields.confirmNewPassword : fields.confirmPassword)
+								?.errors?.length
+								? true
+								: undefined
+						}
 					/>
-					<FieldError errors={convertErrorsToFieldFormat((hasPassword ? fields.confirmNewPassword : fields.confirmPassword)?.errors)} />
+					<FieldError
+						errors={convertErrorsToFieldFormat(
+							(hasPassword ? fields.confirmNewPassword : fields.confirmPassword)
+								?.errors,
+						)}
+					/>
 				</Field>
 
 				<ErrorList id={form.errorId} errors={form.errors} />

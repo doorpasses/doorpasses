@@ -1,4 +1,12 @@
-import { Button, StatusButton, Field, FieldLabel, FieldError, FieldGroup, Input } from '@repo/ui'
+import {
+	Button,
+	StatusButton,
+	Field,
+	FieldLabel,
+	FieldError,
+	FieldGroup,
+	Input,
+} from '@repo/ui'
 import {
 	FormProvider,
 	getFormProps,
@@ -10,7 +18,10 @@ import { useEffect, useState, useRef } from 'react'
 import { useFetcher, useParams } from 'react-router'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
-import { ErrorList, convertErrorsToFieldFormat } from '#app/components/forms.tsx'
+import {
+	ErrorList,
+	convertErrorsToFieldFormat,
+} from '#app/components/forms.tsx'
 import { AIContentGenerator } from '#app/components/note/ai-content-generator.tsx'
 import {
 	ContentEditor,
@@ -183,7 +194,9 @@ export function OrgNoteEditor({
 						<button type="submit" className="hidden" />
 						{note ? <input type="hidden" name="id" value={note.id} /> : null}
 						<div className="flex flex-col gap-1">
-							<Field data-invalid={fields.title.errors?.length ? true : undefined}>
+							<Field
+								data-invalid={fields.title.errors?.length ? true : undefined}
+							>
 								<FieldLabel htmlFor={fields.title.id}>Title</FieldLabel>
 								<Input
 									autoFocus
@@ -191,7 +204,9 @@ export function OrgNoteEditor({
 									onChange={(e) => setTitleValue(e.target.value)}
 									aria-invalid={fields.title.errors?.length ? true : undefined}
 								/>
-								<FieldError errors={convertErrorsToFieldFormat(fields.title.errors)} />
+								<FieldError
+									errors={convertErrorsToFieldFormat(fields.title.errors)}
+								/>
 							</Field>
 
 							{/* Priority and Tags Row */}
@@ -227,14 +242,22 @@ export function OrgNoteEditor({
 								</div>
 
 								<div className="flex-1">
-									<Field data-invalid={fields.tags.errors?.length ? true : undefined}>
-										<FieldLabel htmlFor={fields.tags.id}>Tags (comma-separated)</FieldLabel>
+									<Field
+										data-invalid={fields.tags.errors?.length ? true : undefined}
+									>
+										<FieldLabel htmlFor={fields.tags.id}>
+											Tags (comma-separated)
+										</FieldLabel>
 										<Input
 											{...getInputProps(fields.tags, { type: 'text' })}
 											placeholder="e.g. urgent, meeting, project"
-											aria-invalid={fields.tags.errors?.length ? true : undefined}
+											aria-invalid={
+												fields.tags.errors?.length ? true : undefined
+											}
 										/>
-										<FieldError errors={convertErrorsToFieldFormat(fields.tags.errors)} />
+										<FieldError
+											errors={convertErrorsToFieldFormat(fields.tags.errors)}
+										/>
 									</Field>
 								</div>
 							</div>

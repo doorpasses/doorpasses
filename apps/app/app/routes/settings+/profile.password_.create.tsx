@@ -2,9 +2,21 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { data, redirect, Form, Link } from 'react-router'
-import { ErrorList, convertErrorsToFieldFormat } from '#app/components/forms.tsx'
+import {
+	ErrorList,
+	convertErrorsToFieldFormat,
+} from '#app/components/forms.tsx'
 
-import { Button, Icon, StatusButton, Field, FieldLabel, FieldError, FieldGroup, Input } from '@repo/ui'
+import {
+	Button,
+	Icon,
+	StatusButton,
+	Field,
+	FieldLabel,
+	FieldError,
+	FieldGroup,
+	Input,
+} from '@repo/ui'
 import {
 	checkIsCommonPassword,
 	getPasswordHash,
@@ -109,19 +121,31 @@ export default function CreatePasswordRoute({
 						autoComplete="new-password"
 						aria-invalid={fields.password.errors?.length ? true : undefined}
 					/>
-					<FieldError errors={convertErrorsToFieldFormat(fields.password.errors)} />
+					<FieldError
+						errors={convertErrorsToFieldFormat(fields.password.errors)}
+					/>
 				</Field>
-				
-				<Field data-invalid={fields.confirmPassword.errors?.length ? true : undefined}>
-					<FieldLabel htmlFor={fields.confirmPassword.id}>Confirm New Password</FieldLabel>
+
+				<Field
+					data-invalid={
+						fields.confirmPassword.errors?.length ? true : undefined
+					}
+				>
+					<FieldLabel htmlFor={fields.confirmPassword.id}>
+						Confirm New Password
+					</FieldLabel>
 					<Input
 						{...getInputProps(fields.confirmPassword, { type: 'password' })}
 						autoComplete="new-password"
-						aria-invalid={fields.confirmPassword.errors?.length ? true : undefined}
+						aria-invalid={
+							fields.confirmPassword.errors?.length ? true : undefined
+						}
 					/>
-					<FieldError errors={convertErrorsToFieldFormat(fields.confirmPassword.errors)} />
+					<FieldError
+						errors={convertErrorsToFieldFormat(fields.confirmPassword.errors)}
+					/>
 				</Field>
-				
+
 				<ErrorList id={form.errorId} errors={form.errors} />
 				<div className="grid w-full grid-cols-2 gap-6">
 					<Button variant="secondary" asChild>

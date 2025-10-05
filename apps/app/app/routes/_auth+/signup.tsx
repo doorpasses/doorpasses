@@ -7,7 +7,10 @@ import { data, redirect, Form, useSearchParams, Link } from 'react-router'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
-import { ErrorList, convertErrorsToFieldFormat } from '#app/components/forms.tsx'
+import {
+	ErrorList,
+	convertErrorsToFieldFormat,
+} from '#app/components/forms.tsx'
 import {
 	Card,
 	CardContent,
@@ -236,7 +239,9 @@ export default function SignupRoute({
 					<Form method="POST" {...getFormProps(form)}>
 						<HoneypotInputs />
 						<FieldGroup>
-							<Field data-invalid={fields.email.errors?.length ? true : undefined}>
+							<Field
+								data-invalid={fields.email.errors?.length ? true : undefined}
+							>
 								<FieldLabel htmlFor={fields.email.id}>Email</FieldLabel>
 								<Input
 									{...getInputProps(fields.email, { type: 'email' })}
@@ -246,7 +251,9 @@ export default function SignupRoute({
 									required
 									aria-invalid={fields.email.errors?.length ? true : undefined}
 								/>
-								<FieldError errors={convertErrorsToFieldFormat(fields.email.errors)} />
+								<FieldError
+									errors={convertErrorsToFieldFormat(fields.email.errors)}
+								/>
 							</Field>
 
 							<ErrorList errors={form.errors} id={form.errorId} />

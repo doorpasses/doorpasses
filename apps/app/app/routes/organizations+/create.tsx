@@ -521,7 +521,9 @@ function Step1({ actionData }: { actionData: any }) {
 						<input type="hidden" name="step" value="1" />
 
 						<FieldGroup>
-							<Field data-invalid={fields.logoFile.errors?.length ? true : undefined}>
+							<Field
+								data-invalid={fields.logoFile.errors?.length ? true : undefined}
+							>
 								<FieldLabel htmlFor={fields.logoFile.id}>Logo</FieldLabel>
 								<div className="mt-2">
 									<div className="flex items-center">
@@ -561,7 +563,9 @@ function Step1({ actionData }: { actionData: any }) {
 												accept="image/png,image/jpeg"
 												className="sr-only"
 												onChange={handleImageChange}
-												aria-invalid={fields.logoFile.errors?.length ? true : undefined}
+												aria-invalid={
+													fields.logoFile.errors?.length ? true : undefined
+												}
 											/>
 											<Button type="button" variant="outline" size="sm" asChild>
 												<label
@@ -577,10 +581,14 @@ function Step1({ actionData }: { actionData: any }) {
 										</div>
 									</div>
 								</div>
-								<FieldError errors={convertErrorsToFieldFormat(fields.logoFile.errors)} />
+								<FieldError
+									errors={convertErrorsToFieldFormat(fields.logoFile.errors)}
+								/>
 							</Field>
 
-							<Field data-invalid={fields.name.errors?.length ? true : undefined}>
+							<Field
+								data-invalid={fields.name.errors?.length ? true : undefined}
+							>
 								<FieldLabel htmlFor={fields.name.id}>
 									Name<span className="text-red-500">*</span>
 								</FieldLabel>
@@ -593,10 +601,14 @@ function Step1({ actionData }: { actionData: any }) {
 									placeholder="Acme Inc."
 									aria-invalid={fields.name.errors?.length ? true : undefined}
 								/>
-								<FieldError errors={convertErrorsToFieldFormat(fields.name.errors)} />
+								<FieldError
+									errors={convertErrorsToFieldFormat(fields.name.errors)}
+								/>
 							</Field>
 
-							<Field data-invalid={fields.slug.errors?.length ? true : undefined}>
+							<Field
+								data-invalid={fields.slug.errors?.length ? true : undefined}
+							>
 								<FieldLabel htmlFor={fields.slug.id}>
 									Slug<span className="text-red-500">*</span>
 								</FieldLabel>
@@ -648,18 +660,30 @@ function Step1({ actionData }: { actionData: any }) {
 										)}
 									</div>
 								</div>
-								<FieldError errors={convertErrorsToFieldFormat(fields.slug.errors)} />
+								<FieldError
+									errors={convertErrorsToFieldFormat(fields.slug.errors)}
+								/>
 							</Field>
 
-							<Field data-invalid={fields.description.errors?.length ? true : undefined}>
-								<FieldLabel htmlFor={fields.description.id}>Description</FieldLabel>
+							<Field
+								data-invalid={
+									fields.description.errors?.length ? true : undefined
+								}
+							>
+								<FieldLabel htmlFor={fields.description.id}>
+									Description
+								</FieldLabel>
 								<Textarea
 									{...getInputProps(fields.description, { type: 'text' })}
 									rows={3}
 									placeholder="Tell us about your organization..."
-									aria-invalid={fields.description.errors?.length ? true : undefined}
+									aria-invalid={
+										fields.description.errors?.length ? true : undefined
+									}
 								/>
-								<FieldError errors={convertErrorsToFieldFormat(fields.description.errors)} />
+								<FieldError
+									errors={convertErrorsToFieldFormat(fields.description.errors)}
+								/>
 							</Field>
 						</FieldGroup>
 
@@ -875,7 +899,11 @@ function Step4({ orgId, actionData }: { orgId: string; actionData: any }) {
 					<input type="hidden" name="orgId" value={orgId} />
 
 					<FieldGroup>
-						<Field data-invalid={fields.organizationSize.errors?.length ? true : undefined}>
+						<Field
+							data-invalid={
+								fields.organizationSize.errors?.length ? true : undefined
+							}
+						>
 							<FieldLabel htmlFor={fields.organizationSize.id}>
 								Organization size
 							</FieldLabel>
@@ -894,11 +922,21 @@ function Step4({ orgId, actionData }: { orgId: string; actionData: any }) {
 									))}
 								</SelectContent>
 							</Select>
-							<FieldError errors={convertErrorsToFieldFormat(fields.organizationSize.errors)} />
+							<FieldError
+								errors={convertErrorsToFieldFormat(
+									fields.organizationSize.errors,
+								)}
+							/>
 						</Field>
 
-						<Field data-invalid={fields.userDepartment.errors?.length ? true : undefined}>
-							<FieldLabel htmlFor={fields.userDepartment.id}>Your department</FieldLabel>
+						<Field
+							data-invalid={
+								fields.userDepartment.errors?.length ? true : undefined
+							}
+						>
+							<FieldLabel htmlFor={fields.userDepartment.id}>
+								Your department
+							</FieldLabel>
 							<Select
 								name={fields.userDepartment.name}
 								defaultValue={fields.userDepartment.initialValue}
@@ -914,7 +952,11 @@ function Step4({ orgId, actionData }: { orgId: string; actionData: any }) {
 									))}
 								</SelectContent>
 							</Select>
-							<FieldError errors={convertErrorsToFieldFormat(fields.userDepartment.errors)} />
+							<FieldError
+								errors={convertErrorsToFieldFormat(
+									fields.userDepartment.errors,
+								)}
+							/>
 						</Field>
 					</FieldGroup>
 
@@ -1025,17 +1067,27 @@ function CreateInviteFieldset({
 		<div>
 			<fieldset className="w-full">
 				<div className="flex w-full items-start space-x-2">
-					<Field className="flex-1" data-invalid={inviteFields.email.errors?.length ? true : undefined}>
+					<Field
+						className="flex-1"
+						data-invalid={inviteFields.email.errors?.length ? true : undefined}
+					>
 						<Input
 							{...getInputProps(inviteFields.email, { type: 'email' })}
 							placeholder="Enter email address"
 							className="w-full"
-							aria-invalid={inviteFields.email.errors?.length ? true : undefined}
+							aria-invalid={
+								inviteFields.email.errors?.length ? true : undefined
+							}
 						/>
-						<FieldError errors={convertErrorsToFieldFormat(inviteFields.email.errors)} />
+						<FieldError
+							errors={convertErrorsToFieldFormat(inviteFields.email.errors)}
+						/>
 					</Field>
 
-					<Field className="max-w-[120px]" data-invalid={inviteFields.role.errors?.length ? true : undefined}>
+					<Field
+						className="max-w-[120px]"
+						data-invalid={inviteFields.role.errors?.length ? true : undefined}
+					>
 						<Select
 							name={inviteFields.role.name}
 							value={
@@ -1067,7 +1119,9 @@ function CreateInviteFieldset({
 								))}
 							</SelectContent>
 						</Select>
-						<FieldError errors={convertErrorsToFieldFormat(inviteFields.role.errors)} />
+						<FieldError
+							errors={convertErrorsToFieldFormat(inviteFields.role.errors)}
+						/>
 					</Field>
 
 					{index > 0 && (

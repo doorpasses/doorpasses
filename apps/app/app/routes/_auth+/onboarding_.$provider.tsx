@@ -14,7 +14,11 @@ import {
 } from 'react-router'
 import { safeRedirect } from 'remix-utils/safe-redirect'
 import { z } from 'zod'
-import { CheckboxField, ErrorList, convertErrorsToFieldFormat } from '#app/components/forms.tsx'
+import {
+	CheckboxField,
+	ErrorList,
+	convertErrorsToFieldFormat,
+} from '#app/components/forms.tsx'
 
 import {
 	sessionKey,
@@ -232,55 +236,91 @@ export default function OnboardingProviderRoute({
 										</div>
 									) : null}
 
-									<Field data-invalid={fields.username.errors?.length ? true : undefined}>
-										<FieldLabel htmlFor={fields.username.id}>Username</FieldLabel>
+									<Field
+										data-invalid={
+											fields.username.errors?.length ? true : undefined
+										}
+									>
+										<FieldLabel htmlFor={fields.username.id}>
+											Username
+										</FieldLabel>
 										<Input
 											{...getInputProps(fields.username, { type: 'text' })}
 											autoComplete="username"
 											className="lowercase"
 											placeholder="Enter your username"
 											required
-											aria-invalid={fields.username.errors?.length ? true : undefined}
+											aria-invalid={
+												fields.username.errors?.length ? true : undefined
+											}
 										/>
-										<FieldError errors={convertErrorsToFieldFormat(fields.username.errors)} />
+										<FieldError
+											errors={convertErrorsToFieldFormat(
+												fields.username.errors,
+											)}
+										/>
 									</Field>
 
-									<Field data-invalid={fields.name.errors?.length ? true : undefined}>
+									<Field
+										data-invalid={fields.name.errors?.length ? true : undefined}
+									>
 										<FieldLabel htmlFor={fields.name.id}>Full Name</FieldLabel>
 										<Input
 											{...getInputProps(fields.name, { type: 'text' })}
 											autoComplete="name"
 											placeholder="Enter your full name"
 											required
-											aria-invalid={fields.name.errors?.length ? true : undefined}
+											aria-invalid={
+												fields.name.errors?.length ? true : undefined
+											}
 										/>
-										<FieldError errors={convertErrorsToFieldFormat(fields.name.errors)} />
+										<FieldError
+											errors={convertErrorsToFieldFormat(fields.name.errors)}
+										/>
 									</Field>
 
 									<FieldGroup>
 										<Field orientation="horizontal">
 											<Checkbox
 												{...(() => {
-													const { type, ...props } = getInputProps(fields.agreeToTermsOfServiceAndPrivacyPolicy, { type: 'checkbox' })
+													const { type, ...props } = getInputProps(
+														fields.agreeToTermsOfServiceAndPrivacyPolicy,
+														{ type: 'checkbox' },
+													)
 													return props
 												})()}
 												id={fields.agreeToTermsOfServiceAndPrivacyPolicy.id}
 											/>
-											<FieldLabel htmlFor={fields.agreeToTermsOfServiceAndPrivacyPolicy.id} className="font-normal">
+											<FieldLabel
+												htmlFor={
+													fields.agreeToTermsOfServiceAndPrivacyPolicy.id
+												}
+												className="font-normal"
+											>
 												I agree to the Terms of Service and Privacy Policy
 											</FieldLabel>
 										</Field>
-										<FieldError errors={convertErrorsToFieldFormat(fields.agreeToTermsOfServiceAndPrivacyPolicy.errors)} />
+										<FieldError
+											errors={convertErrorsToFieldFormat(
+												fields.agreeToTermsOfServiceAndPrivacyPolicy.errors,
+											)}
+										/>
 
 										<Field orientation="horizontal">
 											<Checkbox
 												{...(() => {
-													const { type, ...props } = getInputProps(fields.remember, { type: 'checkbox' })
+													const { type, ...props } = getInputProps(
+														fields.remember,
+														{ type: 'checkbox' },
+													)
 													return props
 												})()}
 												id={fields.remember.id}
 											/>
-											<FieldLabel htmlFor={fields.remember.id} className="font-normal">
+											<FieldLabel
+												htmlFor={fields.remember.id}
+												className="font-normal"
+											>
 												Remember me
 											</FieldLabel>
 										</Field>
