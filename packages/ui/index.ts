@@ -243,5 +243,46 @@ export { Icon, type IconName, type IconSize } from './components/icon'
 
 export { Divider } from './components/divider'
 
+// Field components
+export {
+	Field,
+	FieldContent,
+	FieldDescription,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+	FieldLegend,
+	FieldSeparator,
+	FieldSet,
+	FieldTitle,
+} from './components/field'
+
+export {
+  Item,
+  ItemMedia,
+  ItemContent,
+  ItemActions,
+  ItemGroup,
+  ItemSeparator,
+  ItemTitle,
+  ItemDescription,
+  ItemHeader,
+  ItemFooter,
+} from './components/item'
+
+export {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupText,
+  InputGroupInput,
+  InputGroupTextarea,
+} from './components/input-group'
+
+export {
+	Kbd,
+	KbdGroup,
+} from './components/kbd'
+
 // Export utilities
 export { cn } from './utils/cn'
