@@ -153,7 +153,8 @@ export function TwoFactorForm({
 							<OTPField
 								labelProps={{
 									htmlFor: fields.code.id,
-									children: '',
+									children: 'Authentication Code',
+									className: 'sr-only'
 								}}
 								inputProps={{
 									...getInputProps(fields.code, { type: 'text' }),

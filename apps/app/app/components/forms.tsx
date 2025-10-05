@@ -13,6 +13,7 @@ import {
 	Field as UIField,
 	FieldLabel,
 	FieldError,
+	cn,
 } from '@repo/ui'
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined
@@ -84,7 +85,7 @@ export function OTPField({
 	const hasErrors = errors?.length ? true : undefined
 
 	return (
-		<UIField className={className} data-invalid={hasErrors}>
+		<UIField className={cn(className, 'w-auto')} data-invalid={hasErrors}>
 			<FieldLabel htmlFor={id} {...labelProps} />
 			<InputOTP
 				pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
