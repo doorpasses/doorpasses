@@ -1,5 +1,6 @@
 import { type Organization } from '@prisma/client'
 import { Form, Link } from 'react-router'
+import { useState, useEffect } from 'react'
 
 import { type getPlansAndPrices } from '#app/utils/payments.server.ts'
 import {
@@ -52,7 +53,27 @@ export function BillingCard({
 	organization,
 	plansAndPrices,
 	isClosedBeta,
-}: BillingCardProps) {
+	currentPriceId,
+}: BillingCardProps & { currentPriceId?: string | null }) {
+	const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly')
+
+	// Update billing interval when data becomes available
+	useEffect(() => {
+		if (currentPriceId && plansAndPrices) {
+			const isYearly =
+				currentPriceId === plansAndPrices.prices.base?.yearly?.id ||
+				currentPriceId === plansAndPrices.prices.plus?.yearly?.id
+
+			setBillingInterval(isYearly ? 'yearly' : 'monthly')
+		}
+	}, [currentPriceId, plansAndPrices])
+
+	console.log('plansAndPrices', plansAndPrices)
+	console.log('plansAndPrices.prices:', plansAndPrices?.prices)
+	console.log('billingInterval:', billingInterval)
+	console.log('Base price for', billingInterval, ':', plansAndPrices?.prices.base?.[billingInterval])
+	console.log('Plus price for', billingInterval, ':', plansAndPrices?.prices.plus?.[billingInterval])
+
 	if (isClosedBeta) {
 		return (
 			<Card>
@@ -150,32 +171,68 @@ export function BillingCard({
 				</CardContent>
 			</Card>
 
-			{/* Available Plans */}
+			{/* Billing Interval Toggle */}
 			{plansAndPrices && (
+				<div className="flex items-center justify-end">
+					<div className="flex items-center space-x-2 rounded-lg bg-muted p-1">
+						<button
+							onClick={() => setBillingInterval('monthly')}
+							className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${billingInterval === 'monthly'
+								? 'bg-background text-foreground shadow-sm'
+								: 'text-muted-foreground hover:text-foreground'
+								}`}
+						>
+							Monthly
+						</button>
+						<button
+							onClick={() => setBillingInterval('yearly')}
+							className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${billingInterval === 'yearly'
+								? 'bg-background text-foreground shadow-sm'
+								: 'text-muted-foreground hover:text-foreground'
+								}`}
+						>
+							Yearly
+							<Badge variant="secondary" className="ml-2 text-xs">
+								Save 20%
+							</Badge>
+						</button>
+					</div>
+				</div>
+			)}
+
+			{/* Available Plans */}
+			{plansAndPrices ? (
 				<div className="grid gap-6 lg:grid-cols-2">
 					<PricingPlan
 						title={PLANS.Base.name}
-						price={PLANS.Base.price}
+						stripePrice={plansAndPrices.prices.base?.[billingInterval]}
 						includesSeats={PLANS.Base.seats}
-						additionalSeatPrice={PLANS.Base.additionalSeatPrice}
+						billingInterval={billingInterval}
 						currentPlan={
-							plansAndPrices?.prices.base?.productId ===
-							organization.stripeProductId
+							currentPriceId === plansAndPrices?.prices.base?.[billingInterval]?.id
 						}
-						priceId={plansAndPrices?.prices.base?.id}
+						priceId={plansAndPrices?.prices.base?.[billingInterval]?.id}
 					/>
 					<PricingPlan
 						title={PLANS.Plus.name}
-						price={PLANS.Plus.price}
+						stripePrice={plansAndPrices.prices.plus?.[billingInterval]}
 						includesSeats={PLANS.Plus.seats}
-						additionalSeatPrice={PLANS.Plus.additionalSeatPrice}
+						billingInterval={billingInterval}
 						currentPlan={
-							plansAndPrices?.prices.plus?.productId ===
-							organization.stripeProductId
+							currentPriceId === plansAndPrices?.prices.plus?.[billingInterval]?.id
 						}
-						priceId={plansAndPrices?.prices.plus?.id}
+						priceId={plansAndPrices?.prices.plus?.[billingInterval]?.id}
 					/>
 				</div>
+			) : (
+				<Card>
+					<CardContent className="p-6">
+						<div className="text-center text-muted-foreground">
+							<p>Unable to load pricing information</p>
+							<p className="text-sm">Please check your Stripe configuration or try again later</p>
+						</div>
+					</CardContent>
+				</Card>
 			)}
 
 			{/* Enterprise Plan */}
@@ -217,32 +274,113 @@ export function BillingCard({
 
 function PricingPlan({
 	title,
-	price,
+	stripePrice,
 	includesSeats,
-	additionalSeatPrice,
+	billingInterval,
 	currentPlan,
 	priceId,
 }: {
 	title: string
-	price: number
+	stripePrice?: {
+		id: string
+		productId: string
+		unitAmount: number | null
+		currency: string
+		interval: string | null | undefined
+		trialPeriodDays: number | null | undefined
+		tiers?: Array<{
+			flat_amount: number | null
+			unit_amount: number | null
+			up_to: number | null
+		}>
+	}
 	includesSeats: number
-	additionalSeatPrice: number
+	billingInterval: 'monthly' | 'yearly'
 	currentPlan?: boolean
 	priceId?: string
 }) {
+	console.log('PricingPlan stripePrice:', stripePrice)
+
+	if (!stripePrice) {
+		console.log('No stripePrice provided')
+		return (
+			<Card>
+				<CardContent className="p-6">
+					<div className="text-center text-muted-foreground">
+						<p>Pricing not available</p>
+						<p className="text-sm">Please check your Stripe configuration</p>
+					</div>
+				</CardContent>
+			</Card>
+		)
+	}
+
+	// Handle tiered pricing - get the base price from the first tier's flat_amount
+	let basePrice = 0
+	let additionalUserPrice = 0
+
+	if (stripePrice.unitAmount) {
+		// Standard pricing
+		basePrice = stripePrice.unitAmount / 100
+	} else if ((stripePrice as any).tiers && (stripePrice as any).tiers.length > 0) {
+		// Tiered pricing - use the first tier's flat_amount
+		const firstTier = (stripePrice as any).tiers[0]
+		const secondTier = (stripePrice as any).tiers[1]
+
+		if (firstTier?.flat_amount) {
+			basePrice = firstTier.flat_amount / 100
+		}
+
+		// Get additional user pricing from second tier
+		if (secondTier?.unit_amount) {
+			additionalUserPrice = secondTier.unit_amount / 100
+		}
+	}
+
+	if (basePrice === 0) {
+		console.log('No pricing found in stripePrice:', stripePrice)
+		return (
+			<Card>
+				<CardContent className="p-6">
+					<div className="text-center text-muted-foreground">
+						<p>Price not configured</p>
+						<p className="text-sm">Contact support for pricing</p>
+					</div>
+				</CardContent>
+			</Card>
+		)
+	}
+
+	const displayPrice = billingInterval === 'yearly' ? basePrice / 12 : basePrice
 	return (
 		<Card className={currentPlan ? 'ring-primary ring-2' : ''}>
 			<CardHeader>
 				<div className="flex items-baseline gap-2">
-					<CardTitle className="text-2xl font-bold">${price}</CardTitle>
+					<CardTitle className="text-2xl font-bold">
+						${displayPrice.toFixed(2)}
+					</CardTitle>
 					<span className="text-muted-foreground text-sm">per month</span>
 				</div>
+				{billingInterval === 'yearly' && (
+					<div className="text-sm text-muted-foreground">
+						${basePrice.toFixed(2)} billed annually
+					</div>
+				)}
 				<CardDescription>{title}</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<ul className="text-muted-foreground mb-4 space-y-2 text-sm">
 					<li>Includes {includesSeats} user seats</li>
-					<li>Additional seats: ${additionalSeatPrice}/seat/month</li>
+					{additionalUserPrice > 0 && (
+						<li>
+							Additional users: ${billingInterval === 'yearly' ? (additionalUserPrice / 12).toFixed(2) : additionalUserPrice.toFixed(2)}/user/month
+							{billingInterval === 'yearly' && (
+								<span className="block text-xs opacity-75">
+									(${additionalUserPrice.toFixed(2)} billed annually per user)
+								</span>
+							)}
+						</li>
+					)}
 				</ul>
 
 				<Form method="post">

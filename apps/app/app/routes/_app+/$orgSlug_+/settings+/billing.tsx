@@ -52,11 +52,24 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	const plansAndPrices = isClosedBeta ? null : await getPlansAndPrices()
 	const invoices = await getOrganizationInvoices(organization)
 
+	// Get current subscription price ID for accurate plan detection
+	let currentPriceId: string | null = null
+	if (organization.stripeSubscriptionId) {
+		try {
+			const { stripe } = await import('#app/utils/payments.server')
+			const subscription = await stripe.subscriptions.retrieve(organization.stripeSubscriptionId)
+			currentPriceId = subscription.items.data[0]?.price.id || null
+		} catch (error) {
+			console.error('Error fetching current subscription:', error)
+		}
+	}
+
 	return {
 		organization,
 		plansAndPrices,
 		invoices,
 		isClosedBeta,
+		currentPriceId,
 	}
 }
 
@@ -148,7 +161,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function BillingSettings() {
-	const { organization, plansAndPrices, invoices, isClosedBeta } =
+	const { organization, plansAndPrices, invoices, isClosedBeta, currentPriceId } =
 		useLoaderData<typeof loader>()
 
 	return (
@@ -158,6 +171,7 @@ export default function BillingSettings() {
 					organization={organization}
 					plansAndPrices={plansAndPrices}
 					isClosedBeta={isClosedBeta}
+					currentPriceId={currentPriceId}
 				/>
 			</AnnotatedSection>
 

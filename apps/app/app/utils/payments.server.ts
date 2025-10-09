@@ -41,17 +41,41 @@ export async function getPlansAndPrices() {
 		const basePlan = products.find((product) => product.name === 'Base')
 		const plusPlan = products.find((product) => product.name === 'Plus')
 
-		// Fetch the specific prices using the defaultPriceId from products
-		const basePrice = prices.find(
-			(price) => price.id === basePlan?.defaultPriceId,
+		// Filter for monthly and yearly prices
+		const monthlyPrices = prices.filter((price) => price.interval === 'month' && price.currency === 'usd')
+		const yearlyPrices = prices.filter((price) => price.interval === 'year' && price.currency === 'usd')
+
+		console.log('monthlyPrices', monthlyPrices)
+		console.log('yearlyPrices', yearlyPrices)
+
+		const basePrice = prices.filter(price => price.id === basePlan?.defaultPriceId)
+		console.log('basePrice', basePrice)
+		// Find prices for each plan and interval
+		const basePriceMonthly = monthlyPrices.find(
+			(price) => price.productId === basePlan?.id,
 		)
-		let plusPrice = prices.find(
-			(price) => price.id === plusPlan?.defaultPriceId,
+		const basePriceYearly = yearlyPrices.find(
+			(price) => price.productId === basePlan?.id,
+		)
+		const plusPriceMonthly = monthlyPrices.find(
+			(price) => price.productId === plusPlan?.id,
+		)
+		const plusPriceYearly = yearlyPrices.find(
+			(price) => price.productId === plusPlan?.id,
 		)
 
 		const result = {
 			plans: { base: basePlan, plus: plusPlan },
-			prices: { base: basePrice, plus: plusPrice },
+			prices: {
+				base: {
+					monthly: basePriceMonthly,
+					yearly: basePriceYearly,
+				},
+				plus: {
+					monthly: plusPriceMonthly,
+					yearly: plusPriceYearly,
+				},
+			},
 		}
 
 		return result
@@ -61,7 +85,10 @@ export async function getPlansAndPrices() {
 		// Return fallback data to prevent the app from hanging
 		return {
 			plans: { base: undefined, plus: undefined },
-			prices: { base: undefined, plus: undefined },
+			prices: {
+				base: { monthly: undefined, yearly: undefined },
+				plus: { monthly: undefined, yearly: undefined },
+			},
 		}
 	}
 }
@@ -238,8 +265,8 @@ export async function createCheckoutSession(
 			...(trialConfig.creditCardRequired === 'manual'
 				? {}
 				: {
-						trial_period_days: trialConfig.trialDays,
-					}),
+					trial_period_days: trialConfig.trialDays,
+				}),
 		},
 		payment_method_collection:
 			trialConfig.creditCardRequired === 'stripe' ? 'if_required' : 'always',
@@ -419,18 +446,18 @@ export async function getStripePrices() {
 	try {
 		const prices = await stripe.prices.list({
 			active: true,
-			limit: 100,
+			limit: 200,
 			type: 'recurring',
+			expand: ['data.tiers']
 		})
 
 		const mappedPrices = prices.data.map((price) => ({
-			id: price.id,
 			productId:
 				typeof price.product === 'string' ? price.product : price.product.id,
 			unitAmount: price.unit_amount,
-			currency: price.currency,
 			interval: price.recurring?.interval,
 			trialPeriodDays: price.recurring?.trial_period_days,
+			...price
 		}))
 
 		return mappedPrices
