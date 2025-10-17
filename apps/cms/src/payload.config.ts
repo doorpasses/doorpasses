@@ -1,4 +1,5 @@
 // storage-adapter-import-placeholder
+import { s3Storage } from '@payloadcms/storage-s3'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 
 import sharp from 'sharp' // sharp-import
@@ -73,6 +74,21 @@ export default buildConfig({
   plugins: [
     ...plugins,
     // storage-adapter-placeholder
+    s3Storage({
+      collections: {
+        media: true,
+      },
+      bucket: process.env.BUCKET_NAME || '',
+      config: {
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+        },
+        region: process.env.AWS_REGION || 'auto',
+        endpoint: process.env.AWS_ENDPOINT_URL_S3,
+        forcePathStyle: true,
+      },
+    }),
   ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
