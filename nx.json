@@ -1,12 +1,19 @@
 {
 	"$schema": "./node_modules/nx/schemas/nx-schema.json",
 	"namedInputs": {
-		"sharedGlobals": ["{workspaceRoot}/**/.env.*local"],
-		"default": ["{projectRoot}/**/*", "sharedGlobals"]
+		"sharedGlobals": [
+			"{workspaceRoot}/**/.env.*local"
+		],
+		"default": [
+			"{projectRoot}/**/*",
+			"sharedGlobals"
+		]
 	},
 	"targetDefaults": {
 		"build": {
-			"dependsOn": ["^build"],
+			"dependsOn": [
+				"^build"
+			],
 			"outputs": [
 				"{projectRoot}/build/**",
 				"{projectRoot}/public/build/**",
@@ -23,19 +30,26 @@
 			"cache": true
 		},
 		"test": {
-			"dependsOn": ["^build"],
+			"dependsOn": [
+				"^build"
+			],
 			"cache": true
 		},
 		"test:e2e:run": {
-			"dependsOn": ["^build"],
+			"dependsOn": [
+				"^build"
+			],
 			"cache": true
 		},
 		"dev": {
 			"cache": false
 		},
 		"build:docs": {
-			"outputs": ["{projectRoot}/.mintlify/doc-build/**"],
+			"outputs": [
+				"{projectRoot}/.mintlify/doc-build/**"
+			],
 			"cache": true
 		}
-	}
+	},
+	"nxCloudId": "68f550d1653e03e11b484ba9"
 }
