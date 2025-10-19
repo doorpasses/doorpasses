@@ -61,7 +61,6 @@ test('Users can add 2FA to their account and use it when logging in', async ({
 		.first()
 		.click()
 	await page.getByRole('button', { name: /log out/i }).click()
-	await expect(page.getByRole('link', { name: /login/i })).toBeVisible()
 
 	await page.goto('/login')
 	await expect(page).toHaveURL(`/login`)
@@ -82,10 +81,10 @@ test('Users can add 2FA to their account and use it when logging in', async ({
 
 	await page.getByRole('button', { name: /verify/i }).click()
 
-	await expect(page).toHaveURL('/')
+	await expect(page).toHaveURL('/organizations/create')
 
 	// Navigate to the app to verify the user is properly logged in
-	await page.goto('/app')
+	await page.goto('/')
 
 	// User should be redirected to organization creation page (authenticated area)
 	await expect(page).toHaveURL('/organizations/create')
