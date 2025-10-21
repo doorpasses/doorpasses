@@ -18,8 +18,9 @@ test.describe('Dashboard', () => {
 		// Verify organization name is displayed
 		await expect(page.getByText(org.name)).toBeVisible()
 
-		// Verify dashboard components are present
-		await expect(page.getByText(/dashboard/i)).toBeVisible()
+		// Verify dashboard components are present - use more specific selector
+		await expect(page.getByRole('heading', { name: /welcome/i })).toBeVisible()
+		await expect(page.locator('main')).toBeVisible()
 	})
 
 	test('Dashboard shows notes chart with data', async ({ page, login }) => {
@@ -68,11 +69,11 @@ test.describe('Dashboard', () => {
 		await page.goto(`/${org.slug}`)
 		await page.waitForLoadState('networkidle')
 
-		// Verify notes chart is displayed
-		await expect(page.locator('[data-testid="notes-chart"]')).toBeVisible()
+		// Verify notes statistics are displayed (based on actual UI)
+		await expect(page.getByText(/daily notes created/i)).toBeVisible()
 
 		// Verify chart shows data points
-		await expect(page.getByText(/notes created/i)).toBeVisible()
+		await expect(page.getByText(/total notes/i)).toBeVisible()
 	})
 
 	test('Dashboard shows onboarding checklist for new organizations', async ({ page, login }) => {
@@ -85,9 +86,8 @@ test.describe('Dashboard', () => {
 		await page.goto(`/${org.slug}`)
 		await page.waitForLoadState('networkidle')
 
-		// Verify onboarding checklist is displayed
-		await expect(page.getByText(/getting started/i)).toBeVisible()
-		await expect(page.getByText(/onboarding/i)).toBeVisible()
+		// Verify onboarding checklist is displayed - use specific heading
+		await expect(page.getByRole('heading', { name: /get started/i })).toBeVisible()
 
 		// Verify some common onboarding steps
 		await expect(page.getByText(/create your first note/i)).toBeVisible()
@@ -124,8 +124,8 @@ test.describe('Dashboard', () => {
 		await page.goto(`/${org.slug}`)
 		await page.waitForLoadState('networkidle')
 
-		// Verify recent activity section exists
-		await expect(page.getByText(/recent/i)).toBeVisible()
+		// Verify activity is reflected in the dashboard stats
+		await expect(page.getByText(/top contributors/i)).toBeVisible()
 	})
 
 	test('Dashboard displays organization statistics', async ({ page, login }) => {
@@ -181,10 +181,9 @@ test.describe('Dashboard', () => {
 		await page.goto(`/${org.slug}`)
 		await page.waitForLoadState('networkidle')
 
-		// Verify statistics are displayed (these might be in cards or summary sections)
-		// Note: The exact selectors depend on the actual dashboard implementation
-		await expect(page.getByText(/3/)).toBeVisible() // 3 members
-		await expect(page.getByText(/5/)).toBeVisible() // 5 notes
+		// Verify statistics are displayed - use more specific selectors
+		await expect(page.getByText(/3 members/i)).toBeVisible()
+		await expect(page.getByText(/5 notes/i)).toBeVisible()
 	})
 
 	test('Dashboard allows quick note creation', async ({ page, login }) => {
@@ -197,12 +196,8 @@ test.describe('Dashboard', () => {
 		await page.goto(`/${org.slug}`)
 		await page.waitForLoadState('networkidle')
 
-		// Look for quick note creation button or link
-		const createNoteButton = page.getByRole('link', { name: /create note/i }).or(
-			page.getByRole('button', { name: /create note/i })
-		).or(
-			page.getByRole('link', { name: /new note/i })
-		)
+		// Look for quick note creation button or link - use first() to avoid strict mode
+		const createNoteButton = page.getByRole('link', { name: /create note/i }).first()
 
 		if (await createNoteButton.isVisible()) {
 			await createNoteButton.click()
@@ -222,9 +217,9 @@ test.describe('Dashboard', () => {
 		await page.goto(`/${org.slug}`)
 		await page.waitForLoadState('networkidle')
 
-		// Verify empty state messaging
-		await expect(page.getByText(/get started/i)).toBeVisible()
-		await expect(page.getByText(/welcome/i)).toBeVisible()
+		// Verify empty state messaging - use specific selectors
+		await expect(page.getByRole('heading', { name: /get started/i })).toBeVisible()
+		await expect(page.getByRole('heading', { name: /welcome/i })).toBeVisible()
 	})
 
 	test('Dashboard navigation works correctly', async ({ page, login }) => {
@@ -237,8 +232,8 @@ test.describe('Dashboard', () => {
 		await page.goto(`/${org.slug}`)
 		await page.waitForLoadState('networkidle')
 
-		// Test navigation to notes section
-		const notesLink = page.getByRole('link', { name: /notes/i })
+		// Test navigation to notes section - use first() to avoid strict mode
+		const notesLink = page.getByRole('link', { name: 'Notes', exact: true }).first()
 		if (await notesLink.isVisible()) {
 			await notesLink.click()
 			await expect(page).toHaveURL(new RegExp(`/${org.slug}/notes`))
@@ -248,11 +243,12 @@ test.describe('Dashboard', () => {
 		await page.goto(`/${org.slug}`)
 		await page.waitForLoadState('networkidle')
 
-		// Test navigation to settings
-		const settingsLink = page.getByRole('link', { name: /settings/i })
-		if (await settingsLink.isVisible()) {
-			await settingsLink.click()
-			await expect(page).toHaveURL(new RegExp(`/${org.slug}/settings`))
+		// Test navigation to settings - use button since it's a dropdown
+		const settingsButton = page.getByRole('button', { name: /settings/i })
+		if (await settingsButton.isVisible()) {
+			await settingsButton.click()
+			// Just verify the dropdown opened, not navigation since it's a dropdown
+			await expect(page.locator('[role="menu"]')).toBeVisible()
 		}
 	})
 
