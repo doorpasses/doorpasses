@@ -8,6 +8,7 @@ import Featured from './blocks/Featured.astro'
 import Logos from './blocks/Logos.astro'
 import Pricing from './blocks/Pricing.astro'
 import Testimonials from './blocks/Testimonials.astro'
+import TestimonialHighlight from './blocks/TestimonialHighlight.astro'
 import FeatureList from './blocks/FeatureList.astro'
 import BuildFor from './blocks/BuildFor.astro'
 import Blog from './blocks/Blog.astro'
@@ -52,6 +53,8 @@ console.log(blocks)
 					return <Pricing {...block} />
 				case 'testimonials':
 					return <Testimonials {...block} />
+				case 'testimonialHighlight':
+					return <TestimonialHighlight {...block} />
 				case 'featureList':
 					return <FeatureList {...block} />
 				case 'buildFor':

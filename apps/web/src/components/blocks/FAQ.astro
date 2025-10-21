@@ -46,6 +46,12 @@ const {
 		<div class="space-y-4 px-4 pt-12 pb-4 md:border-r border-dashed">
 			<h2 class="text-3xl font-title md:text-6xl">{title}</h2>
 			<p class="text-muted-foreground">{subtitle}</p>
+			<p class="text-muted-foreground">
+			{supportText}{' '}
+			<a class="text-primary hover:underline" href={supportLinkUrl}>
+				{supportLinkLabel}
+			</a>
+		</p>
 		</div>
 		<div class="place-content-center py-20 relative">
 			<div class="absolute inset-0 bg-[repeating-linear-gradient(135deg,rgb(0,0,0),rgb(68,85,119)_1px,transparent_1px,transparent_5px)]" />
@@ -53,8 +59,8 @@ const {
 			<div class="accordion bg-background relative z-10">
 				{
 					items.map((faq, idx) => (
-						<details name="frequently-asked-questions" class="accordion-item group border-b first:border-t border-dashed" open={idx === 0}>
-							<summary class="accordion-trigger flex cursor-pointer items-center justify-between px-4 py-4 text-[15px] leading-6 hover:no-underline list-none">
+						<details class="accordion-item border-b first:border-t border-dashed overflow-hidden" open={idx === 0}>
+							<summary class="accordion-trigger flex cursor-pointer items-center justify-between px-4 py-4 text-[15px] leading-6 hover:no-underline list-none transition-colors duration-200 hover:bg-muted/50">
 								<span class="font-title">{faq.question}</span>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -66,13 +72,15 @@ const {
 									stroke-width="2"
 									stroke-linecap="round"
 									stroke-linejoin="round"
-									class="shrink-0 transition-transform duration-200 group-open:rotate-180"
+									class="accordion-icon shrink-0 transition-transform duration-300"
 								>
 									<path d="m6 9 6 6 6-6" />
 								</svg>
 							</summary>
-							<div class="accordion-content px-4 pb-4 text-muted-foreground">
-								{faq.answer}
+							<div class="accordion-content overflow-hidden transition-all duration-300 ease-out">
+								<div class="px-4 pb-4 text-muted-foreground">
+									{faq.answer}
+								</div>
 							</div>
 						</details>
 					))
@@ -80,13 +88,5 @@ const {
 			</div>
 		</div>
 	</div>
-	</div>
-	<div class="flex h-14 items-center justify-center border-t border-dashed">
-		<p class="text-muted-foreground">
-			{supportText}{' '}
-			<a class="text-primary hover:underline" href={supportLinkUrl}>
-				{supportLinkLabel}
-			</a>
-		</p>
 	</div>
 </div>

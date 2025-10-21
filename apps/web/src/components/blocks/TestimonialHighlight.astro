@@ -1,0 +1,100 @@
+---
+import Badge from '../ui/Badge.astro' 
+
+interface Author {
+	name: string
+	title: string
+	company: string
+	companyUrl?: string
+	image: string
+}
+
+interface CMSTestimonialHighlight {
+	tagline?: string
+	quote: string
+	authorName: string
+	authorTitle: string
+	authorCompany: string
+	authorCompanyUrl?: string
+	authorImage: string
+}
+
+interface Props {
+	tagline?: string
+	quote?: string
+	author?: Author
+	testimonial?: CMSTestimonialHighlight
+	blockType: 'testimonialHighlight'
+}
+
+const {
+	tagline = 'Used by the best developers',
+	quote = 'The Pro Blocks are a game-changer. They are easy to use and customize, and they are a great way to build with shadcn/ui faster.',
+	author = {
+		name: 'OrcDev',
+		title: 'Creator of',
+		company: '8bitcn',
+		companyUrl: 'https://www.8bitcn.com/',
+		image: 'https://i.pravatar.cc/150?img=42',
+	},
+	testimonial,
+} = Astro.props
+
+// Transform CMS testimonial to consistent structure if provided
+const finalTestimonial = testimonial
+	? {
+			tagline: testimonial.tagline || tagline,
+			quote: testimonial.quote,
+			author: {
+				name: testimonial.authorName,
+				title: testimonial.authorTitle,
+				company: testimonial.authorCompany,
+				companyUrl: testimonial.authorCompanyUrl,
+				image: testimonial.authorImage,
+			},
+		}
+	: { tagline, quote, author }
+---
+
+<section class="relative border-b border-dashed">
+	<div class="container border-border text-center relative z-10 px-4 md:px-6">
+	<div class="absolute inset-0 bg-[repeating-linear-gradient(135deg,rgb(0,0,0),rgb(68,85,119)_1px,transparent_1px,transparent_5px)]" />
+		<div class="relative bg-muted w-full h-full flex flex-col items-center justify-center gap-4 md:gap-6 border-x px-4 py-12 sm:p-12">
+			<Badge class="bg-transparent" variant="outline" size="sm">
+				{finalTestimonial.tagline}
+			</Badge>
+			
+			<blockquote class="text-foreground max-w-2xl text-lg font-medium md:text-xl">
+				"{finalTestimonial.quote}"
+			</blockquote>
+			
+			<div class="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
+				<div class="relative flex shrink-0 overflow-hidden rounded-full size-12">
+					<img
+						class="aspect-square size-full object-cover"
+						alt={finalTestimonial.author.name}
+						src={finalTestimonial.author.image}
+					/>
+				</div>
+				<div class="flex flex-col">
+					<p class="font-semibold">{finalTestimonial.author.name}</p>
+					<p class="text-muted-foreground">
+						{finalTestimonial.author.title}
+						{finalTestimonial.author.companyUrl ? (
+							<a
+								target="_blank"
+								rel="noopener noreferrer"
+								class="underline hover:text-foreground"
+								href={finalTestimonial.author.companyUrl}
+							>
+								{finalTestimonial.author.company}
+							</a>
+						) : (
+							finalTestimonial.author.company
+						)}
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>

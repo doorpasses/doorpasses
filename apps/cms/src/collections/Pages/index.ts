@@ -16,6 +16,7 @@ import { Logos } from '../../blocks/Logos/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
 import { Pricing } from '../../blocks/Pricing/config'
 import { Testimonials } from '../../blocks/Testimonials/config'
+import { TestimonialHighlight } from '../../blocks/TestimonialHighlight/config'
 import { FAQ } from '../../blocks/FAQ/config'
 import { Blog } from '../../blocks/Blog/config'
 import { Tabs } from '../../blocks/Tabs/config'
@@ -102,6 +103,7 @@ export const Pages: CollectionConfig<'pages'> = {
                 Logos,
                 Pricing,
                 Testimonials,
+                TestimonialHighlight,
                 BuildFor,
                 Blog,
                 FAQ,

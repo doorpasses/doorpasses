@@ -287,6 +287,7 @@ export interface Page {
     | LogosBlock
     | PricingBlock
     | TestimonialsBlock
+    | TestimonialHighlightBlock
     | BuildForBlock
     | BlogBlock
     | FAQBlock
@@ -1045,6 +1046,22 @@ export interface TestimonialsBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialHighlightBlock".
+ */
+export interface TestimonialHighlightBlock {
+  tagline?: string | null;
+  quote: string;
+  authorName: string;
+  authorTitle: string;
+  authorCompany: string;
+  authorCompanyUrl?: string | null;
+  authorImage: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'testimonialHighlight';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "BuildForBlock".
  */
 export interface BuildForBlock {
@@ -1491,6 +1508,7 @@ export interface PagesSelect<T extends boolean = true> {
         logos?: T | LogosBlockSelect<T>;
         pricing?: T | PricingBlockSelect<T>;
         testimonials?: T | TestimonialsBlockSelect<T>;
+        testimonialHighlight?: T | TestimonialHighlightBlockSelect<T>;
         buildFor?: T | BuildForBlockSelect<T>;
         blog?: T | BlogBlockSelect<T>;
         faq?: T | FAQBlockSelect<T>;
@@ -1755,6 +1773,21 @@ export interface TestimonialsBlockSelect<T extends boolean = true> {
         variant?: T;
         id?: T;
       };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialHighlightBlock_select".
+ */
+export interface TestimonialHighlightBlockSelect<T extends boolean = true> {
+  tagline?: T;
+  quote?: T;
+  authorName?: T;
+  authorTitle?: T;
+  authorCompany?: T;
+  authorCompanyUrl?: T;
+  authorImage?: T;
   id?: T;
   blockName?: T;
 }
