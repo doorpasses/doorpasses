@@ -88,6 +88,29 @@ test.describe('Dashboard', () => {
 		// Create a new organization
 		const org = await createTestOrganization(user.id, 'admin')
 
+		// Ensure onboarding progress is visible and not completed
+		await prisma.onboardingProgress.upsert({
+			where: {
+				userId_organizationId: {
+					userId: user.id,
+					organizationId: org.id,
+				},
+			},
+			update: {
+				isVisible: true,
+				isCompleted: false,
+				completedCount: 0,
+			},
+			create: {
+				userId: user.id,
+				organizationId: org.id,
+				totalSteps: 6, // Based on DEFAULT_ONBOARDING_STEPS length
+				completedCount: 0,
+				isCompleted: false,
+				isVisible: true,
+			},
+		})
+
 		// Navigate to organization dashboard
 		await page.goto(`/${org.slug}`)
 		await page.waitForLoadState('networkidle')
@@ -228,6 +251,29 @@ test.describe('Dashboard', () => {
 
 		// Create a new organization with no notes
 		const org = await createTestOrganization(user.id, 'admin')
+
+		// Ensure onboarding progress is visible and not completed
+		await prisma.onboardingProgress.upsert({
+			where: {
+				userId_organizationId: {
+					userId: user.id,
+					organizationId: org.id,
+				},
+			},
+			update: {
+				isVisible: true,
+				isCompleted: false,
+				completedCount: 0,
+			},
+			create: {
+				userId: user.id,
+				organizationId: org.id,
+				totalSteps: 6, // Based on DEFAULT_ONBOARDING_STEPS length
+				completedCount: 0,
+				isCompleted: false,
+				isVisible: true,
+			},
+		})
 
 		// Navigate to organization dashboard
 		await page.goto(`/${org.slug}`)

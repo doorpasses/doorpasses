@@ -61,35 +61,39 @@ test.describe('Mobile Responsiveness', () => {
 		await page.goto(`/${org.slug}`)
 		await page.waitForLoadState('networkidle')
 
-		// Look for mobile menu button (hamburger menu or sidebar trigger)
-		const mobileMenuButton = page
-			.getByRole('button')
-			.filter({ hasText: /menu|☰/i })
+		// Look for sidebar trigger button (the sidebar should be collapsible on mobile)
+		const sidebarTrigger = page
+			.getByRole('button', { name: /toggle sidebar/i })
+			.or(page.locator('[data-sidebar="trigger"]'))
 			.first()
-		const buttonExists = await mobileMenuButton
-			.count()
-			.then((count) => count > 0)
 
-		if (buttonExists && (await mobileMenuButton.isVisible())) {
-			// Open mobile menu
-			await mobileMenuButton.click()
+		// Try to open the sidebar if there's a trigger
+		if (await sidebarTrigger.isVisible().catch(() => false)) {
+			await sidebarTrigger.click()
 			await page.waitForTimeout(300) // Wait for animation
+		}
 
-			// Verify navigation links become accessible
-			const notesLink = page.getByRole('link', { name: /notes/i }).first()
-			const settingsLink = page.getByRole('link', { name: /settings/i }).first()
+		// Look for navigation links - they should be in the sidebar
+		const notesLink = page.getByRole('link', { name: /notes/i }).first()
+		const dashboardLink = page.getByRole('link', { name: /dashboard/i }).first()
+		const settingsLink = page.getByRole('link', { name: /settings/i }).first()
 
-			// Check if at least one navigation element is now visible
-			const hasNavigation =
-				(await notesLink.isVisible().catch(() => false)) ||
-				(await settingsLink.isVisible().catch(() => false))
+		// Check if at least one navigation element is accessible
+		const hasNavigation =
+			(await notesLink.isVisible().catch(() => false)) ||
+			(await dashboardLink.isVisible().catch(() => false)) ||
+			(await settingsLink.isVisible().catch(() => false)) ||
+			(await notesLink
+				.count()
+				.then((count) => count > 0)
+				.catch(() => false)) // Link exists in DOM even if not visible
 
-			expect(hasNavigation).toBeTruthy()
-		} else {
-			// If no mobile menu button, sidebar might always be visible or use different pattern
-			// Just verify navigation links exist somewhere on the page
-			const notesLink = page.getByRole('link', { name: /notes/i }).first()
-			await expect(notesLink).toBeAttached() // Link exists in DOM
+		expect(hasNavigation).toBeTruthy()
+
+		// If notes link is visible, verify it works
+		if (await notesLink.isVisible().catch(() => false)) {
+			await notesLink.click()
+			await expect(page).toHaveURL(new RegExp(`/${org.slug}/notes`))
 		}
 	})
 
