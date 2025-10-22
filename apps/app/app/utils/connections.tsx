@@ -2,6 +2,7 @@ import { Form } from 'react-router'
 import { z } from 'zod'
 import { useIsPending } from './misc.tsx'
 import { Icon, StatusButton } from '@repo/ui'
+import { saveLastLoginMethod, type LoginMethod } from './last-login-method.ts'
 
 export const GITHUB_PROVIDER_NAME = 'github'
 export const GOOGLE_PROVIDER_NAME = 'google'
@@ -41,6 +42,12 @@ export function ProviderConnectionForm({
 			className="flex items-center justify-center gap-2"
 			action={formAction}
 			method="POST"
+			onSubmit={() => {
+				// Save the login method when form is submitted
+				if (type === 'Login' && (providerName === 'github' || providerName === 'google')) {
+					saveLastLoginMethod(providerName as LoginMethod)
+				}
+			}}
 		>
 			{redirectTo ? (
 				<input type="hidden" name="redirectTo" value={redirectTo} />

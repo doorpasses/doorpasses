@@ -31,6 +31,12 @@ import {
 	FieldGroup,
 	Checkbox,
 } from '@repo/ui'
+import { 
+	saveLastLoginMethod, 
+	useLastLoginMethod, 
+	getLoginMethodLabel,
+	type LoginMethod 
+} from '#app/utils/last-login-method.ts'
 import arcjet from '#app/utils/arcjet.server.ts'
 import { login, requireAnonymous } from '#app/utils/auth.server.ts'
 import {
@@ -152,6 +158,7 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
 	const [searchParams] = useSearchParams()
 	const redirectTo = searchParams.get('redirectTo')
 	const isBanned = searchParams.get('banned') === 'true'
+	const lastLoginMethod = useLastLoginMethod()
 
 	const [form, fields] = useForm({
 		id: 'login-form',
@@ -162,6 +169,10 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
 			return parseWithZod(formData, { schema: LoginFormSchema })
 		},
 		shouldRevalidate: 'onBlur',
+		onSubmit(event, { formData }) {
+			// Save the login method when password form is submitted
+			saveLastLoginMethod('password')
+		},
 	})
 
 	return (
@@ -189,20 +200,33 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
 					{/* Social Login Buttons */}
 					<div className="flex flex-col gap-4">
 						{providerNames.map((providerName) => (
-							<ProviderConnectionForm
-								key={providerName}
-								type="Login"
-								providerName={providerName}
-								redirectTo={redirectTo}
-							/>
+							<div key={providerName} className="relative">
+								<ProviderConnectionForm
+									type="Login"
+									providerName={providerName}
+									redirectTo={redirectTo}
+								/>
+								{lastLoginMethod === providerName && (
+									<div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full font-medium">
+										Last used
+									</div>
+								)}
+							</div>
 						))}
 					</div>
 
 					{/* Passkey Login */}
-					<PasskeyLogin
-						redirectTo={redirectTo}
-						remember={fields.remember.value === 'on'}
-					/>
+					<div className="relative">
+						<PasskeyLogin
+							redirectTo={redirectTo}
+							remember={fields.remember.value === 'on'}
+						/>
+						{lastLoginMethod === 'passkey' && (
+							<div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full font-medium">
+								Last used
+							</div>
+						)}
+					</div>
 
 					{/* Divider */}
 					<div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
@@ -211,11 +235,12 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
 						</span>
 					</div>
 
-					<Form method="POST" {...getFormProps(form)}>
-						<HoneypotInputs />
+					<div className="relative">
+						<Form method="POST" {...getFormProps(form)}>
+							<HoneypotInputs />
 
-						{/* Email/Username Login Form */}
-						<FieldGroup>
+							{/* Email/Username Login Form */}
+							<FieldGroup>
 							<Field
 								data-invalid={fields.username.errors?.length ? true : undefined}
 							>
@@ -294,8 +319,14 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
 							</StatusButton>
 						</FieldGroup>
 					</Form>
+					{lastLoginMethod === 'password' && (
+						<div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full font-medium">
+							Last used
+						</div>
+					)}
 				</div>
-			</CardContent>
+			</div>
+		</CardContent>
 			<CardFooter className="block rounded-lg p-4 text-center text-sm">
 				Don&apos;t have an account?{' '}
 				<Link
@@ -371,6 +402,9 @@ function PasskeyLogin({
 			}
 			const { location } = parsedResult.data
 
+			// Save the successful login method
+			saveLastLoginMethod('passkey')
+			
 			setPasskeyMessage("You're logged in! Navigating...")
 			await navigate(location ?? '/')
 		} catch (e) {
