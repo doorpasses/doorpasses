@@ -7,13 +7,14 @@ import {
 	useLocation,
 	useNavigate,
 	useFetcher,
+	useSearchParams,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
 } from 'react-router'
 import { EmptyState } from '#app/components/empty-state.tsx'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 
-import { Sheet, SheetContent, Icon } from '@repo/ui'
+import { Sheet, SheetContent, Icon, Input } from '@repo/ui'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
@@ -44,7 +45,22 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request)
 	await userHasOrgAccess(request, organization.id)
 
-	// Get organization notes with access control
+	// Get search query from URL
+	const url = new URL(request.url)
+	const searchQuery = url.searchParams.get('search')?.trim() || ''
+
+	// Build search conditions
+	// For SQLite, we'll use a simpler approach and rely on the database's default behavior
+	const searchConditions = searchQuery
+		? {
+				OR: [
+					{ title: { contains: searchQuery } },
+					{ content: { contains: searchQuery } },
+				],
+			}
+		: {}
+
+	// Get organization notes with access control and search
 	const notes = await prisma.organizationNote.findMany({
 		select: {
 			id: true,
@@ -88,10 +104,15 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		},
 		where: {
 			organizationId: organization.id,
-			OR: [
-				{ isPublic: true },
-				{ createdById: userId },
-				{ noteAccess: { some: { userId } } },
+			AND: [
+				{
+					OR: [
+						{ isPublic: true },
+						{ createdById: userId },
+						{ noteAccess: { some: { userId } } },
+					],
+				},
+				searchConditions,
 			],
 		},
 		orderBy: [{ statusId: 'asc' }, { position: 'asc' }, { createdAt: 'desc' }],
@@ -125,6 +146,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		notes: formattedNotes,
 		statuses,
 		viewMode,
+		searchQuery,
 	}
 }
 
@@ -199,12 +221,15 @@ export default function NotesRoute({
 			position: number | null
 		}>
 		viewMode: 'cards' | 'kanban'
+		searchQuery: string
 	}
 }) {
 	const location = useLocation()
 	const [hasOutlet, setHasOutlet] = useState(false)
 	const navigate = useNavigate()
 	const fetcher = useFetcher()
+	const [searchParams, setSearchParams] = useSearchParams()
+	const [searchValue, setSearchValue] = useState(loaderData.searchQuery)
 
 	const viewMode = loaderData.viewMode
 
@@ -213,6 +238,29 @@ export default function NotesRoute({
 		const baseNotesPath = `/${loaderData.organization.slug}/notes`
 		setHasOutlet(location.pathname !== baseNotesPath)
 	}, [location.pathname, loaderData.organization.slug])
+
+	// Handle search
+	const handleSearch = (value: string) => {
+		const newSearchParams = new URLSearchParams(searchParams)
+		if (value.trim()) {
+			newSearchParams.set('search', value.trim())
+		} else {
+			newSearchParams.delete('search')
+		}
+		setSearchParams(newSearchParams)
+	}
+
+	const handleSearchSubmit = (e: React.FormEvent) => {
+		e.preventDefault()
+		handleSearch(searchValue)
+	}
+
+	const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === 'Enter') {
+			e.preventDefault()
+			handleSearch(searchValue)
+		}
+	}
 
 	return (
 		<div className="flex h-full flex-col py-8 md:p-8">
@@ -265,6 +313,29 @@ export default function NotesRoute({
 				</div>
 			</div>
 
+			{/* Search Section */}
+			<div className="pb-4">
+				<form onSubmit={handleSearchSubmit} className="relative max-w-md">
+					<Input
+						type="search"
+						role="searchbox"
+						name="search"
+						aria-label="Search notes"
+						placeholder="Search notes by title or content..."
+						value={searchValue}
+						onChange={(e) => {
+							setSearchValue(e.target.value)
+						}}
+						onKeyDown={handleSearchKeyDown}
+						onBlur={() => handleSearch(searchValue)}
+						className="pr-10"
+					/>
+					<div className="absolute inset-y-0 right-0 flex items-center pr-3">
+						<Icon name="search" className="text-muted-foreground h-4 w-4" />
+					</div>
+				</form>
+			</div>
+
 			<div className="flex-grow pb-4">
 				{loaderData.notes.length > 0 ? (
 					viewMode === 'kanban' ? (
@@ -280,20 +351,28 @@ export default function NotesRoute({
 							organizationId={loaderData.organization.id}
 						/>
 					)
+				) : loaderData.searchQuery ? (
+					<EmptyState
+						title="No notes found"
+						description={`No notes match your search for "${loaderData.searchQuery}". Try a different search term or create a new note.`}
+						icons={['search', 'file-text']}
+						action={{
+							label: 'Create Note',
+							href: `/${loaderData.organization.slug}/notes/new`,
+						}}
+					/>
 				) : (
-					<>
-						<EmptyState
-							title="You haven't created any notes yet!"
-							description="Notes help you capture thoughts, meeting minutes, or anything
-							important for your organization. Get started by creating your
-							first note."
-							icons={['file-text', 'link-2', 'image']}
-							action={{
-								label: 'Create Note',
-								href: `/${loaderData.organization.slug}/notes/new`,
-							}}
-						/>
-					</>
+					<EmptyState
+						title="You haven't created any notes yet!"
+						description="Notes help you capture thoughts, meeting minutes, or anything
+						important for your organization. Get started by creating your
+						first note."
+						icons={['file-text', 'link-2', 'image']}
+						action={{
+							label: 'Create Note',
+							href: `/${loaderData.organization.slug}/notes/new`,
+						}}
+					/>
 				)}
 			</div>
 

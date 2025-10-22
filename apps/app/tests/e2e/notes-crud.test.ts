@@ -26,20 +26,18 @@ test.describe('Notes CRUD Operations', () => {
 		const contentEditor = page
 			.locator('.ProseMirror')
 			.or(page.getByRole('textbox', { name: /content/i }))
-		await contentEditor.waitFor({ state: 'visible', timeout: 10000 })
+		await contentEditor.waitFor({ state: 'visible' })
 		await contentEditor.fill(newNote.content)
 
-		// Wait for any pending operations before looking for save button
+		// Wait for any pending operations before looking for create button
 		await page.waitForLoadState('networkidle')
 
-		// Try multiple selectors for the save button with extended timeout
-		const saveButton = page
-			.getByRole('button', { name: /save/i })
-			.or(page.getByText(/save/i).first())
-		await saveButton.waitFor({ state: 'visible', timeout: 30000 })
-		await saveButton.click({ timeout: 30000 })
+		// Try multiple selectors for the create button
+		const createButton = page.getByRole('button', { name: /create/i })
+		await createButton.waitFor({ state: 'visible' })
+		await createButton.click()
 		await expect(page).toHaveURL(new RegExp(`/${org.slug}/notes/.*`))
-		await expect(page.getByText(newNote.title)).toBeVisible()
+		await expect(page.getByText(newNote.title).first()).toBeVisible()
 	})
 
 	test('Users can edit notes', async ({ page, login }) => {
@@ -68,18 +66,16 @@ test.describe('Notes CRUD Operations', () => {
 		const contentEditor = page
 			.locator('.ProseMirror')
 			.or(page.getByRole('textbox', { name: /content/i }))
-		await contentEditor.waitFor({ state: 'visible', timeout: 10000 })
+		await contentEditor.waitFor({ state: 'visible' })
 		await contentEditor.fill(updatedNote.content)
 
-		// Wait for any pending operations before looking for save button
+		// Wait for any pending operations before looking for update button
 		await page.waitForLoadState('networkidle')
 
-		// Try multiple selectors for the save button with extended timeout
-		const saveButton = page
-			.getByRole('button', { name: /save/i })
-			.or(page.getByText(/save/i).first())
-		await saveButton.waitFor({ state: 'visible', timeout: 30000 })
-		await saveButton.click({ timeout: 30000 })
+		// Try multiple selectors for the update button
+		const updateButton = page.getByRole('button', { name: /update/i })
+		await updateButton.waitFor({ state: 'visible' })
+		await updateButton.click()
 
 		await expect(page).toHaveURL(`/${org.slug}/notes/${note.id}`)
 		await expect(
@@ -246,7 +242,7 @@ test.describe('Notes CRUD Operations', () => {
 
 		if (await visibilityToggle.isVisible()) {
 			await visibilityToggle.click()
-			await page.getByRole('button', { name: /save/i }).click()
+			await page.getByRole('button', { name: /update/i }).click()
 
 			// Verify note is now public
 			const updatedNote = await prisma.organizationNote.findUnique({

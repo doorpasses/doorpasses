@@ -11,8 +11,8 @@ test.describe('File Operations', () => {
 		await login()
 
 		// Navigate to profile settings
-		await page.goto('/profile', { timeout: 120000 })
-		await page.waitForLoadState('networkidle', { timeout: 30000 })
+		await page.goto('/profile')
+		await page.waitForLoadState('networkidle')
 
 		// Look for profile photo upload section
 		const photoUploadButton = page
@@ -99,7 +99,7 @@ test.describe('File Operations', () => {
 		const contentEditor = page
 			.locator('.ProseMirror')
 			.or(page.getByRole('textbox', { name: /content/i }))
-		await contentEditor.waitFor({ state: 'visible', timeout: 10000 })
+		await contentEditor.waitFor({ state: 'visible' })
 		await contentEditor.fill('This note will have an image')
 
 		// Look for image upload functionality
@@ -129,7 +129,7 @@ test.describe('File Operations', () => {
 			await page.waitForTimeout(2000)
 
 			// Save the note
-			await page.getByRole('button', { name: /save/i }).click()
+			await page.getByRole('button', { name: /create/i }).click()
 
 			// Verify note was created with image
 			await expect(page.getByText('Note with Image')).toBeVisible()

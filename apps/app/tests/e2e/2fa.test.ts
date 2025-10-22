@@ -82,13 +82,13 @@ test('Users can add 2FA to their account and use it when logging in', async ({
 	await page.getByRole('button', { name: /verify/i }).click()
 
 	// Wait for navigation after verification
-	await page.waitForURL(/\/(organizations\/create|$)/, { timeout: 30000 })
+	await page.waitForURL(/\/(organizations\/create|$)/)
 
 	// Navigate to the app to verify the user is properly logged in
 	await page.goto('/')
 
 	// User should be redirected to organization creation page (authenticated area)
-	await page.waitForURL('/organizations/create', { timeout: 15000 })
+	await page.waitForURL('/organizations/create')
 
 	// Wait for the page to fully load
 	await page.waitForLoadState('networkidle')
