@@ -1,11 +1,18 @@
 import { faker } from '@faker-js/faker'
 import { prisma } from '#app/utils/db.server.ts'
-import {
-	createTestOrganization,
-	createTestOrganizationWithMultipleUsers,
-} from '#tests/test-utils.ts'
+import { createTestOrganization } from '#tests/test-utils.ts'
 // Removed prisma import - using test utilities instead
 import { expect, test } from '#tests/playwright-utils.ts'
+import { initializeOnboardingSteps } from '../../../../packages/prisma/setup-onboarding.ts'
+
+// Ensure onboarding steps are seeded before tests
+async function ensureOnboardingStepsExist() {
+	const existingSteps = await prisma.onboardingStep.count()
+	if (existingSteps === 0) {
+		console.log('Seeding onboarding steps for tests...')
+		await initializeOnboardingSteps()
+	}
+}
 
 test.describe('Dashboard', () => {
 	test('Dashboard displays organization overview', async ({ page, login }) => {
@@ -83,6 +90,9 @@ test.describe('Dashboard', () => {
 		page,
 		login,
 	}) => {
+		// Ensure onboarding steps exist in database
+		await ensureOnboardingStepsExist()
+
 		const user = await login()
 
 		// Create a new organization with minimal data to avoid auto-completion
@@ -236,6 +246,9 @@ test.describe('Dashboard', () => {
 		page,
 		login,
 	}) => {
+		// Ensure onboarding steps exist in database
+		await ensureOnboardingStepsExist()
+
 		const user = await login()
 
 		// Create a new organization with minimal data to avoid auto-completion

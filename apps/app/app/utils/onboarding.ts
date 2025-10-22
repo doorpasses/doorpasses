@@ -52,25 +52,64 @@ export async function getOnboardingProgress(
 		},
 	})
 
+	// If no onboarding steps exist (e.g., database not seeded), return empty progress
+	if (steps.length === 0) {
+		return {
+			totalSteps: 0,
+			completedCount: 0,
+			isCompleted: true, // Mark as completed so onboarding doesn't show
+			isVisible: false,
+			steps: [],
+		}
+	}
+
 	// Get or create overall progress record
-	let progress = await prisma.onboardingProgress.upsert({
-		where: {
-			userId_organizationId: {
+	let progress
+	try {
+		progress = await prisma.onboardingProgress.upsert({
+			where: {
+				userId_organizationId: {
+					userId,
+					organizationId,
+				},
+			},
+			update: {
+				totalSteps: steps.length,
+			},
+			create: {
 				userId,
 				organizationId,
+				totalSteps: steps.length,
+				completedCount: 0,
+				isCompleted: false,
 			},
-		},
-		update: {
-			totalSteps: steps.length,
-		},
-		create: {
-			userId,
-			organizationId,
+		})
+	} catch (error) {
+		console.error('Error upserting onboarding progress:', error)
+		// Return safe default if foreign key constraint fails - show onboarding if steps exist
+		return {
 			totalSteps: steps.length,
 			completedCount: 0,
-			isCompleted: false,
-		},
-	})
+			isCompleted: false, // Don't mark as completed so onboarding shows
+			isVisible: true, // Make it visible so onboarding shows
+			steps: steps.map((step) => ({
+				id: step.id,
+				key: step.key,
+				title: step.title,
+				description: step.description,
+				icon: step.icon || undefined,
+				actionConfig: step.actionConfig
+					? (JSON.parse(step.actionConfig) as OnboardingStepAction)
+					: undefined,
+				detectConfig: step.detectConfig
+					? (JSON.parse(step.detectConfig) as OnboardingStepDetectConfig)
+					: undefined,
+				sortOrder: step.sortOrder,
+				isCompleted: false,
+				completedAt: undefined,
+			})),
+		}
+	}
 
 	// Transform steps with progress data
 	const stepsWithProgress: OnboardingStepWithProgress[] = steps.map((step) => {
@@ -229,53 +268,63 @@ export async function autoDetectCompletedSteps(
 	userId: string,
 	organizationId: string,
 ) {
-	// Get detection data
-	const detectionData = await getDetectionData(userId, organizationId)
+	try {
+		// Get steps that have auto-detection enabled
+		const stepsWithDetection = await prisma.onboardingStep.findMany({
+			where: {
+				isActive: true,
+				autoDetect: true,
+				detectConfig: { not: null },
+			},
+		})
 
-	// Get steps that have auto-detection enabled
-	const stepsWithDetection = await prisma.onboardingStep.findMany({
-		where: {
-			isActive: true,
-			autoDetect: true,
-			detectConfig: { not: null },
-		},
-	})
+		// If no onboarding steps exist, skip auto-detection
+		if (stepsWithDetection.length === 0) {
+			return
+		}
 
-	for (const step of stepsWithDetection) {
-		if (!step.detectConfig) continue
+		// Get detection data
+		const detectionData = await getDetectionData(userId, organizationId)
 
-		try {
-			const detectConfig = JSON.parse(
-				step.detectConfig,
-			) as OnboardingStepDetectConfig
-			const isCompleted = evaluateDetectionCondition(
-				detectConfig.condition,
-				detectionData,
-			)
+		for (const step of stepsWithDetection) {
+			if (!step.detectConfig) continue
 
-			if (isCompleted) {
-				// Check if already marked as completed
-				const existingProgress = await prisma.onboardingStepProgress.findUnique(
-					{
-						where: {
-							userId_organizationId_stepId: {
-								userId,
-								organizationId,
-								stepId: step.id,
-							},
-						},
-					},
+			try {
+				const detectConfig = JSON.parse(
+					step.detectConfig,
+				) as OnboardingStepDetectConfig
+				const isCompleted = evaluateDetectionCondition(
+					detectConfig.condition,
+					detectionData,
 				)
 
-				if (!existingProgress?.isCompleted) {
-					await markStepCompleted(userId, organizationId, step.key, {
-						autoDetected: true,
-					})
+				if (isCompleted) {
+					// Check if already marked as completed
+					const existingProgress =
+						await prisma.onboardingStepProgress.findUnique({
+							where: {
+								userId_organizationId_stepId: {
+									userId,
+									organizationId,
+									stepId: step.id,
+								},
+							},
+						})
+
+					if (!existingProgress?.isCompleted) {
+						await markStepCompleted(userId, organizationId, step.key, {
+							autoDetected: true,
+						})
+					}
 				}
+			} catch (error) {
+				console.error(`Error auto-detecting step ${step.key}:`, error)
 			}
-		} catch (error) {
-			console.error(`Error auto-detecting step ${step.key}:`, error)
 		}
+	} catch (error) {
+		console.error('Error in autoDetectCompletedSteps:', error)
+		// Fail silently to avoid breaking the app
+		return
 	}
 }
 

@@ -22,13 +22,24 @@ export async function loader({ request }: { request: Request }) {
 
 		if (defaultOrg?.organization?.id) {
 			// Auto-detect completed steps first
-			await autoDetectCompletedSteps(userId, defaultOrg.organization.id)
+			try {
+				await autoDetectCompletedSteps(userId, defaultOrg.organization.id)
+			} catch (autoDetectError) {
+				console.error('Error auto-detecting onboarding steps:', autoDetectError)
+				// Continue without auto-detection if there's an error
+			}
 
 			// Get current progress
-			onboardingProgress = await getOnboardingProgress(
-				userId,
-				defaultOrg.organization.id,
-			)
+			try {
+				onboardingProgress = await getOnboardingProgress(
+					userId,
+					defaultOrg.organization.id,
+				)
+			} catch (onboardingError) {
+				console.error('Error fetching onboarding progress:', onboardingError)
+				// Continue without onboarding progress if there's an error
+				onboardingProgress = null
+			}
 
 			// Get trial status using environment variables
 			try {
