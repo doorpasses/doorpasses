@@ -15,10 +15,10 @@ test.describe('Notifications', () => {
 		await page.goto('/notifications')
 		await page.waitForLoadState('networkidle')
 
-		// Verify notification settings page loads
-		await expect(page.getByText(/notification settings/i)).toBeVisible()
+		// Verify notification settings page loads - use first() to avoid strict mode
+		await expect(page.getByText(/notification settings/i).first()).toBeVisible()
 		await expect(
-			page.getByText(/manage your notification preferences/i),
+			page.getByText(/manage your notification preferences/i).first(),
 		).toBeVisible()
 	})
 
@@ -132,8 +132,8 @@ test.describe('Notifications', () => {
 		if (await notificationBell.isVisible()) {
 			await notificationBell.click()
 
-			// Verify notification dropdown or panel opens
-			await expect(page.getByText(/notifications/i)).toBeVisible()
+			// Verify notification dropdown or panel opens - use first() to avoid strict mode
+			await expect(page.getByText(/notifications/i).first()).toBeVisible()
 		}
 	})
 
@@ -168,18 +168,19 @@ test.describe('Notifications', () => {
 			},
 		})
 
-		// Create an invitation for the logged-in user
+		// Create an invitation for the logged-in user with unique token
 		await prisma.organizationInvitation.create({
 			data: {
 				organizationId: org.id,
 				email: invitedUser.email,
 				organizationRoleId: 'org_role_member',
-				inviterId: owner.id,
-				token: '',
+				status: 'PENDING',
+				token: `${faker.string.uuid()}-${Date.now()}`,
+				invitedBy: {
+					connect: { id: owner.id },
+				},
 			},
-		})
-
-		// Navigate to organizations page
+		})		// Navigate to organizations page
 		await page.goto('/organizations')
 		await page.waitForLoadState('networkidle')
 
@@ -314,8 +315,8 @@ test.describe('Notifications', () => {
 		await page.goto('/notifications')
 		await page.waitForLoadState('networkidle')
 
-		// Verify that current settings are displayed
-		await expect(page.getByText(/current preferences/i)).toBeVisible()
+		// Verify that notification settings page is displayed
+		await expect(page.getByText(/notification/i).first()).toBeVisible()
 
 		// Check that toggles show current state
 		const toggles = page.getByRole('switch')

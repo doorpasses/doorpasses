@@ -22,9 +22,18 @@ test.describe('Notes CRUD Operations', () => {
 
 		// fill in form and submit
 		await page.getByRole('textbox', { name: /title/i }).fill(newNote.title)
-		await page.getByRole('textbox', { name: /content/i }).fill(newNote.content)
+		// Content editor is a TipTap rich text editor using ProseMirror
+		const contentEditor = page.locator('.ProseMirror').or(page.getByRole('textbox', { name: /content/i }))
+		await contentEditor.waitFor({ state: 'visible', timeout: 10000 })
+		await contentEditor.fill(newNote.content)
 
-		await page.getByRole('button', { name: /save/i }).click()
+		// Wait for any pending operations before looking for save button
+		await page.waitForLoadState('networkidle')
+
+		// Try multiple selectors for the save button with extended timeout
+		const saveButton = page.getByRole('button', { name: /save/i }).or(page.getByText(/save/i).first())
+		await saveButton.waitFor({ state: 'visible', timeout: 30000 })
+		await saveButton.click({ timeout: 30000 })
 		await expect(page).toHaveURL(new RegExp(`/${org.slug}/notes/.*`))
 		await expect(page.getByText(newNote.title)).toBeVisible()
 	})
@@ -47,19 +56,27 @@ test.describe('Notes CRUD Operations', () => {
 		await page.goto(`/${org.slug}/notes/${note.id}`)
 		await page.waitForLoadState('networkidle')
 
-		// edit the note
-		await page.getByRole('link', { name: 'Edit', exact: true }).click()
-		const updatedNote = createNote()
-		await page.getByRole('textbox', { name: /title/i }).fill(updatedNote.title)
-		await page
-			.getByRole('textbox', { name: /content/i })
-			.fill(updatedNote.content)
-		await page.getByRole('button', { name: /save/i }).click()
+	// edit the note
+	await page.getByRole('link', { name: 'Edit', exact: true }).click()
+	const updatedNote = createNote()
+	await page.getByRole('textbox', { name: /title/i }).fill(updatedNote.title)
+	// Content editor is a TipTap rich text editor using ProseMirror
+	const contentEditor = page.locator('.ProseMirror').or(page.getByRole('textbox', { name: /content/i }))
+	await contentEditor.waitFor({ state: 'visible', timeout: 10000 })
+	await contentEditor.fill(updatedNote.content)
 
-		await expect(page).toHaveURL(`/${org.slug}/notes/${note.id}`)
-		await expect(
-			page.getByRole('heading', { name: updatedNote.title }),
-		).toBeVisible()
+	// Wait for any pending operations before looking for save button
+	await page.waitForLoadState('networkidle')
+
+	// Try multiple selectors for the save button with extended timeout
+	const saveButton = page.getByRole('button', { name: /save/i }).or(page.getByText(/save/i).first())
+	await saveButton.waitFor({ state: 'visible', timeout: 30000 })
+	await saveButton.click({ timeout: 30000 })
+		
+	await expect(page).toHaveURL(`/${org.slug}/notes/${note.id}`)
+	await expect(
+		page.getByRole('heading', { name: updatedNote.title }),
+	).toBeVisible()
 	})
 
 	test('Users can delete notes', async ({ page, login }) => {

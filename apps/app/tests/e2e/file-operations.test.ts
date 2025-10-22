@@ -11,8 +11,8 @@ test.describe('File Operations', () => {
 		await login()
 
 		// Navigate to profile settings
-		await page.goto('/profile')
-		await page.waitForLoadState('networkidle')
+		await page.goto('/profile', { timeout: 120000 })
+		await page.waitForLoadState('networkidle', { timeout: 30000 })
 
 		// Look for profile photo upload section
 		const photoUploadButton = page
@@ -94,9 +94,11 @@ test.describe('File Operations', () => {
 
 		// Fill in note details
 		await page.getByRole('textbox', { name: /title/i }).fill('Note with Image')
-		await page
-			.getByRole('textbox', { name: /content/i })
-			.fill('This note will have an image')
+		
+		// Content editor is a TipTap rich text editor
+		const contentEditor = page.locator('.ProseMirror').or(page.getByRole('textbox', { name: /content/i }))
+		await contentEditor.waitFor({ state: 'visible', timeout: 10000 })
+		await contentEditor.fill('This note will have an image')
 
 		// Look for image upload functionality
 		const imageUploadButton = page

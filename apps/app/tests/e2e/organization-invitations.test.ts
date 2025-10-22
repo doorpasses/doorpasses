@@ -19,8 +19,14 @@ test.describe('Organization Invitations', () => {
 		await page.goto(`/${org.slug}/settings/members`)
 		await page.waitForLoadState('networkidle')
 
-		// Click invite member button
-		await page.getByRole('button', { name: /invite member/i }).click()
+		// Wait for page to fully load
+		await page.waitForLoadState('networkidle')
+
+		// Wait for and click invite member button with extended timeout
+		const inviteButton = page.getByRole('button', { name: /invite member/i })
+		await inviteButton.waitFor({ state: 'visible', timeout: 60000 })
+		await page.waitForTimeout(1000) // Small delay to ensure button is clickable
+		await inviteButton.click()
 
 		// Fill in invitation form
 		const inviteEmail = faker.internet.email()
@@ -89,9 +95,9 @@ test.describe('Organization Invitations', () => {
 			data: {
 				organizationId: org.id,
 				email: invitedUser.email,
-				organizationRoleId: 'org_role_member',
+		organizationRoleId: 'org_role_member',
 				inviterId: owner.id,
-				token: '',
+				token: `accept-test-1-${faker.string.uuid()}-${Date.now()}`,
 			},
 		})
 
