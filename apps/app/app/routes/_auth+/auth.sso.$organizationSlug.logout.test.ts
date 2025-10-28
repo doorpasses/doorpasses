@@ -119,7 +119,14 @@ test('successful SSO logout revokes tokens and performs regular logout', async (
 	})
 
 	const request = await setupRequest({ sessionId: session.id })
-	const response = await loader({ request, params: PARAMS, context: {} })
+
+	// The loader should throw the logout response
+	let thrownResponse: Response | undefined
+	try {
+		await loader({ request, params: PARAMS, context: {} })
+	} catch (response) {
+		thrownResponse = response as Response
+	}
 
 	// Verify token revocation was called
 	expect(ssoAuthService.revokeTokens).toHaveBeenCalledWith(ssoSession.id)
@@ -130,7 +137,7 @@ test('successful SSO logout revokes tokens and performs regular logout', async (
 		redirectTo: '/login',
 	})
 
-	expect(response).toBe(mockLogoutResponse)
+	expect(thrownResponse).toBe(mockLogoutResponse)
 })
 
 test('handles logout when organization not found', async () => {
@@ -145,15 +152,22 @@ test('handles logout when organization not found', async () => {
 	})
 
 	const request = await setupRequest()
-	const response = await loader({
-		request,
-		params: { organizationSlug: 'non-existent-org' },
-		context: {},
-	})
+
+	// The loader should throw the logout response
+	let thrownResponse: Response | undefined
+	try {
+		await loader({
+			request,
+			params: { organizationSlug: 'non-existent-org' },
+			context: {},
+		})
+	} catch (response) {
+		thrownResponse = response as Response
+	}
 
 	// Should perform regular logout when organization not found
 	expect(logout).toHaveBeenCalledWith({ request })
-	expect(response).toBe(mockLogoutResponse)
+	expect(thrownResponse).toBe(mockLogoutResponse)
 })
 
 test('handles logout when SSO not configured', async () => {
@@ -170,11 +184,18 @@ test('handles logout when SSO not configured', async () => {
 	})
 
 	const request = await setupRequest()
-	const response = await loader({ request, params: PARAMS, context: {} })
+
+	// The loader should throw the logout response
+	let thrownResponse: Response | undefined
+	try {
+		await loader({ request, params: PARAMS, context: {} })
+	} catch (response) {
+		thrownResponse = response as Response
+	}
 
 	// Should perform regular logout when SSO not configured
 	expect(logout).toHaveBeenCalledWith({ request })
-	expect(response).toBe(mockLogoutResponse)
+	expect(thrownResponse).toBe(mockLogoutResponse)
 })
 
 test('handles logout when SSO disabled', async () => {
@@ -194,11 +215,18 @@ test('handles logout when SSO disabled', async () => {
 	})
 
 	const request = await setupRequest()
-	const response = await loader({ request, params: PARAMS, context: {} })
+
+	// The loader should throw the logout response
+	let thrownResponse: Response | undefined
+	try {
+		await loader({ request, params: PARAMS, context: {} })
+	} catch (response) {
+		thrownResponse = response as Response
+	}
 
 	// Should perform regular logout when SSO disabled
 	expect(logout).toHaveBeenCalledWith({ request })
-	expect(response).toBe(mockLogoutResponse)
+	expect(thrownResponse).toBe(mockLogoutResponse)
 })
 
 test('handles logout when no session exists', async () => {
@@ -213,14 +241,21 @@ test('handles logout when no session exists', async () => {
 	})
 
 	const request = await setupRequest() // No session ID
-	const response = await loader({ request, params: PARAMS, context: {} })
+
+	// The loader should throw the logout response
+	let thrownResponse: Response | undefined
+	try {
+		await loader({ request, params: PARAMS, context: {} })
+	} catch (response) {
+		thrownResponse = response as Response
+	}
 
 	// Should perform regular logout
 	expect(logout).toHaveBeenCalledWith({
 		request,
 		redirectTo: '/login',
 	})
-	expect(response).toBe(mockLogoutResponse)
+	expect(thrownResponse).toBe(mockLogoutResponse)
 })
 
 test('handles logout when no SSO session exists', async () => {
@@ -247,7 +282,14 @@ test('handles logout when no SSO session exists', async () => {
 	})
 
 	const request = await setupRequest({ sessionId: session.id })
-	const response = await loader({ request, params: PARAMS, context: {} })
+
+	// The loader should throw the logout response
+	let thrownResponse: Response | undefined
+	try {
+		await loader({ request, params: PARAMS, context: {} })
+	} catch (response) {
+		thrownResponse = response as Response
+	}
 
 	// Should not try to revoke tokens
 	expect(ssoAuthService.revokeTokens).not.toHaveBeenCalled()
@@ -257,7 +299,7 @@ test('handles logout when no SSO session exists', async () => {
 		request,
 		redirectTo: '/login',
 	})
-	expect(response).toBe(mockLogoutResponse)
+	expect(thrownResponse).toBe(mockLogoutResponse)
 })
 
 test('continues logout even if token revocation fails', async () => {
@@ -304,7 +346,14 @@ test('continues logout even if token revocation fails', async () => {
 	})
 
 	const request = await setupRequest({ sessionId: session.id })
-	const response = await loader({ request, params: PARAMS, context: {} })
+
+	// The loader should throw the logout response
+	let thrownResponse: Response | undefined
+	try {
+		await loader({ request, params: PARAMS, context: {} })
+	} catch (response) {
+		thrownResponse = response as Response
+	}
 
 	// Verify token revocation was attempted
 	expect(ssoAuthService.revokeTokens).toHaveBeenCalledWith(ssoSession.id)
@@ -320,7 +369,7 @@ test('continues logout even if token revocation fails', async () => {
 		request,
 		redirectTo: '/login',
 	})
-	expect(response).toBe(mockLogoutResponse)
+	expect(thrownResponse).toBe(mockLogoutResponse)
 
 	// Restore console.warn
 	consoleWarn.mockRestore()
@@ -338,13 +387,20 @@ test('handles custom redirect URL from query params', async () => {
 	})
 
 	const request = await setupRequest({ redirectTo: '/custom-redirect' })
-	const response = await loader({ request, params: PARAMS, context: {} })
+
+	// The loader should throw the logout response
+	let thrownResponse: Response | undefined
+	try {
+		await loader({ request, params: PARAMS, context: {} })
+	} catch (response) {
+		thrownResponse = response as Response
+	}
 
 	expect(logout).toHaveBeenCalledWith({
 		request,
 		redirectTo: '/custom-redirect',
 	})
-	expect(response).toBe(mockLogoutResponse)
+	expect(thrownResponse).toBe(mockLogoutResponse)
 })
 
 async function setupRequest({

@@ -110,7 +110,11 @@ describe('discover-org route', () => {
 
 			expect(response.status).toBe(200)
 			expect(data.error).toBeNull()
-			expect(data.organization).toEqual(mockOrganization)
+			expect(data.organization).toEqual({
+				...mockOrganization,
+				createdAt: mockOrganization.createdAt.toISOString(),
+				updatedAt: mockOrganization.updatedAt.toISOString(),
+			})
 			expect(data.ssoConfig).toBeNull()
 			expect(data.ssoAvailable).toBe(false)
 			expect(ssoConfigurationService.getConfiguration).toHaveBeenCalledWith(
@@ -175,7 +179,11 @@ describe('discover-org route', () => {
 
 			expect(response.status).toBe(200)
 			expect(data.error).toBeNull()
-			expect(data.organization).toEqual(mockOrganization)
+			expect(data.organization).toEqual({
+				...mockOrganization,
+				createdAt: mockOrganization.createdAt.toISOString(),
+				updatedAt: mockOrganization.updatedAt.toISOString(),
+			})
 			expect(data.ssoConfig).toBeNull()
 			expect(data.ssoAvailable).toBe(false)
 		})
@@ -237,7 +245,11 @@ describe('discover-org route', () => {
 
 			expect(response.status).toBe(200)
 			expect(data.error).toBeNull()
-			expect(data.organization).toEqual(mockOrganization)
+			expect(data.organization).toEqual({
+				...mockOrganization,
+				createdAt: mockOrganization.createdAt.toISOString(),
+				updatedAt: mockOrganization.updatedAt.toISOString(),
+			})
 			expect(data.ssoConfig).toEqual({
 				id: mockSSOConfig.id,
 				providerName: mockSSOConfig.providerName,
@@ -312,7 +324,11 @@ describe('discover-org route', () => {
 			const data = (await response.json()) as DiscoverOrgResponse
 
 			expect(response.status).toBe(200)
-			expect(data.organization).toEqual(mockOrganization)
+			expect(data.organization).toEqual({
+				...mockOrganization,
+				createdAt: mockOrganization.createdAt.toISOString(),
+				updatedAt: mockOrganization.updatedAt.toISOString(),
+			})
 			expect(discoverOrganizationFromEmail).toHaveBeenCalledWith(email)
 		})
 
