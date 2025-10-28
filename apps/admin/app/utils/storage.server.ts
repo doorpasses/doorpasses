@@ -2,7 +2,7 @@ import { createHash, createHmac } from 'crypto'
 import { type FileUpload } from '@mjackson/form-data-parser'
 import { createId } from '@paralleldrive/cuid2'
 import { prisma } from './db.server'
-import { decrypt } from './encryption.server'
+import { decrypt, getSSOMasterKey } from './encryption.server'
 
 // Default storage configuration from environment variables
 const DEFAULT_STORAGE_ENDPOINT = process.env.AWS_ENDPOINT_URL_S3
@@ -36,7 +36,7 @@ async function getStorageConfig(
 				endpoint: s3Config.endpoint,
 				bucket: s3Config.bucketName,
 				accessKey: s3Config.accessKeyId,
-				secretKey: decrypt(s3Config.secretAccessKey), // Decrypt the secret key
+				secretKey: decrypt(s3Config.secretAccessKey, getSSOMasterKey()), // Decrypt the secret key
 				region: s3Config.region,
 			}
 		}

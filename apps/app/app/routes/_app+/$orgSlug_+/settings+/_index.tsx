@@ -30,7 +30,7 @@ import VerifiedDomainCard, {
 
 import { requireUserId } from '#app/utils/auth.server'
 import { prisma } from '#app/utils/db.server'
-import { encrypt } from '#app/utils/encryption.server'
+import { encrypt, getSSOMasterKey } from '#app/utils/encryption.server'
 import { markStepCompleted } from '#app/utils/onboarding'
 import {
 	updateSeatQuantity,
@@ -483,7 +483,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				})
 
 				const secretToUse = s3SecretAccessKey
-					? encrypt(s3SecretAccessKey)
+					? encrypt(s3SecretAccessKey, getSSOMasterKey())
 					: existingConfig?.secretAccessKey || ''
 
 				// Create or update S3 configuration

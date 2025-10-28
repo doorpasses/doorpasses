@@ -9,6 +9,7 @@ import { prisma } from './db.server.ts'
 import { combineHeaders, downloadFile } from './misc.tsx'
 import { type ProviderUser } from './providers/provider.ts'
 import { authSessionStorage } from './session.server.ts'
+import { ssoAuthService } from './sso-auth.server.ts'
 import { uploadProfileImage } from './storage.server.ts'
 import { getUtmParams } from './utm.server.ts'
 
@@ -20,11 +21,64 @@ export const sessionKey = 'sessionId'
 
 export const authenticator = new Authenticator<ProviderUser>()
 
+// Register existing OAuth providers (GitHub, Google, etc.)
 for (const [providerName, provider] of Object.entries(providers)) {
 	const strategy = provider.getAuthStrategy()
 	if (strategy) {
 		authenticator.use(strategy, providerName)
 	}
+}
+
+/**
+ * Get or register an SSO strategy for an organization
+ * This creates dynamic strategies based on organization SSO configuration
+ */
+export async function getSSOStrategy(organizationId: string) {
+	const strategyName = `sso-${organizationId}`
+
+	// Check if strategy is already registered
+	try {
+		// Try to get the existing strategy - this will throw if not found
+		const existingStrategy = (authenticator as any)._strategies.get(
+			strategyName,
+		)
+		if (existingStrategy) {
+			return strategyName
+		}
+	} catch {
+		// Strategy doesn't exist, we'll create it below
+	}
+
+	// Get the SSO strategy from the service
+	const strategy = await ssoAuthService.getStrategy(organizationId)
+	if (!strategy) {
+		return null
+	}
+
+	// Register the strategy with the authenticator
+	authenticator.use(strategy, strategyName)
+
+	return strategyName
+}
+
+/**
+ * Refresh an SSO strategy when configuration changes
+ */
+export async function refreshSSOStrategy(organizationId: string) {
+	const strategyName = `sso-${organizationId}`
+
+	// Remove existing strategy if it exists
+	try {
+		;(authenticator as any)._strategies.delete(strategyName)
+	} catch {
+		// Strategy might not exist, that's fine
+	}
+
+	// Refresh the strategy in the SSO service
+	await ssoAuthService.refreshStrategy(organizationId)
+
+	// Re-register the strategy
+	return getSSOStrategy(organizationId)
 }
 
 export async function getUserId(request: Request) {
@@ -147,10 +201,28 @@ export async function login({
 	username,
 	password,
 }: {
-	username: User['username']
+	username: string
 	password: string
 }) {
-	const user = await verifyUserPassword({ username }, password)
+	// Try to find user by username first, then by email if it looks like an email
+	let user = null
+
+	if (username.includes('@')) {
+		// Looks like an email, try email first
+		user = await verifyUserPassword({ email: username }, password)
+		if (!user) {
+			// If email fails, try as username (in case someone has @ in their username)
+			user = await verifyUserPassword({ username }, password)
+		}
+	} else {
+		// Looks like a username, try username first
+		user = await verifyUserPassword({ username }, password)
+		if (!user) {
+			// If username fails, try as email (in case it's a short email)
+			user = await verifyUserPassword({ email: username }, password)
+		}
+	}
+
 	if (!user) return null
 
 	const canLogin = await canUserLogin(user.id)
@@ -292,6 +364,32 @@ export async function signupWithConnection({
 	return session
 }
 
+/**
+ * Create session for SSO authenticated user
+ */
+export async function loginWithSSO({
+	user,
+	organizationId,
+}: {
+	user: User
+	organizationId: string
+}) {
+	const canLogin = await canUserLogin(user.id)
+	if (!canLogin) {
+		throw new Error('User is banned and cannot login')
+	}
+
+	const session = await prisma.session.create({
+		select: { id: true, expirationDate: true, userId: true },
+		data: {
+			expirationDate: getSessionExpirationDate(),
+			userId: user.id,
+		},
+	})
+
+	return session
+}
+
 export async function logout(
 	{
 		request,
@@ -328,7 +426,7 @@ export async function getPasswordHash(password: string) {
 }
 
 export async function verifyUserPassword(
-	where: Pick<User, 'username'> | Pick<User, 'id'>,
+	where: Pick<User, 'username'> | Pick<User, 'id'> | Pick<User, 'email'>,
 	password: Password['hash'],
 ) {
 	const userWithPassword = await prisma.user.findUnique({

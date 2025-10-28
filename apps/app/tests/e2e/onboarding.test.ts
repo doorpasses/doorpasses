@@ -334,10 +334,13 @@ test('login as existing user', async ({ page, insertNewUser }) => {
 	const user = await insertNewUser({ password })
 	invariant(user.name, 'User name not found')
 	await page.goto('/login')
-	await page.getByRole('textbox', { name: /^username$/i }).fill(user.username)
+	await page
+		.getByRole('textbox', { name: /^email or username$/i })
+		.fill(user.username)
+	await page.getByRole('button', { name: 'Continue', exact: true }).click()
 	await page.getByLabel(/^password$/i).fill(password)
 	await page
-		.getByRole('button', { name: 'Login', exact: true })
+		.getByRole('button', { name: 'Sign In', exact: true })
 		.click({ force: true })
 
 	// Wait for navigation or error message
@@ -380,7 +383,10 @@ test('reset password with a link', async ({ page, insertNewUser }) => {
 	invariant(user.name, 'User name not found')
 
 	await page.goto('/login')
-
+	await page
+		.getByRole('textbox', { name: /email or username/i })
+		.fill(user.username)
+	await page.getByRole('button', { name: 'Continue', exact: true }).click()
 	await page.getByRole('link', { name: /forgot your password/i }).click()
 	await expect(page).toHaveURL('/forgot-password')
 
@@ -446,10 +452,13 @@ test('reset password with a link', async ({ page, insertNewUser }) => {
 	await page.waitForLoadState('networkidle')
 
 	// Try logging in with the new password directly
-	await page.getByRole('textbox', { name: /^username$/i }).fill(user.username)
+	await page
+		.getByRole('textbox', { name: /^email or username$/i })
+		.fill(user.username)
+	await page.getByRole('button', { name: 'Continue', exact: true }).click()
 	await page.getByLabel(/^password$/i).fill(newPassword)
 	await page
-		.getByRole('button', { name: 'Login', exact: true })
+		.getByRole('button', { name: 'Sign In', exact: true })
 		.click({ force: true })
 
 	// Wait for login to complete and redirect to home page
@@ -463,10 +472,12 @@ test('reset password with a link', async ({ page, insertNewUser }) => {
 test('reset password with a short code', async ({ page, insertNewUser }) => {
 	const user = await insertNewUser()
 	await page.goto('/login')
-
+	await page
+		.getByRole('textbox', { name: /email or username/i })
+		.fill(user.username)
+	await page.getByRole('button', { name: 'Continue', exact: true }).click()
 	await page.getByRole('link', { name: /forgot your password/i }).click()
 	await expect(page).toHaveURL('/forgot-password')
-
 	await expect(page.getByText(/forgot password/i)).toBeVisible()
 	await page
 		.getByRole('textbox', { name: /username or email/i })

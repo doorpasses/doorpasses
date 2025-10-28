@@ -48,6 +48,8 @@ model User {
   ipAddressUsers         IpAddressUser[]
   apiKeys                ApiKey[]
   configFlags            ConfigFlag[]
+  createdSSOConfigs      SSOConfiguration[]         @relation("SSOConfigCreatedBy")
+  auditLogs              AuditLog[]                 @relation("AuditLogUser")
 }
 
 model Note {
@@ -93,12 +95,13 @@ model Password {
 }
 
 model Session {
-  id             String   @id @default(cuid())
+  id             String      @id @default(cuid())
   expirationDate DateTime
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
   userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ssoSession     SSOSession?
 
   @@index([userId])
 }
@@ -222,6 +225,8 @@ model Organization {
   noteStatuses           OrganizationNoteStatus[]
   users                  UserOrganization[]
   s3Config               OrganizationS3Config?
+  ssoConfiguration       SSOConfiguration?
+  auditLogs              AuditLog[]
   Feedback               Feedback[]
   apiKeys                ApiKey[]
   configFlags            ConfigFlag[]
@@ -689,4 +694,90 @@ model ConfigFlag {
   @@index([level])
   @@index([organizationId])
   @@index([userId])
+}
+
+model SSOConfiguration {
+  id                String       @id @default(cuid())
+  organizationId    String       @unique
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Identity Provider Configuration
+  providerName      String       // "okta", "azure-ad", "auth0", etc.
+  issuerUrl         String       // Base URL of the identity provider
+  clientId          String       // OAuth2 client ID
+  clientSecret      String       // Encrypted OAuth2 client secret
+  
+  // OAuth2 Endpoints (can be auto-discovered or manually configured)
+  authorizationUrl  String?      // Authorization endpoint
+  tokenUrl          String?      // Token endpoint
+  userinfoUrl       String?      // UserInfo endpoint
+  revocationUrl     String?      // Token revocation endpoint
+  
+  // Configuration Options
+  scopes            String       @default("openid email profile") // Space-separated scopes
+  autoDiscovery     Boolean      @default(true) // Use OIDC discovery
+  pkceEnabled       Boolean      @default(true) // Use PKCE for security
+  
+  // User Provisioning Settings
+  autoProvision     Boolean      @default(true) // Auto-create users
+  defaultRole       String       @default("member") // Default organization role
+  attributeMapping  String?      // JSON mapping of OIDC claims to user fields
+  
+  // Status and Metadata
+  isEnabled         Boolean      @default(false)
+  lastTested        DateTime?    // Last successful connection test
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  
+  // Audit Trail
+  createdById       String?
+  createdBy         User?        @relation("SSOConfigCreatedBy", fields: [createdById], references: [id])
+  
+  // Relations
+  ssoSessions       SSOSession[]
+  
+  @@index([organizationId])
+  @@index([isEnabled])
+}
+
+model SSOSession {
+  id                String           @id @default(cuid())
+  sessionId         String           @unique
+  session           Session          @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  ssoConfigId       String
+  ssoConfig         SSOConfiguration @relation(fields: [ssoConfigId], references: [id])
+  
+  // Identity Provider Data
+  providerUserId    String           // User ID from identity provider
+  accessToken       String?          // Encrypted access token
+  refreshToken      String?          // Encrypted refresh token
+  tokenExpiresAt    DateTime?        // Access token expiration
+  
+  // Session Metadata
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  
+  @@index([ssoConfigId])
+  @@index([providerUserId])
+}
+
+model AuditLog {
+  id             String       @id @default(cuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String?
+  user           User?        @relation("AuditLogUser", fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Action details
+  action         String       // e.g., "sso_login", "sso_config_updated", etc.
+  details        String       // Human-readable description
+  metadata       String?      // JSON metadata for additional context
+  
+  // Timestamps
+  createdAt      DateTime     @default(now())
+  
+  @@index([organizationId])
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
 }

@@ -18,3 +18,19 @@ export {
 	OAuthCallbackSchema,
 	SocialAuthSchema,
 } from './src/auth-validation'
+
+// SSO validation schemas
+export {
+	SSOConfigurationSchema,
+	SSOConfigurationUpdateSchema,
+	SSOConnectionTestSchema,
+	SSOAuthRequestSchema,
+	SSOCallbackSchema,
+	OIDCUserInfoSchema,
+	type SSOConfigurationInput,
+	type SSOConfigurationUpdate,
+	type SSOConnectionTest,
+	type SSOAuthRequest,
+	type SSOCallback,
+	type OIDCUserInfo,
+} from './src/sso-validation'

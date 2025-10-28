@@ -4,7 +4,7 @@ import React from 'react'
  * Utility functions for tracking the last used login method in localStorage
  */
 
-export type LoginMethod = 'password' | 'passkey' | 'github' | 'google'
+export type LoginMethod = 'password' | 'passkey' | 'github' | 'google' | 'sso'
 
 const LAST_LOGIN_METHOD_KEY = 'lastLoginMethod'
 
@@ -58,7 +58,7 @@ export function clearLastLoginMethod(): void {
  * Check if a string is a valid login method
  */
 function isValidLoginMethod(method: string): method is LoginMethod {
-	return ['password', 'passkey', 'github', 'google'].includes(method)
+	return ['password', 'passkey', 'github', 'google', 'sso'].includes(method)
 }
 
 /**
@@ -70,6 +70,7 @@ export function getLoginMethodLabel(method: LoginMethod): string {
 		passkey: 'Passkey',
 		github: 'GitHub',
 		google: 'Google',
+		sso: 'Single Sign-On',
 	}
 	return labels[method]
 }
@@ -78,17 +79,16 @@ export function getLoginMethodLabel(method: LoginMethod): string {
  * Hook to get the last login method (for React components)
  */
 export function useLastLoginMethod(): LoginMethod | null {
-	if (typeof window === 'undefined') {
-		return null
-	}
-	
 	// Use a simple state approach since this is just for display
 	const [lastMethod, setLastMethod] = React.useState<LoginMethod | null>(null)
-	
+
 	React.useEffect(() => {
 		setLastMethod(getLastLoginMethod())
 	}, [])
-	
+
+	if (typeof window === 'undefined') {
+		return null
+	}
+
 	return lastMethod
 }
-

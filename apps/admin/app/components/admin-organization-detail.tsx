@@ -295,6 +295,67 @@ export function AdminOrganizationDetail({
 				</Card>
 			</div>
 
+			{/* Management Actions */}
+			<div className="grid gap-4 md:grid-cols-3">
+				<Card>
+					<CardHeader>
+						<CardTitle className="flex items-center gap-2">
+							<Icon name="shield" className="h-5 w-5" />
+							SSO Configuration
+						</CardTitle>
+						<CardDescription>
+							Configure Single Sign-On authentication
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<div className="flex gap-2">
+							<Button asChild variant="outline" size="sm">
+								<a href={`/organizations/${organization.id}/sso`}>
+									<Icon name="settings" className="mr-2 h-4 w-4" />
+									Configure SSO
+								</a>
+							</Button>
+							<Button asChild variant="outline" size="sm">
+								<a href={`/organizations/${organization.id}/sso/users`}>
+									<Icon name="users" className="mr-2 h-4 w-4" />
+									SSO Users
+								</a>
+							</Button>
+						</div>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardHeader>
+						<CardTitle className="flex items-center gap-2">
+							<Icon name="settings" className="h-5 w-5" />
+							Organization Settings
+						</CardTitle>
+						<CardDescription>Manage organization configuration</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<Button variant="outline" size="sm">
+							<Icon name="edit" className="mr-2 h-4 w-4" />
+							Edit Organization
+						</Button>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardHeader>
+						<CardTitle className="flex items-center gap-2">
+							<Icon name="mail" className="h-5 w-5" />
+							Invitations
+						</CardTitle>
+						<CardDescription>Manage pending invitations</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<Button variant="outline" size="sm">
+							<Icon name="user-plus" className="mr-2 h-4 w-4" />
+							Send Invitation
+						</Button>
+					</CardContent>
+				</Card>
+			</div>
+
 			<div className="grid gap-6 lg:grid-cols-2">
 				{/* Members */}
 				<Card>

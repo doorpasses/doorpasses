@@ -284,6 +284,27 @@ export async function getOrganizationBySlug(slug: string) {
 	})
 }
 
+export async function getOrganizationByDomain(domain: string) {
+	return prisma.organization.findFirst({
+		where: {
+			verifiedDomain: domain.toLowerCase(),
+		},
+		select: {
+			id: true,
+			name: true,
+			slug: true,
+			verifiedDomain: true,
+		},
+	})
+}
+
+export async function discoverOrganizationFromEmail(email: string) {
+	const domain = email.split('@')[1]
+	if (!domain) return null
+
+	return getOrganizationByDomain(domain)
+}
+
 export async function checkUserOrganizationAccess(
 	userId: string,
 	organizationId: string,

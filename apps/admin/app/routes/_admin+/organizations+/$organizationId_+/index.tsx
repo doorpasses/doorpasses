@@ -5,7 +5,7 @@ import { prisma } from '#app/utils/db.server.ts'
 import { requireUserWithRole } from '#app/utils/permissions.server.ts'
 import { type Route } from './+types/$organizationId.ts'
 
-export async function loader({ request, params }: Route.LoaderArgs) {
+export async function loader({ request, params }: Route['LoaderArgs']) {
 	await requireUserWithRole(request, 'admin')
 
 	invariant(params.organizationId, 'Organization ID is required')

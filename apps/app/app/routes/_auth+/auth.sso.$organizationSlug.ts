@@ -1,0 +1,187 @@
+import { redirect } from 'react-router'
+import { getSSOStrategy } from '#app/utils/auth.server.ts'
+import { getOrganizationBySlug } from '#app/utils/organizations.server.ts'
+import { ssoAuthService } from '#app/utils/sso-auth.server.ts'
+import { getReferrerRoute } from '#app/utils/misc.tsx'
+import { getRedirectCookieHeader } from '#app/utils/redirect-cookie.server.ts'
+import { SSOAuthRequestSchema } from '@repo/validation'
+import {
+	sanitizeOrganizationSlug,
+	sanitizeRedirectUrl,
+} from '#app/utils/sso-sanitization.server.ts'
+import {
+	trackSuspiciousActivity,
+	isSuspiciousActivityBlocked,
+} from '#app/utils/sso-rate-limit.server.ts'
+import {
+	handleSSOError,
+	createSSOError,
+	SSOErrorType,
+	createSSOFallbackResponse,
+} from '#app/utils/sso-error-handling.server.ts'
+import {
+	ssoAuditLogger,
+	SSOAuditEventType,
+} from '#app/utils/sso-audit-logging.server.ts'
+import { type Route } from './+types/auth.sso.$organizationSlug.ts'
+
+export async function loader({ request, params }: Route.LoaderArgs) {
+	// This route should handle SSO callback/redirect from the identity provider
+	// If we get here via GET request, it's likely a callback from the SSO provider
+	const url = new URL(request.url)
+
+	// Check if this is a callback with auth parameters
+	if (
+		url.searchParams.has('code') ||
+		url.searchParams.has('state') ||
+		url.searchParams.has('SAMLResponse')
+	) {
+		// Handle SSO callback - delegate to the SSO auth service
+		try {
+			const organizationSlug = params.organizationSlug
+			if (!organizationSlug) {
+				throw new Response('Organization slug is required', { status: 400 })
+			}
+
+			const organization = await getOrganizationBySlug(organizationSlug)
+			if (!organization) {
+				throw new Response('Organization not found', { status: 404 })
+			}
+
+			// Process the SSO callback
+			return await ssoAuthService.handleCallback(organization.id, request)
+		} catch (error) {
+			console.error('SSO callback error:', error)
+			// Redirect to login with error
+			return redirect('/login?error=sso_callback_failed')
+		}
+	}
+
+	// If no callback parameters, redirect to login
+	// This prevents direct access to the SSO route
+	return redirect('/login')
+}
+
+export async function action({ request, params }: Route.ActionArgs) {
+	const clientIP =
+		request.headers.get('x-forwarded-for') ||
+		request.headers.get('x-real-ip') ||
+		'unknown'
+
+	try {
+		// Sanitize and validate organization slug
+		const rawOrganizationSlug = params.organizationSlug
+		if (!rawOrganizationSlug) {
+			throw new Response('Organization slug is required', { status: 400 })
+		}
+
+		const organizationSlug = sanitizeOrganizationSlug(rawOrganizationSlug)
+		if (!organizationSlug) {
+			throw new Response('Invalid organization slug format', { status: 400 })
+		}
+
+		// Check for suspicious activity
+		const activityKey = `${organizationSlug}:${clientIP}`
+		if (isSuspiciousActivityBlocked(activityKey, 'failed_auth')) {
+			const error = createSSOError(
+				SSOErrorType.SUSPICIOUS_ACTIVITY,
+				'Too many failed authentication attempts',
+				`Activity key: ${activityKey}`,
+			)
+			throw await handleSSOError(error)
+		}
+
+		// Get and validate form data
+		const formData = await request.formData()
+		const rawRedirectTo = formData.get('redirectTo')
+
+		// Validate request data
+		const requestData = SSOAuthRequestSchema.parse({
+			organizationSlug,
+			redirectTo: typeof rawRedirectTo === 'string' ? rawRedirectTo : undefined,
+		})
+
+		// Get organization by slug
+		const organization = await getOrganizationBySlug(
+			requestData.organizationSlug,
+		)
+		if (!organization) {
+			trackSuspiciousActivity(activityKey, 'failed_auth')
+			throw new Response('Organization not found', { status: 404 })
+		}
+
+		// Check if SSO is configured and enabled for this organization
+		const strategyName = await getSSOStrategy(organization.id)
+		if (!strategyName) {
+			trackSuspiciousActivity(activityKey, 'failed_auth')
+			throw new Response('SSO not configured for this organization', {
+				status: 400,
+			})
+		}
+
+		// Audit log the authentication initiation
+		await ssoAuditLogger.logAuthenticationEvent(
+			SSOAuditEventType.AUTH_INITIATED,
+			organization.id,
+			'SSO authentication initiated',
+			undefined, // No user ID yet
+			undefined, // No session ID yet
+			{
+				organizationSlug: requestData.organizationSlug,
+				redirectTo: requestData.redirectTo,
+				userAgent: request.headers.get('user-agent'),
+			},
+			request,
+			'info',
+		)
+
+		// Initiate SSO authentication flow
+		const response = await ssoAuthService.initiateAuth(organization.id, request)
+
+		// Handle redirect cookie for post-auth redirect
+		const redirectTo = requestData.redirectTo || getReferrerRoute(request)
+		const sanitizedRedirectTo = sanitizeRedirectUrl(redirectTo)
+
+		if (sanitizedRedirectTo) {
+			const redirectToCookie = getRedirectCookieHeader(sanitizedRedirectTo)
+			if (redirectToCookie) {
+				response.headers.append('set-cookie', redirectToCookie)
+			}
+		}
+
+		return response
+	} catch (error: unknown) {
+		// Track failed authentication attempts
+		const organizationSlug = sanitizeOrganizationSlug(
+			params.organizationSlug || '',
+		)
+		if (organizationSlug) {
+			const activityKey = `${organizationSlug}:${clientIP}`
+			trackSuspiciousActivity(activityKey, 'failed_auth')
+		}
+
+		// If it's already a Response (from our error handling), just throw it
+		if (error instanceof Response) {
+			throw error
+		}
+
+		// Handle unexpected errors - don't log to console in tests
+		if (process.env.NODE_ENV !== 'test') {
+			console.error('Unexpected SSO initiation error:', error)
+		}
+
+		// For service errors, just re-throw the original error
+		if (error instanceof Error) {
+			throw error
+		}
+
+		const ssoError = createSSOError(
+			SSOErrorType.UNKNOWN_ERROR,
+			error instanceof Error
+				? error.message
+				: 'Unknown error during SSO initiation',
+		)
+		const response = await handleSSOError(ssoError)
+		throw response
+	}
+}
