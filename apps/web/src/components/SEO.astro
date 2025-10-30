@@ -2,10 +2,14 @@
 interface Props {
   title?: string
   description?: string
-  image?: string | { url: string; alt?: string }
+  image?: string | { url: string; alt?: string; width?: number; height?: number }
   type?: 'website' | 'article'
   publishedTime?: string
   modifiedTime?: string
+  author?: string
+  keywords?: string[]
+  noindex?: boolean
+  nofollow?: boolean
 }
 
 import { brand } from '@repo/config/brand'
@@ -17,27 +21,72 @@ const {
   type = 'website',
   publishedTime,
   modifiedTime,
+  author,
+  keywords = [],
+  noindex = false,
+  nofollow = false,
 } = Astro.props
 
 const imageUrl = typeof image === 'object' && image?.url ? image.url : typeof image === 'string' ? image : undefined
 const imageAlt = typeof image === 'object' && image?.alt ? image.alt : title
+const imageWidth = typeof image === 'object' && image?.width ? image.width : 1200
+const imageHeight = typeof image === 'object' && image?.height ? image.height : 630
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site)
+
+// Build robots meta content
+const robotsContent = [
+  noindex ? 'noindex' : 'index',
+  nofollow ? 'nofollow' : 'follow',
+].join(', ')
+
+// Structured data for website
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': type === 'article' ? 'Article' : 'WebSite',
+  ...(type === 'article' ? {
+    headline: title,
+    description: description,
+    image: imageUrl,
+    datePublished: publishedTime,
+    dateModified: modifiedTime || publishedTime,
+    author: {
+      '@type': 'Organization',
+      name: author || brand.name,
+    },
+  } : {
+    name: brand.name,
+    description: brand.description,
+    url: Astro.site,
+  }),
+}
 ---
 
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonicalURL} />
 
+<!-- Additional SEO Meta Tags -->
+<meta name="robots" content={robotsContent} />
+<meta name="googlebot" content={robotsContent} />
+{author && <meta name="author" content={author} />}
+{keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
+<meta name="theme-color" content="#000000" />
+
 <!-- Open Graph -->
 <meta property="og:type" content={type} />
 <meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
+<meta property="og:site_name" content={brand.name} />
 {imageUrl && <meta property="og:image" content={imageUrl} />}
+{imageUrl && <meta property="og:image:secure_url" content={imageUrl} />}
 {imageAlt && <meta property="og:image:alt" content={imageAlt} />}
+{imageUrl && <meta property="og:image:width" content={imageWidth.toString()} />}
+{imageUrl && <meta property="og:image:height" content={imageHeight.toString()} />}
 {publishedTime && <meta property="article:published_time" content={publishedTime} />}
 {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+{author && <meta property="article:author" content={author} />}
 
 <!-- Twitter -->
 <meta name="twitter:card" content={imageUrl ? 'summary_large_image' : 'summary'} />
@@ -46,3 +95,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 <meta name="twitter:description" content={description} />
 {imageUrl && <meta name="twitter:image" content={imageUrl} />}
 {imageAlt && <meta name="twitter:image:alt" content={imageAlt} />}
+<meta name="twitter:site" content="@epic_stack" />
+<meta name="twitter:creator" content="@epic_stack" />
+
+<!-- Structured Data (JSON-LD) -->
+<script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
