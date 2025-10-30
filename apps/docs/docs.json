@@ -20,6 +20,7 @@
 					{
 						"group": "Essentials",
 						"pages": [
+							"essentials/applications",
 							"essentials/authentication",
 							"essentials/database",
 							"essentials/styling",
