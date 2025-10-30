@@ -54,8 +54,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		throw new Response('Not Found', { status: 404 })
 	}
 
-	const isClosedBeta = launchStatus === 'CLOSED_BETA'
-	const plansAndPrices = isClosedBeta ? null : await getPlansAndPrices()
+	// At this point, we know we're in LAUNCHED mode, so fetch plans
+	const plansAndPrices = await getPlansAndPrices()
 	const invoices = await getOrganizationInvoices(organization)
 
 	// Get current subscription price ID for accurate plan detection
@@ -76,7 +76,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		organization,
 		plansAndPrices,
 		invoices,
-		isClosedBeta,
 		currentPriceId,
 	}
 }
