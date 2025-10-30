@@ -345,7 +345,7 @@ export async function action({ request }: ActionFunctionArgs) {
 				select: { slug: true },
 			})
 
-			return redirect(`/${organization?.slug}`)
+			return redirect(`/${organization?.slug}?celebrate=true`)
 		} catch (error) {
 			console.error('Failed to complete setup', error)
 			return submission.reply({

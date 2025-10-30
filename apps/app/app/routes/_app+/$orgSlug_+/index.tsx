@@ -11,7 +11,11 @@ import {
 	type LoaderFunctionArgs,
 	useLoaderData,
 	useRouteLoaderData,
+	useSearchParams,
+	useNavigate,
 } from 'react-router'
+import { useEffect } from 'react'
+import confetti from 'canvas-confetti'
 import { PageTitle } from '@repo/ui'
 import { LeadershipCard } from '#app/components/leadership-card.tsx'
 import { NotesChart } from '#app/components/notes-chart'
@@ -232,6 +236,51 @@ export default function OrganizationDashboard() {
 	const user = rootData?.user
 	const orgSlug =
 		rootData?.userOrganizations?.currentOrganization?.organization.slug || ''
+
+	const [searchParams] = useSearchParams()
+	const navigate = useNavigate()
+
+	// Trigger confetti animation when celebrate param is present
+	useEffect(() => {
+		const shouldCelebrate = searchParams.get('celebrate') === 'true'
+
+		if (shouldCelebrate) {
+			// Fire confetti from the top
+			const duration = 3000
+			const animationEnd = Date.now() + duration
+			const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 }
+
+			const interval = setInterval(() => {
+				const timeLeft = animationEnd - Date.now()
+
+				if (timeLeft <= 0) {
+					clearInterval(interval)
+					return
+				}
+
+				const particleCount = 50 * (timeLeft / duration)
+
+				// Fire confetti from the top center
+				confetti({
+					...defaults,
+					particleCount,
+					origin: { x: 0.5, y: 0 },
+				})
+			}, 250)
+
+			// Clean up query parameter after animation starts
+			const newSearchParams = new URLSearchParams(searchParams)
+			newSearchParams.delete('celebrate')
+			navigate(
+				{
+					search: newSearchParams.toString(),
+				},
+				{ replace: true },
+			)
+
+			return () => clearInterval(interval)
+		}
+	}, [searchParams, navigate])
 
 	return (
 		<div className="py-8 md:p-8">
