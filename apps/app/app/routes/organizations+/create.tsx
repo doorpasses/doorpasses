@@ -150,10 +150,16 @@ const Step4Schema = z.object({
 
 export async function loader() {
 	const trialConfig = getTrialConfig()
+	const launchStatus = process.env.LAUNCH_STATUS
 	let plansAndPrices = null
 
-	// Only fetch plans if we need Stripe subscription
-	if (trialConfig.creditCardRequired === 'stripe') {
+	// Only fetch plans if we need Stripe subscription and not in PUBLIC_BETA
+	const shouldShowPricing =
+		trialConfig.creditCardRequired === 'stripe' &&
+		launchStatus !== 'PUBLIC_BETA' &&
+		launchStatus !== 'CLOSED_BETA'
+
+	if (shouldShowPricing) {
 		try {
 			plansAndPrices = await getPlansAndPrices()
 		} catch (error) {
@@ -164,6 +170,7 @@ export async function loader() {
 	return {
 		trialConfig,
 		plansAndPrices,
+		launchStatus,
 	}
 }
 
@@ -202,8 +209,14 @@ export async function action({ request }: ActionFunctionArgs) {
 				imageObjectKey,
 			})
 
-			// Determine next step based on trial configuration
-			const nextStep = trialConfig.creditCardRequired === 'stripe' ? 2 : 3
+			// Determine next step based on trial configuration and launch status
+			const launchStatus = process.env.LAUNCH_STATUS
+			const shouldShowPricing =
+				trialConfig.creditCardRequired === 'stripe' &&
+				launchStatus !== 'PUBLIC_BETA' &&
+				launchStatus !== 'CLOSED_BETA'
+
+			const nextStep = shouldShowPricing ? 2 : 3
 			return redirect(
 				`/organizations/create?step=${nextStep}&orgId=${organization.id}`,
 			)

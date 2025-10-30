@@ -48,7 +48,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		throw new Response('Not Found', { status: 404 })
 	}
 
-	const isClosedBeta = process.env.LAUNCH_STATUS === 'CLOSED_BETA'
+	// Block access to billing page for PUBLIC_BETA and CLOSED_BETA
+	const launchStatus = process.env.LAUNCH_STATUS
+	if (launchStatus === 'PUBLIC_BETA' || launchStatus === 'CLOSED_BETA') {
+		throw new Response('Not Found', { status: 404 })
+	}
+
+	const isClosedBeta = launchStatus === 'CLOSED_BETA'
 	const plansAndPrices = isClosedBeta ? null : await getPlansAndPrices()
 	const invoices = await getOrganizationInvoices(organization)
 
@@ -92,6 +98,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	})
 
 	if (!organization) {
+		throw new Response('Not Found', { status: 404 })
+	}
+
+	// Block access to billing actions for PUBLIC_BETA and CLOSED_BETA
+	const launchStatus = process.env.LAUNCH_STATUS
+	if (launchStatus === 'PUBLIC_BETA' || launchStatus === 'CLOSED_BETA') {
 		throw new Response('Not Found', { status: 404 })
 	}
 

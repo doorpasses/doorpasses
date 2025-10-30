@@ -200,6 +200,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 			favoriteNotes,
 			impersonationInfo,
 			cookieConsent,
+			launchStatus: process.env.LAUNCH_STATUS || 'LAUNCHED',
 		},
 		{
 			headers: combineHeaders(

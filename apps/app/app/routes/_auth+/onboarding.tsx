@@ -283,6 +283,19 @@ export async function action({ request }: Route.ActionArgs) {
 		)
 	}
 
+	// Check launch status and redirect accordingly
+	const launchStatus = process.env.LAUNCH_STATUS
+	if (launchStatus === 'CLOSED_BETA') {
+		return redirectWithToast(
+			'/waitlist',
+			{
+				title: 'Welcome',
+				description: "Thanks for signing up! We'll notify you when we're ready.",
+			},
+			{ headers },
+		)
+	}
+
 	return redirectWithToast(
 		'/organizations/create',
 		{ title: 'Welcome', description: 'Thanks for signing up!' },

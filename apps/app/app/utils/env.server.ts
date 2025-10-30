@@ -30,6 +30,12 @@ const schema = z.object({
 
 	ALLOW_INDEXING: z.enum(['true', 'false']).optional(),
 
+	// Launch status configuration
+	LAUNCH_STATUS: z
+		.enum(['CLOSED_BETA', 'PUBLIC_BETA', 'LAUNCHED'])
+		.optional()
+		.default('LAUNCHED'),
+
 	// Tigris Object Storage Configuration
 	AWS_ACCESS_KEY_ID: z.string(),
 	AWS_SECRET_ACCESS_KEY: z.string(),

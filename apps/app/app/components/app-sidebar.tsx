@@ -40,11 +40,16 @@ import { ExternalLinkIcon } from './icons/external-link-icon'
 function UpgradeAccountCard({
 	trialStatus,
 	orgSlug,
+	launchStatus,
 }: {
 	trialStatus: { isActive: boolean; daysRemaining: number }
 	orgSlug: string
+	launchStatus?: string
 }) {
 	if (!trialStatus.isActive || trialStatus.daysRemaining < 0) return null
+	// Hide upgrade card for PUBLIC_BETA and CLOSED_BETA
+	if (launchStatus === 'PUBLIC_BETA' || launchStatus === 'CLOSED_BETA')
+		return null
 
 	return (
 		<Card className="bg-sidebar-accent dark:bg-sidebar-accent border-sidebar-border mb-4 gap-1 border p-2 group-data-[collapsible=icon]:hidden">
@@ -241,11 +246,17 @@ function OrganizationSidebar({
 					url: `/${orgSlug}/settings/integrations`,
 					isActive: location.pathname === `/${orgSlug}/settings/integrations`,
 				},
-				{
-					title: 'Billing',
-					url: `/${orgSlug}/settings/billing`,
-					isActive: location.pathname === `/${orgSlug}/settings/billing`,
-				},
+				// Hide billing for PUBLIC_BETA and CLOSED_BETA
+				...(rootData?.launchStatus !== 'PUBLIC_BETA' &&
+				rootData?.launchStatus !== 'CLOSED_BETA'
+					? [
+							{
+								title: 'Billing',
+								url: `/${orgSlug}/settings/billing`,
+								isActive: location.pathname === `/${orgSlug}/settings/billing`,
+							},
+						]
+					: []),
 			],
 		},
 	]
@@ -315,7 +326,11 @@ function OrganizationSidebar({
 				<div className="mt-auto">
 					{/* Upgrade Account Card */}
 					{trialStatus && orgSlug && (
-						<UpgradeAccountCard trialStatus={trialStatus} orgSlug={orgSlug} />
+						<UpgradeAccountCard
+							trialStatus={trialStatus}
+							orgSlug={orgSlug}
+							launchStatus={rootData?.launchStatus}
+						/>
 					)}
 					{/* Feature Updates */}
 					{!trialStatus && (
