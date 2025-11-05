@@ -30,6 +30,12 @@ const schema = z.object({
 
 	ALLOW_INDEXING: z.enum(['true', 'false']).optional(),
 
+	// Launch status configuration
+	LAUNCH_STATUS: z
+		.enum(['CLOSED_BETA', 'PUBLIC_BETA', 'LAUNCHED'])
+		.optional()
+		.default('LAUNCHED'),
+
 	// Tigris Object Storage Configuration
 	AWS_ACCESS_KEY_ID: z.string(),
 	AWS_SECRET_ACCESS_KEY: z.string(),
@@ -72,6 +78,25 @@ export function getEnv() {
 		SENTRY_DSN: process.env.SENTRY_DSN,
 		ALLOW_INDEXING: process.env.ALLOW_INDEXING,
 	}
+}
+
+/**
+ * Gets the validated LAUNCH_STATUS environment variable.
+ * Returns 'LAUNCHED' as default if not set or invalid.
+ * @returns The current launch status: CLOSED_BETA, PUBLIC_BETA, or LAUNCHED
+ */
+export function getLaunchStatus() {
+	const status = process.env.LAUNCH_STATUS
+	// Validate against schema enum values
+	if (
+		status === 'CLOSED_BETA' ||
+		status === 'PUBLIC_BETA' ||
+		status === 'LAUNCHED'
+	) {
+		return status
+	}
+	// Return default value as defined in schema
+	return 'LAUNCHED' as const
 }
 
 type ENV = ReturnType<typeof getEnv>

@@ -28,7 +28,7 @@ import { getUserId, logout } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { getCookieConsentState } from './utils/cookie-consent.server.ts'
 import { prisma } from './utils/db.server.ts'
-import { getEnv } from './utils/env.server.ts'
+import { getEnv, getLaunchStatus } from './utils/env.server.ts'
 import { pipeHeaders } from './utils/headers.server.ts'
 import { honeypot } from './utils/honeypot.server.ts'
 import { getImpersonationInfo } from './utils/impersonation.server.ts'
@@ -200,6 +200,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 			favoriteNotes,
 			impersonationInfo,
 			cookieConsent,
+			launchStatus: getLaunchStatus(),
 		},
 		{
 			headers: combineHeaders(

@@ -11,6 +11,7 @@ import { InvoicesCard } from '#app/components/settings/cards/organization/invoic
 
 import { requireUserId } from '#app/utils/auth.server'
 import { prisma } from '#app/utils/db.server'
+import { getLaunchStatus } from '#app/utils/env.server'
 import {
 	checkoutAction,
 	customerPortalAction,
@@ -48,8 +49,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		throw new Response('Not Found', { status: 404 })
 	}
 
-	const isClosedBeta = process.env.LAUNCH_STATUS === 'CLOSED_BETA'
-	const plansAndPrices = isClosedBeta ? null : await getPlansAndPrices()
+	// Block access to billing page for PUBLIC_BETA and CLOSED_BETA
+	// EXCEPT for organizations with existing active subscriptions (grandfathered)
+	const launchStatus = getLaunchStatus()
+	const hasActiveSubscription = Boolean(
+		organization.stripeSubscriptionId &&
+			organization.subscriptionStatus === 'active',
+	)
+
+	if (
+		!hasActiveSubscription &&
+		(launchStatus === 'PUBLIC_BETA' || launchStatus === 'CLOSED_BETA')
+	) {
+		throw new Response('Not Found', { status: 404 })
+	}
+
+	// Fetch plans (will be null if in beta and no active subscription)
+	const shouldFetchPlans =
+		launchStatus === 'LAUNCHED' || hasActiveSubscription
+	const plansAndPrices = shouldFetchPlans ? await getPlansAndPrices() : null
 	const invoices = await getOrganizationInvoices(organization)
 
 	// Get current subscription price ID for accurate plan detection
@@ -70,7 +88,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 		organization,
 		plansAndPrices,
 		invoices,
-		isClosedBeta,
 		currentPriceId,
 	}
 }
@@ -88,10 +105,31 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				},
 			},
 		},
-		select: { id: true, name: true, slug: true },
+		select: {
+			id: true,
+			name: true,
+			slug: true,
+			stripeSubscriptionId: true,
+			subscriptionStatus: true,
+		},
 	})
 
 	if (!organization) {
+		throw new Response('Not Found', { status: 404 })
+	}
+
+	// Block access to billing actions for PUBLIC_BETA and CLOSED_BETA
+	// EXCEPT for organizations with existing active subscriptions (grandfathered)
+	const launchStatus = getLaunchStatus()
+	const hasActiveSubscription = Boolean(
+		organization.stripeSubscriptionId &&
+			organization.subscriptionStatus === 'active',
+	)
+
+	if (
+		!hasActiveSubscription &&
+		(launchStatus === 'PUBLIC_BETA' || launchStatus === 'CLOSED_BETA')
+	) {
 		throw new Response('Not Found', { status: 404 })
 	}
 
@@ -167,7 +205,6 @@ export default function BillingSettings() {
 		organization,
 		plansAndPrices,
 		invoices,
-		isClosedBeta,
 		currentPriceId,
 	} = useLoaderData<typeof loader>()
 
@@ -177,16 +214,13 @@ export default function BillingSettings() {
 				<BillingCard
 					organization={organization}
 					plansAndPrices={plansAndPrices}
-					isClosedBeta={isClosedBeta}
 					currentPriceId={currentPriceId}
 				/>
 			</AnnotatedSection>
 
-			{!isClosedBeta && (
-				<AnnotatedSection>
-					<InvoicesCard invoices={invoices} />
-				</AnnotatedSection>
-			)}
+			<AnnotatedSection>
+				<InvoicesCard invoices={invoices} />
+			</AnnotatedSection>
 		</AnnotatedLayout>
 	)
 }

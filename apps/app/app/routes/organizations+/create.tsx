@@ -30,6 +30,7 @@ import {
 
 import { requireUserId } from '#app/utils/auth.server'
 import { prisma } from '#app/utils/db.server'
+import { getLaunchStatus } from '#app/utils/env.server'
 import {
 	createOrganizationInvitation,
 	sendOrganizationInvitationEmail,
@@ -150,10 +151,16 @@ const Step4Schema = z.object({
 
 export async function loader() {
 	const trialConfig = getTrialConfig()
+	const launchStatus = getLaunchStatus()
 	let plansAndPrices = null
 
-	// Only fetch plans if we need Stripe subscription
-	if (trialConfig.creditCardRequired === 'stripe') {
+	// Only fetch plans if we need Stripe subscription and not in PUBLIC_BETA or CLOSED_BETA
+	const shouldShowPricing =
+		trialConfig.creditCardRequired === 'stripe' &&
+		launchStatus !== 'PUBLIC_BETA' &&
+		launchStatus !== 'CLOSED_BETA'
+
+	if (shouldShowPricing) {
 		try {
 			plansAndPrices = await getPlansAndPrices()
 		} catch (error) {
@@ -164,6 +171,7 @@ export async function loader() {
 	return {
 		trialConfig,
 		plansAndPrices,
+		launchStatus,
 	}
 }
 
@@ -202,8 +210,14 @@ export async function action({ request }: ActionFunctionArgs) {
 				imageObjectKey,
 			})
 
-			// Determine next step based on trial configuration
-			const nextStep = trialConfig.creditCardRequired === 'stripe' ? 2 : 3
+			// Determine next step based on trial configuration and launch status
+			const launchStatus = getLaunchStatus()
+			const shouldShowPricing =
+				trialConfig.creditCardRequired === 'stripe' &&
+				launchStatus !== 'PUBLIC_BETA' &&
+				launchStatus !== 'CLOSED_BETA'
+
+			const nextStep = shouldShowPricing ? 2 : 3
 			return redirect(
 				`/organizations/create?step=${nextStep}&orgId=${organization.id}`,
 			)
@@ -278,6 +292,14 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	// Handle step 3: Subscription (only for stripe mode)
 	if (intent === 'subscribe') {
+		// CRITICAL: Validate launch status to prevent unauthorized subscription creation
+		const launchStatus = getLaunchStatus()
+		if (launchStatus === 'PUBLIC_BETA' || launchStatus === 'CLOSED_BETA') {
+			throw new Response('Subscriptions are not available during beta', {
+				status: 403,
+			})
+		}
+
 		const orgId = formData.get('orgId') as string
 		const submission = parseWithZod(formData, { schema: SubscriptionSchema })
 

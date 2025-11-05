@@ -18,6 +18,7 @@ import {
 	signup,
 } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
+import { getLaunchStatus } from '#app/utils/env.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { updateSeatQuantity } from '#app/utils/payments.server.ts'
@@ -283,6 +284,24 @@ export async function action({ request }: Route.ActionArgs) {
 		)
 	}
 
+	// Check launch status and redirect accordingly
+	// CLOSED_BETA: Users can sign up but are placed on waitlist
+	// PUBLIC_BETA: Users can create organizations without billing (billing is hidden)
+	// LAUNCHED: Full access to all features including billing
+	const launchStatus = getLaunchStatus()
+	if (launchStatus === 'CLOSED_BETA') {
+		return redirectWithToast(
+			'/waitlist',
+			{
+				title: 'Welcome',
+				description: "Thanks for signing up! We'll notify you when we're ready.",
+			},
+			{ headers },
+		)
+	}
+
+	// PUBLIC_BETA and LAUNCHED: Allow organization creation
+	// (PUBLIC_BETA users won't see billing/pricing options)
 	return redirectWithToast(
 		'/organizations/create',
 		{ title: 'Welcome', description: 'Thanks for signing up!' },
