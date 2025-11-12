@@ -40,8 +40,8 @@ import {
 	type OrganizationRoleName,
 } from '#app/utils/organizations.server.ts'
 import { uploadOrganizationImage } from '#app/utils/storage.server.ts'
-import { getTrialConfig } from '#app/utils/trial-config.server.ts'
 import {
+	getTrialConfig,
 	getPlansAndPrices,
 	createCheckoutSession,
 } from '#app/utils/payments.server.ts'
