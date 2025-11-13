@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button } from './button';
+import { Icon as IconComponent } from './icon';
 
 const meta = {
   title: 'Components/Button',
@@ -112,6 +113,66 @@ export const AllVariants: Story = {
         <Button size="default">Default</Button>
         <Button size="lg">Large</Button>
         <Button size="icon">🚀</Button>
+      </div>
+    </div>
+  ),
+};
+
+export const WithIcons: Story = {
+  render: () => (
+    <div className="flex gap-2 flex-wrap">
+      <Button>
+        <IconComponent name="plus" />
+        Create New
+      </Button>
+      <Button variant="outline">
+        <IconComponent name="download" />
+        Download
+      </Button>
+      <Button variant="destructive">
+        <IconComponent name="trash-2" />
+        Delete
+      </Button>
+      <Button variant="secondary">
+        <IconComponent name="settings" />
+        Settings
+      </Button>
+      <Button variant="ghost" size="icon">
+        <IconComponent name="search" />
+      </Button>
+    </div>
+  ),
+};
+
+export const ActionButtons: Story = {
+  render: () => (
+    <div className="flex flex-col gap-4 max-w-md">
+      <div className="flex justify-between items-center">
+        <h3 className="font-medium">Form Actions</h3>
+        <div className="flex gap-2">
+          <Button variant="outline">Cancel</Button>
+          <Button>Save Changes</Button>
+        </div>
+      </div>
+      <div className="flex justify-between items-center">
+        <h3 className="font-medium">Confirmation Dialog</h3>
+        <div className="flex gap-2">
+          <Button variant="ghost">Maybe Later</Button>
+          <Button variant="destructive">Delete Account</Button>
+        </div>
+      </div>
+      <div className="flex justify-between items-center">
+        <h3 className="font-medium">Navigation</h3>
+        <div className="flex gap-2">
+          <Button variant="ghost">
+            <IconComponent name="chevron-left" />
+            Back
+          </Button>
+          <Button>
+            Next
+            <IconComponent name="chevron-right" />
+          </Button>
+        </div>
       </div>
     </div>
   ),
