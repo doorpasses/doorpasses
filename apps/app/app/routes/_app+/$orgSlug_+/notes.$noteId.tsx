@@ -56,6 +56,36 @@ import {
 import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { data } from 'react-router'
 
+// Define comment types based on Prisma query structure
+type CommentWithUser = {
+	id: string
+	content: string
+	createdAt: Date
+	parentId: string | null
+	user: {
+		id: string
+		name: string | null
+		username: string
+		image: { objectKey: string } | null
+	}
+	images: {
+		id: string
+		altText: string | null
+		objectKey: string
+	}[]
+	replies?: CommentWithReplies[]
+}
+
+type CommentWithReplies = CommentWithUser & {
+	replies: CommentWithReplies[]
+}
+
+// Serialized comment type (what the client receives after loader serialization)
+type SerializedComment = Omit<CommentWithReplies, 'createdAt' | 'replies'> & {
+	createdAt: string
+	replies: SerializedComment[]
+}
+
 export async function loader({ params, request }: LoaderFunctionArgs) {
 	const userId = await requireUserId(request)
 	const noteId = params.noteId
@@ -184,9 +214,9 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	])
 
 	// Organize comments into a tree structure
-	const organizeComments = (comments: any[]) => {
-		const commentMap = new Map<string, any>()
-		const rootComments: any[] = []
+	const organizeComments = (comments: CommentWithUser[]) => {
+		const commentMap = new Map<string, CommentWithReplies>()
+		const rootComments: CommentWithReplies[] = []
 
 		// First pass: create map of all comments
 		comments.forEach((comment) => {
@@ -198,36 +228,24 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 			if (comment.parentId) {
 				const parent = commentMap.get(comment.parentId)
 				if (parent) {
-					console.log(
-						`Adding ${comment.content.substring(0, 30)}... as reply to ${parent.content.substring(0, 30)}...`,
-					)
-					parent.replies.push(commentMap.get(comment.id))
-				} else {
-					console.log(
-						`Warning: Parent ${comment.parentId} not found for comment ${comment.id}`,
-					)
+					parent.replies.push(commentMap.get(comment.id)!)
 				}
 			} else {
-				console.log(
-					`Adding ${comment.content.substring(0, 30)}... as root comment`,
-				)
-				rootComments.push(commentMap.get(comment.id))
+				rootComments.push(commentMap.get(comment.id)!)
 			}
 		})
-
-		console.log(
-			'Final organized structure:',
-			rootComments.map((c) => ({
-				content: c.content.substring(0, 30) + '...',
-				repliesCount: c.replies.length,
-				replies: c.replies.map((r: any) => r.content.substring(0, 30) + '...'),
-			})),
-		)
 
 		return rootComments
 	}
 
-	const organizedComments = organizeComments(comments)
+	// Serialize comments for client (convert Date to string)
+	const serializeComment = (comment: CommentWithReplies): SerializedComment => ({
+		...comment,
+		createdAt: comment.createdAt.toISOString(),
+		replies: comment.replies.map(serializeComment),
+	})
+
+	const organizedComments = organizeComments(comments).map(serializeComment)
 
 	// Get recent activity logs for this note
 	const activityLogs = await getNoteActivityLogs(note.id, 20)
@@ -485,7 +503,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			return data({ result: { status: 'success' } })
 		} catch (error) {
-			console.error('Error connecting note to channel:', error)
 			return data(
 				{
 					result: {
@@ -555,7 +572,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			return data({ result: { status: 'success' } })
 		} catch (error) {
-			console.error('Error disconnecting note from channel:', error)
 			return data(
 				{
 					result: {
@@ -597,8 +613,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			return data({ channels })
 		} catch (error) {
-			console.error('Error fetching integration channels:', error)
-
 			// For demo purposes, return empty channels array instead of error
 			// This allows the UI to show "No channels available" instead of crashing
 			return data({
@@ -660,7 +674,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			return data({ result: { status: 'success' } })
 		} catch (error) {
-			console.error('Error updating note sharing:', error)
 			return data(
 				{
 					result: {
@@ -747,7 +760,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			return data({ result: { status: 'success' } })
 		} catch (error) {
-			console.error('Error adding note access:', error)
 			return data(
 				{
 					result: {
@@ -806,7 +818,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			return data({ result: { status: 'success' } })
 		} catch (error) {
-			console.error('Error removing note access:', error)
 			return data(
 				{
 					result: {
@@ -979,7 +990,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			return data({ result: { status: 'success' } })
 		} catch (error) {
-			console.error('Error in batch update note access:', error)
 			return data(
 				{
 					result: {
@@ -1168,7 +1178,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			return data({ result: { status: 'success' } })
 		} catch (error) {
-			console.error('Error adding comment:', error)
 			return data(
 				{
 					result: {
@@ -1237,7 +1246,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			return data({ result: { status: 'success' } })
 		} catch (error) {
-			console.error('Error deleting comment:', error)
 			return data(
 				{
 					result: {
@@ -1333,7 +1341,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			return data({ result: { status: 'success' } })
 		} catch (error) {
-			console.error('Error toggling favorite:', error)
 			return data(
 				{
 					result: {
@@ -1396,7 +1403,7 @@ type NoteLoaderData = {
 			name: string | null
 			username: string
 		}
-		replies: any[]
+		replies: CommentWithReplies[]
 		images?: Array<{
 			id: string
 			altText: string | null
@@ -1427,7 +1434,7 @@ type NoteLoaderData = {
 	connections: Array<{
 		id: string
 		externalId: string
-		config: any
+		config: Record<string, unknown>
 		integration: {
 			id: string
 			providerName: string
@@ -1624,7 +1631,8 @@ export default function NoteRoute() {
 					>
 						<CommentsSection
 							noteId={note.id}
-							comments={comments}
+							// SerializedComment is compatible with Comment interface
+							comments={comments as any}
 							currentUserId={currentUserId}
 							users={mentionUsers}
 							organizationId={note.organization.id}
