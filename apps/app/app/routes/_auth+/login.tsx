@@ -1,6 +1,7 @@
 import { detectBot, slidingWindow } from '@arcjet/remix'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { Trans } from '@lingui/macro'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { getPageTitle } from '@repo/config/brand'
 import { startAuthentication } from '@simplewebauthn/browser'
@@ -627,7 +628,7 @@ function UsernameInputStep({
 					}
 				>
 					<FieldLabel htmlFor={usernameFields.username.id}>
-						Email or Username
+						<Trans>Email or Username</Trans>
 					</FieldLabel>
 					<Input
 						{...getInputProps(usernameFields.username, { type: 'text' })}

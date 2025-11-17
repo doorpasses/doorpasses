@@ -13,6 +13,6 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: app/routes/_marketing+/index.tsx:67
-msgid "Getting Started guide"
-msgstr "الدليل البدء في التثبيت"
+#: app/routes/_auth+/login.tsx:631
+msgid "Email or Username"
+msgstr "البريد الإلكتروني / اسم المستخدم"
