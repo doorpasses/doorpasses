@@ -3,7 +3,7 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { getPageTitle } from '@repo/config/brand'
 import { data, redirect, Form, useSearchParams } from 'react-router'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
-
+import { Trans, t } from '@lingui/macro'
 import { z } from 'zod'
 import {
 	CheckboxField,
@@ -51,19 +51,6 @@ export const onboardingEmailSessionKey = 'onboardingEmail'
 export const onboardingInviteTokenSessionKey = 'onboardingInviteToken'
 export const onboardingReferralCodeSessionKey = 'referralCode'
 
-const SignupFormSchema = z
-	.object({
-		username: UsernameSchema,
-		name: NameSchema,
-		agreeToTermsOfServiceAndPrivacyPolicy: z.boolean({
-			required_error:
-				'You must agree to the terms of service and privacy policy',
-		}),
-		remember: z.boolean().optional(),
-		redirectTo: z.string().optional(),
-	})
-	.and(PasswordAndConfirmPasswordSchema)
-
 async function requireOnboardingEmail(request: Request) {
 	await requireAnonymous(request)
 	const verifySession = await verifySessionStorage.getSession(
@@ -99,6 +86,17 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action({ request }: Route.ActionArgs) {
+	const SignupFormSchema = z
+	.object({
+		username: UsernameSchema,
+		name: NameSchema,
+		agreeToTermsOfServiceAndPrivacyPolicy: z.boolean({
+			required_error: t`You must agree to the terms of service and privacy policy`,
+		}),
+		remember: z.boolean().optional(),
+		redirectTo: z.string().optional(),
+	})
+	.and(PasswordAndConfirmPasswordSchema)
 	const email = await requireOnboardingEmail(request)
 	const inviteToken = await getOnboardingInviteToken(request)
 	const formData = await request.formData()
@@ -114,7 +112,7 @@ export async function action({ request }: Route.ActionArgs) {
 					ctx.addIssue({
 						path: ['username'],
 						code: z.ZodIssueCode.custom,
-						message: 'A user already exists with this username',
+						message: t`A user already exists with this username`,
 					})
 					return
 				}
@@ -123,7 +121,7 @@ export async function action({ request }: Route.ActionArgs) {
 					ctx.addIssue({
 						path: ['password'],
 						code: 'custom',
-						message: 'Password is too common',
+						message: t`Password is too common`,
 					})
 				}
 			}).transform(async (data) => {
@@ -176,8 +174,8 @@ export async function action({ request }: Route.ActionArgs) {
 			return redirectWithToast(
 				'/organizations',
 				{
-					title: 'Welcome!',
-					description: `Thanks for signing up! ${inviterName} has invited you to join ${invitation.organization.name}. Review the invitation below.`,
+					title: t`Welcome!`,
+					description: t`Thanks for signing up! ${inviterName} has invited you to join ${invitation.organization.name}. Review the invitation below.`,
 				},
 				{ headers },
 			)
@@ -206,8 +204,8 @@ export async function action({ request }: Route.ActionArgs) {
 				return redirectWithToast(
 					'/organizations',
 					{
-						title: 'Welcome!',
-						description: `Thanks for signing up! You have pending organization invitations.`,
+						title: t`Welcome!`,
+						description: t`Thanks for signing up! You have pending organization invitations.`,
 					},
 					{ headers },
 				)
@@ -278,8 +276,8 @@ export async function action({ request }: Route.ActionArgs) {
 				return redirectWithToast(
 					'/organizations',
 					{
-						title: 'Welcome!',
-						description: `Thanks for signing up! You've been automatically added to ${orgNames} based on your email domain.`,
+						title: t`Welcome!`,
+						description: t`Thanks for signing up! You've been automatically added to ${orgNames} based on your email domain.`,
 					},
 					{ headers },
 				)
@@ -318,8 +316,8 @@ export async function action({ request }: Route.ActionArgs) {
 		return redirectWithToast(
 			'/waitlist',
 			{
-				title: 'Welcome',
-				description: "Thanks for signing up! We'll notify you when we're ready.",
+				title: t`Welcome`,
+				description: t`Thanks for signing up! We'll notify you when we're ready.`,
 			},
 			{ headers },
 		)
@@ -329,7 +327,7 @@ export async function action({ request }: Route.ActionArgs) {
 	// (PUBLIC_BETA users won't see billing/pricing options)
 	return redirectWithToast(
 		'/organizations/create',
-		{ title: 'Welcome', description: 'Thanks for signing up!' },
+		{ title: t`Welcome`, description: t`Thanks for signing up!` },
 		{ headers },
 	)
 }
@@ -342,6 +340,17 @@ export default function OnboardingRoute({
 	loaderData,
 	actionData,
 }: Route.ComponentProps) {
+	const SignupFormSchema = z
+	.object({
+		username: UsernameSchema,
+		name: NameSchema,
+		agreeToTermsOfServiceAndPrivacyPolicy: z.boolean({
+			required_error: t`You must agree to the terms of service and privacy policy`,
+		}),
+		remember: z.boolean().optional(),
+		redirectTo: z.string().optional(),
+	})
+	.and(PasswordAndConfirmPasswordSchema)
 	const isPending = useIsPending()
 	const [searchParams] = useSearchParams()
 	const redirectTo = searchParams.get('redirectTo')
@@ -362,11 +371,17 @@ export default function OnboardingRoute({
 		<Card className="bg-muted/80 border-0 shadow-2xl">
 			<CardHeader>
 				<CardTitle className="text-xl">
-					{inviteToken ? 'Complete your profile' : 'Welcome aboard!'}
+					{inviteToken ? (
+						<Trans>Complete your profile</Trans>
+					) : (
+						<Trans>Welcome aboard!</Trans>
+					)}
 				</CardTitle>
 				<CardDescription>
-					Hi {loaderData.email}, please complete your profile
-					{inviteToken ? ' to join the organization' : ''}.
+					<Trans>
+						Hi {loaderData.email}, please complete your profile
+						{inviteToken ? ' to join the organization' : ''}.
+					</Trans>
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -376,11 +391,13 @@ export default function OnboardingRoute({
 						<Field
 							data-invalid={fields.username.errors?.length ? true : undefined}
 						>
-							<FieldLabel htmlFor={fields.username.id}>Username</FieldLabel>
+							<FieldLabel htmlFor={fields.username.id}>
+								<Trans>Username</Trans>
+							</FieldLabel>
 							<Input
 								{...getInputProps(fields.username, { type: 'text' })}
 								autoComplete="username"
-								placeholder="Enter your username"
+								placeholder={t`Enter your username`}
 								required
 								aria-invalid={fields.username.errors?.length ? true : undefined}
 							/>
@@ -390,11 +407,13 @@ export default function OnboardingRoute({
 						</Field>
 
 						<Field data-invalid={fields.name.errors?.length ? true : undefined}>
-							<FieldLabel htmlFor={fields.name.id}>Full Name</FieldLabel>
+							<FieldLabel htmlFor={fields.name.id}>
+								<Trans>Full Name</Trans>
+							</FieldLabel>
 							<Input
 								{...getInputProps(fields.name, { type: 'text' })}
 								autoComplete="name"
-								placeholder="Enter your full name"
+								placeholder={t`Enter your full name`}
 								required
 								aria-invalid={fields.name.errors?.length ? true : undefined}
 							/>
@@ -406,11 +425,13 @@ export default function OnboardingRoute({
 						<Field
 							data-invalid={fields.password.errors?.length ? true : undefined}
 						>
-							<FieldLabel htmlFor={fields.password.id}>Password</FieldLabel>
+							<FieldLabel htmlFor={fields.password.id}>
+								<Trans>Password</Trans>
+							</FieldLabel>
 							<Input
 								{...getInputProps(fields.password, { type: 'password' })}
 								autoComplete="new-password"
-								placeholder="Create a password"
+								placeholder={t`Create a password`}
 								required
 								aria-invalid={fields.password.errors?.length ? true : undefined}
 							/>
@@ -425,14 +446,14 @@ export default function OnboardingRoute({
 							}
 						>
 							<FieldLabel htmlFor={fields.confirmPassword.id}>
-								Confirm Password
+								<Trans>Confirm Password</Trans>
 							</FieldLabel>
 							<Input
 								{...getInputProps(fields.confirmPassword, {
 									type: 'password',
 								})}
 								autoComplete="new-password"
-								placeholder="Confirm your password"
+								placeholder={t`Confirm your password`}
 								required
 								aria-invalid={
 									fields.confirmPassword.errors?.length ? true : undefined
@@ -461,7 +482,9 @@ export default function OnboardingRoute({
 									htmlFor={fields.agreeToTermsOfServiceAndPrivacyPolicy.id}
 									className="font-normal"
 								>
-									I agree to the Terms of Service and Privacy Policy
+									<Trans>
+										I agree to the Terms of Service and Privacy Policy
+									</Trans>
 								</FieldLabel>
 							</Field>
 							<FieldError
@@ -484,7 +507,7 @@ export default function OnboardingRoute({
 									htmlFor={fields.remember.id}
 									className="font-normal"
 								>
-									Remember me
+									<Trans>Remember me</Trans>
 								</FieldLabel>
 							</Field>
 						</FieldGroup>
@@ -498,7 +521,7 @@ export default function OnboardingRoute({
 							type="submit"
 							disabled={isPending}
 						>
-							Create account
+							<Trans>Create account</Trans>
 						</StatusButton>
 					</FieldGroup>
 				</Form>
