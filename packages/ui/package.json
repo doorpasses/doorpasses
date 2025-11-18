@@ -84,7 +84,7 @@
   "scripts": {
     "dev": "node generate-icons.js --watch",
     "build": "node generate-icons.js && tsc",
-    "lint": "oxlint . && eslint .",
+    "lint": "oxlint . && eslint . --ignore-pattern '.storybook/**'",
     "lint:oxc": "oxlint .",
     "lint:oxc:fix": "oxlint --fix .",
     "typecheck": "tsc --noEmit",

@@ -1,4 +1,3 @@
-import { invariant } from '@epic-web/invariant'
 import { AnnotatedLayout, AnnotatedSection } from '@repo/ui/annotated-layout'
 import {
 	type ActionFunctionArgs,
@@ -21,7 +20,7 @@ import {
 import { requireUserOrganization } from '#app/utils/organization-loader.server.ts'
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-	const userId = await requireUserId(request)
+	await requireUserId(request)
 
 	const organization = await requireUserOrganization(request, params.orgSlug, {
 		id: true,

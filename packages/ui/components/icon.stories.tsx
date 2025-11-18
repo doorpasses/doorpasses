@@ -1,5 +1,5 @@
+import  { type Meta, type StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
 import { Icon, type IconName } from './icon';
 
 // All available icons from the IconName type

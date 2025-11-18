@@ -1,7 +1,6 @@
 import { parseWithZod } from '@conform-to/zod'
 import { AnnotatedLayout, AnnotatedSection } from '@repo/ui/annotated-layout'
 import { Divider } from '@repo/ui/divider'
-import { invariant } from '@epic-web/invariant'
 import { parseFormData } from '@mjackson/form-data-parser'
 import {
 	type ActionFunctionArgs,
@@ -45,7 +44,7 @@ import { redirectWithToast } from '#app/utils/toast.server.ts'
 import { requireUserOrganization } from '#app/utils/organization-loader.server.ts'
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-	const userId = await requireUserId(request)
+	await requireUserId(request)
 
 	const organization = await requireUserOrganization(request, params.orgSlug, {
 		id: true,

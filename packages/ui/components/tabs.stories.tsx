@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
+import  { type Meta, type StoryObj } from '@storybook/react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
 
 const meta = {
   title: 'Components/Tabs',

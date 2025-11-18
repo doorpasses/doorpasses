@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import  { type Meta, type StoryObj } from '@storybook/react';
 import { AnnotatedLayout, AnnotatedSection } from './annotated-layout';
+import { Button } from './button';
 import { Input } from './input';
 import { Label } from './label';
-import { Button } from './button';
 
 const meta = {
   title: 'Components/AnnotatedLayout',

@@ -1,5 +1,4 @@
 import { styleText } from 'node:util'
-import { type OutgoingHttpHeaders, type OutgoingHttpHeader } from 'node:http'
 import { helmet } from '@nichtsam/helmet/node-http'
 import { createRequestHandler } from '@react-router/express'
 import * as Sentry from '@sentry/react-router'
@@ -26,15 +25,15 @@ if (SENTRY_ENABLED) {
 const viteDevServer = IS_PROD
 	? undefined
 	: await import('vite').then((vite) =>
-			vite.createServer({
-				server: {
-					middlewareMode: true,
-				},
-				// We tell Vite we are running a custom app instead of
-				// the SPA default so it doesn't run HTML middleware
-				appType: 'custom',
-			}),
-		)
+		vite.createServer({
+			server: {
+				middlewareMode: true,
+			},
+			// We tell Vite we are running a custom app instead of
+			// the SPA default so it doesn't run HTML middleware
+			appType: 'custom',
+		}),
+	)
 
 const app = express()
 
@@ -46,10 +45,10 @@ app.use((req, res, next) => {
 		// Allow localhost origins for development (mobile app)
 		...(IS_DEV
 			? [
-					'http://localhost:8081',
-					'http://localhost:8082',
-					'http://localhost:19006', // Default Expo web port
-				]
+				'http://localhost:8081',
+				'http://localhost:8082',
+				'http://localhost:19006', // Default Expo web port
+			]
 			: []),
 	]
 
@@ -278,7 +277,7 @@ async function getBuild() {
 		const build = viteDevServer
 			? await viteDevServer.ssrLoadModule('virtual:react-router/server-build')
 			: // @ts-expect-error - the file might not exist yet but it will
-				await import('../build/server/index.js')
+			await import('../build/server/index.js')
 
 		return { build: build as unknown as ServerBuild, error: null }
 	} catch {

@@ -21,8 +21,9 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { useState } from 'react'
 import { Form } from 'react-router'
 import { z } from 'zod'
-import { ErrorList, Field } from '#app/components/forms.tsx'
+import { ErrorList } from '#app/components/forms.tsx'
 import { type OrganizationRoleName } from '#app/utils/organizations.server.ts'
+import { error } from 'console'
 
 // Create role descriptions map
 const ROLE_DESCRIPTIONS: Record<string, string> = {
@@ -361,7 +362,7 @@ function InviteFieldset({
 	const { _ } = useLingui()
 	const inviteFields = meta.getFieldset()
 	const role = useInputControl(inviteFields.role)
-	const { key, ...emailProps } = getInputProps(inviteFields.email, {
+	const { key: _key, ...emailProps } = getInputProps(inviteFields.email, {
 		type: 'email',
 	})
 

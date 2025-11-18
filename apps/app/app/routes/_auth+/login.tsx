@@ -152,7 +152,7 @@ export async function action({ request }: Route.ActionArgs) {
 			return data({ result: submission.reply() })
 		}
 
-		const { username, redirectTo } = submission.value
+		const { username } = submission.value
 
 		// Only try SSO discovery if input looks like an email
 		if (username.includes('@')) {
@@ -659,7 +659,6 @@ function UsernameInputStep({
 function PasswordLoginStep({
 	username,
 	organization,
-	ssoConfig,
 	redirectTo,
 	actionData,
 	showBackToSSO = false,
@@ -786,7 +785,7 @@ function PasswordLoginStep({
 					<Field orientation="horizontal">
 						<Checkbox
 							{...(() => {
-								const { type, ...props } = getInputProps(fields.remember, {
+								const { type: _type, ...props } = getInputProps(fields.remember, {
 									type: 'checkbox',
 								})
 								return props

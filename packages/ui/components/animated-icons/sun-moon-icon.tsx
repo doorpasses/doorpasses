@@ -1,3 +1,4 @@
+import { cn } from '@repo/ui/cn'
 import { motion, useAnimation, type Variants } from 'motion/react'
 import {
 	forwardRef,
@@ -6,7 +7,6 @@ import {
 	useRef,
 	type HTMLAttributes,
 } from 'react'
-import { cn } from '@repo/ui/cn'
 
 export interface SunMoonIconHandle {
 	startAnimation: () => void

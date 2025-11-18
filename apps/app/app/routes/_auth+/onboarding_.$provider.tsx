@@ -13,11 +13,9 @@ import {
 	Form,
 	useSearchParams,
 } from 'react-router'
-import { safeRedirect } from 'remix-utils/safe-redirect'
 import { z } from 'zod'
 import { Trans, t } from '@lingui/macro'
 import {
-	CheckboxField,
 	ErrorList,
 	convertErrorsToFieldFormat,
 } from '#app/components/forms.tsx'
@@ -143,7 +141,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 		)
 	}
 
-	const { session, remember, redirectTo } = submission.value
+	const { session, remember } = submission.value
 
 	const authSession = await authSessionStorage.getSession(
 		request.headers.get('cookie'),
@@ -292,7 +290,7 @@ export default function OnboardingProviderRoute({
 										<Field orientation="horizontal">
 											<Checkbox
 												{...(() => {
-													const { type, ...props } = getInputProps(
+													const { type: _type, ...props } = getInputProps(
 														fields.agreeToTermsOfServiceAndPrivacyPolicy,
 														{ type: 'checkbox' },
 													)
@@ -320,7 +318,7 @@ export default function OnboardingProviderRoute({
 										<Field orientation="horizontal">
 											<Checkbox
 												{...(() => {
-													const { type, ...props } = getInputProps(
+													const { type: _type, ...props } = getInputProps(
 														fields.remember,
 														{ type: 'checkbox' },
 													)

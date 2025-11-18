@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import  { type Meta, type StoryObj } from '@storybook/react';
 import { PrioritySignal } from './priority-signal';
 
 const meta = {

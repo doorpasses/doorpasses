@@ -2,10 +2,9 @@
  * Unit tests for Stripe webhook handler
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { handleStripeWebhook } from '../../src/route-handlers/stripe-webhook'
-import type { StripeWebhookDependencies } from '../../src/route-handlers/stripe-webhook'
 import type Stripe from 'stripe'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { handleStripeWebhook, type StripeWebhookDependencies  } from '../../src/route-handlers/stripe-webhook'
 
 describe('handleStripeWebhook', () => {
 	let mockStripe: any

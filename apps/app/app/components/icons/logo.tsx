@@ -3,7 +3,7 @@ import { brand } from '@repo/config/brand'
 
 export function Logo({
 	className,
-	size = 34,
+	size: _size = 34,
 }: {
 	className?: string
 	size?: number

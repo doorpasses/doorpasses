@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { StatusButton } from './status-button';
+import  { type Meta, type StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { StatusButton } from './status-button';
 
 const meta = {
   title: 'Components/StatusButton',

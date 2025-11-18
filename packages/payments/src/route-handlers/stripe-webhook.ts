@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs } from 'react-router'
+import  { type ActionFunctionArgs } from 'react-router'
 import type Stripe from 'stripe'
 
 export interface StripeWebhookDependencies {

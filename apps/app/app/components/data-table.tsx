@@ -28,7 +28,6 @@ import {
 import { Input } from '@repo/ui/input'
 import { Label } from '@repo/ui/label'
 import { Separator } from '@repo/ui/separator'
-import { TableCell, TableRow } from '@repo/ui/table'
 import {
 	ChartContainer,
 	ChartTooltip,
@@ -172,7 +171,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
 						(table.getIsSomePageRowsSelected() && 'indeterminate')
 					}
 					onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-					aria-label={useLingui()._(msg`Select all`)}
+					aria-label="Select all"
 				/>
 			</div>
 		),
@@ -181,7 +180,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
 				<Checkbox
 					checked={row.getIsSelected()}
 					onCheckedChange={(value) => row.toggleSelected(!!value)}
-					aria-label={useLingui()._(msg`Select row`)}
+					aria-label="Select row"
 				/>
 			</div>
 		),

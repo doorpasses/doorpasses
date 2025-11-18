@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import  { type Meta, type StoryObj } from '@storybook/react';
+import { Button } from './button';
 import {
   Dialog,
   DialogContent,
@@ -8,11 +9,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './dialog';
-import { Button } from './button';
-import { Label } from './label';
-import { Input } from './input';
-import { Icon } from './icon';
 import { Field, FieldLabel, FieldDescription } from './field';
+import { Icon } from './icon';
+import { Input } from './input';
+import { Label } from './label';
 import { Textarea } from './textarea';
 
 const meta = {

@@ -1,8 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { SquarePenIcon } from './square-pen-icon';
+import  { type Meta, type StoryObj } from '@storybook/react';
 import { useRef } from 'react';
 import { Button } from './button';
-import type { SquarePenIconHandle } from './square-pen-icon';
+import { SquarePenIcon, type SquarePenIconHandle  } from './square-pen-icon';
 
 const meta = {
   title: 'Components/SquarePenIcon',

@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import  { type Meta, type StoryObj } from '@storybook/react';
+import { Icon } from './icon';
 import {
   InputGroup,
   InputGroupAddon,
@@ -7,7 +8,6 @@ import {
   InputGroupText,
   InputGroupTextarea,
 } from './input-group';
-import { Icon } from './icon';
 
 const meta = {
   title: 'Components/InputGroup',

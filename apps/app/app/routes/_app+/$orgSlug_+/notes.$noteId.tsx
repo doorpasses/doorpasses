@@ -1517,7 +1517,6 @@ export default function NoteRoute() {
 		activityLogs,
 		connections,
 		availableIntegrations,
-		userPermissions,
 	} = useLoaderData() as NoteLoaderData
 
 	// Add ref for auto-focusing

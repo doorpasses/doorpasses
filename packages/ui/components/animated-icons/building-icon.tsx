@@ -1,5 +1,6 @@
 'use client'
 
+import { cn } from '@repo/ui/cn'
 import {
 	type Transition,
 	type Variants,
@@ -13,7 +14,6 @@ import {
 	useImperativeHandle,
 	useRef,
 } from 'react'
-import { cn } from '@repo/ui/cn'
 
 export interface BuildingIconHandle {
 	startAnimation: () => void

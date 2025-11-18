@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import  { type Meta, type StoryObj } from '@storybook/react';
+import { Checkbox } from './checkbox';
 import {
   Field,
   FieldContent,
@@ -11,7 +12,6 @@ import {
   FieldSet,
 } from './field';
 import { Input } from './input';
-import { Checkbox } from './checkbox';
 
 const meta = {
   title: 'Components/Field',

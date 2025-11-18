@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import  { type Meta, type StoryObj } from '@storybook/react';
+import { Button } from './button';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -14,7 +15,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from './dropdown-menu';
-import { Button } from './button';
 
 const meta = {
   title: 'Components/DropdownMenu',

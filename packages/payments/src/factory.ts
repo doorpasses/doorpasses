@@ -3,9 +3,9 @@
  * Creates the appropriate payment provider based on configuration
  */
 
-import type { PaymentProvider, PaymentProviderConfig } from './types'
-import { StripeProvider } from './providers/stripe'
 import { PolarProvider } from './providers/polar'
+import { StripeProvider } from './providers/stripe'
+import  { type PaymentProvider, type PaymentProviderConfig } from './types'
 
 /**
  * Create a payment provider instance

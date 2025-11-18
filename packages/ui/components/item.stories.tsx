@@ -1,4 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import  { type Meta, type StoryObj } from '@storybook/react';
+import { Badge } from './badge';
+import { Button } from './button';
+import { Icon } from './icon';
 import {
   Item,
   ItemActions,
@@ -9,9 +12,6 @@ import {
   ItemSeparator,
   ItemTitle,
 } from './item';
-import { Button } from './button';
-import { Icon } from './icon';
-import { Badge } from './badge';
 
 const meta = {
   title: 'Components/Item',

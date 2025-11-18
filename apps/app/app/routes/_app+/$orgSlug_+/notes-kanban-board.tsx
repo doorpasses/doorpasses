@@ -564,7 +564,6 @@ function KanbanColumn({
 	isActive?: boolean
 }) {
 	const { setNodeRef } = useDroppable({ id: column.id })
-	const renameFetcher = useFetcher()
 	const deleteFetcher = useFetcher()
 	const dc = useDoubleCheck()
 	const [editing, setEditing] = useState(false)

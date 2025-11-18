@@ -4,7 +4,8 @@ import * as React from 'react'
 import { cn } from '../utils/cn'
 import { Icon } from './icon'
 
-// Icon dependency injection interface
+// Icon dependency injection interface (currently unused but kept for future extensibility)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface DropdownMenuIconProps {
 	name: string
 	className?: string

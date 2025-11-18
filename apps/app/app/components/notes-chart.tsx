@@ -1,6 +1,6 @@
 import { TrendingUp } from 'lucide-react'
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts'
-import { Trans, t } from '@lingui/macro'
+import { Trans } from '@lingui/macro'
 import { useLingui } from '@lingui/react'
 import {
 	Card,

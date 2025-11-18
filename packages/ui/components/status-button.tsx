@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react'
 import { useSpinDelay } from 'spin-delay'
 import { cn } from '../utils/cn'
 import { Button, type ButtonVariant } from './button'
+import { Icon } from './icon'
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
 } from './tooltip'
-import { Icon } from './icon'
 
 interface StatusButtonProps
 	extends React.ComponentProps<'button'>,

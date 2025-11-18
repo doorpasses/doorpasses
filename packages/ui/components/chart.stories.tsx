@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import  { type Meta, type StoryObj } from '@storybook/react';
+import { Bar, BarChart, Line, LineChart, Pie, PieChart, CartesianGrid, XAxis } from 'recharts';
 import {
   ChartContainer,
   ChartTooltip,
@@ -7,7 +8,6 @@ import {
   ChartLegendContent,
   type ChartConfig,
 } from './chart';
-import { Bar, BarChart, Line, LineChart, Pie, PieChart, CartesianGrid, XAxis } from 'recharts';
 
 const meta = {
   title: 'Components/Chart',

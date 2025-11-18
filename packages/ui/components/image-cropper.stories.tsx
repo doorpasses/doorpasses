@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { ImageCropper } from './image-cropper';
-import { Button } from './button';
+import  { type Meta, type StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { Button } from './button';
+import { ImageCropper } from './image-cropper';
 
 const meta = {
   title: 'Components/ImageCropper',

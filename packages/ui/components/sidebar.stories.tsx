@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import  { type Meta, type StoryObj } from '@storybook/react';
+import { Icon } from './icon';
 import {
   Sidebar,
   SidebarContent,
@@ -14,7 +15,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from './sidebar';
-import { Icon } from './icon';
 
 const meta = {
   title: 'Components/Sidebar',

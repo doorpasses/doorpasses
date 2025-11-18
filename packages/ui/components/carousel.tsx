@@ -3,8 +3,8 @@ import useEmblaCarousel, {
 } from 'embla-carousel-react'
 import * as React from 'react'
 
-import { Button } from './button'
 import { cn } from '../utils/cn'
+import { Button } from './button'
 import { Icon } from './icon'
 
 type CarouselApi = UseEmblaCarouselType[1]

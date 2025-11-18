@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from './input-otp';
-import { Field, FieldLabel, FieldError, FieldDescription } from './field';
+import  { type Meta, type StoryObj } from '@storybook/react';
 import { REGEXP_ONLY_DIGITS, REGEXP_ONLY_CHARS, REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
+import { Field, FieldLabel, FieldError, FieldDescription } from './field';
+import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from './input-otp';
 
 const meta = {
   title: 'Components/InputOTP',

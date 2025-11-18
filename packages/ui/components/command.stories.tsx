@@ -1,4 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import  { type Meta, type StoryObj } from '@storybook/react';
+import { useState } from 'react';
+import { Button } from './button';
 import {
   Command,
   CommandDialog,
@@ -10,9 +12,7 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from './command';
-import { Button } from './button';
 import { Icon } from './icon';
-import { useState } from 'react';
 
 const meta = {
   title: 'Components/Command',

@@ -39,7 +39,7 @@ const CommentInput: React.FC<CommentInputProps> = ({
 	reply,
 	onCancel,
 	users,
-	placeholder = 'Add a comment...',
+	placeholder: _placeholder = 'Add a comment...',
 	disabled = false,
 }) => {
 	const { _ } = useLingui()

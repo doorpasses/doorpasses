@@ -11,13 +11,11 @@ import {
 } from '#app/utils/sso-sanitization.server.ts'
 import {
 	trackSuspiciousActivity,
-	isSuspiciousActivityBlocked,
 } from '#app/utils/sso-rate-limit.server.ts'
 import {
 	handleSSOError,
 	createSSOError,
 	SSOErrorType,
-	createSSOFallbackResponse,
 } from '#app/utils/sso-error-handling.server.ts'
 import {
 	ssoAuditLogger,

@@ -1191,7 +1191,7 @@ function CreateInviteFieldset({
 }
 
 function PlanCard({
-	plan,
+	plan: _plan,
 	title,
 	seats,
 	stripePrice,

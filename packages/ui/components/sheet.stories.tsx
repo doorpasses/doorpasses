@@ -1,4 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import  { type Meta, type StoryObj } from '@storybook/react';
+import { Button } from './button';
+import { Input } from './input';
+import { Label } from './label';
 import {
   Sheet,
   SheetClose,
@@ -9,9 +12,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from './sheet';
-import { Button } from './button';
-import { Label } from './label';
-import { Input } from './input';
 
 const meta = {
   title: 'Components/Sheet',

@@ -4,7 +4,6 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { StripeProvider } from '../../src/providers/stripe'
-import type Stripe from 'stripe'
 
 // Mock Stripe SDK
 vi.mock('stripe', () => {

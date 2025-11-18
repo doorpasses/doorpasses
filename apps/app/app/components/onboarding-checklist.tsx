@@ -2,7 +2,7 @@ import React, { useRef } from 'react'
 import { Link, useFetcher } from 'react-router'
 import { Trans } from '@lingui/macro'
 import { type OnboardingProgressData } from '#app/utils/onboarding.ts'
-import { ListTodoIcon, type ListTodoIconHandle } from './icons/list-todo'
+import { ListTodoIcon } from './icons/list-todo'
 
 import { Button } from '@repo/ui/button'
 import { Card, CardHeader, CardHeaderContent, CardAction, CardContent } from '@repo/ui/card'

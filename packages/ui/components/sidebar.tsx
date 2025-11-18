@@ -1,10 +1,12 @@
-import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { cva, VariantProps } from 'class-variance-authority'
-import { PanelLeftIcon } from 'lucide-react'
 import { getDirection } from '@repo/i18n'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { PanelLeftIcon } from 'lucide-react'
+import * as React from 'react'
 import { useRouteLoaderData } from 'react-router'
 
+import { cn } from '../utils/cn'
+import { useIsMobile } from '../utils/use-mobile'
 import { Button } from './button'
 import { Input } from './input'
 import { Separator } from './separator'
@@ -22,8 +24,6 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from './tooltip'
-import { cn } from '../utils/cn'
-import { useIsMobile } from '../utils/use-mobile'
 
 const SIDEBAR_WIDTH = '16rem'
 const SIDEBAR_WIDTH_MOBILE = '18rem'

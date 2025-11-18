@@ -3,10 +3,9 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { getPageTitle } from '@repo/config/brand'
 import { data, redirect, Form, useSearchParams } from 'react-router'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
-import { Trans, t } from '@lingui/macro'
+import { t, Trans } from '@lingui/macro'
 import { z } from 'zod'
 import {
-	CheckboxField,
 	ErrorList,
 	convertErrorsToFieldFormat,
 } from '#app/components/forms.tsx'
@@ -34,7 +33,6 @@ import { type Route } from './+types/onboarding.ts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/ui/card'
 import { Input } from '@repo/ui/input'
 import { StatusButton } from '@repo/ui/status-button'
-import { Icon } from '@repo/ui/icon'
 import { Field, FieldLabel, FieldError, FieldGroup } from '@repo/ui/field'
 import { Checkbox } from '@repo/ui/checkbox'
 
@@ -170,7 +168,7 @@ export async function action({ request }: Route.ActionArgs) {
 				},
 				{ headers },
 			)
-		} catch {
+		} catch (error) {
 			console.error('Error processing invite link during signup:', error)
 			// If invite link processing fails, continue with normal flow
 		}
@@ -202,7 +200,7 @@ export async function action({ request }: Route.ActionArgs) {
 				)
 			}
 		}
-	} catch {
+	} catch (error) {
 		// Don't fail the signup if invitation processing fails
 		console.error(
 			'Error processing organization invitations during signup:',
@@ -251,7 +249,7 @@ export async function action({ request }: Route.ActionArgs) {
 				for (const org of organizationsWithMatchingDomain) {
 					try {
 						await updateSeatQuantity(org.id)
-					} catch {
+					} catch (error) {
 						console.error(
 							`Failed to update seat quantity for organization ${org.id} after domain-based auto-join:`,
 							error,
@@ -274,7 +272,7 @@ export async function action({ request }: Route.ActionArgs) {
 				)
 			}
 		}
-	} catch {
+	} catch (error) {
 		// Don't fail the signup if domain-based organization joining fails
 		console.error(
 			'Error processing domain-based organization joining during signup:',
@@ -292,7 +290,7 @@ export async function action({ request }: Route.ActionArgs) {
 			// Ensure waitlist entry exists before linking referral
 			await getOrCreateWaitlistEntry(session.userId)
 			await linkReferral(session.userId, referralCode)
-		} catch {
+		} catch (error) {
 			// Don't fail the signup if referral linking fails
 			console.error('Error linking referral code during signup:', error)
 		}
@@ -461,7 +459,7 @@ export default function OnboardingRoute({
 							<Field orientation="horizontal">
 								<Checkbox
 									{...(() => {
-										const { type, ...props } = getInputProps(
+										const { type: _type, ...props } = getInputProps(
 											fields.agreeToTermsOfServiceAndPrivacyPolicy,
 											{ type: 'checkbox' },
 										)
@@ -487,7 +485,7 @@ export default function OnboardingRoute({
 							<Field orientation="horizontal">
 								<Checkbox
 									{...(() => {
-										const { type, ...props } = getInputProps(fields.remember, {
+										const { type: _type, ...props } = getInputProps(fields.remember, {
 											type: 'checkbox',
 										})
 										return props

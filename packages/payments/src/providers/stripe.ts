@@ -3,19 +3,19 @@
  */
 
 import Stripe from 'stripe'
-import type {
-	PaymentProvider,
-	Product,
-	Price,
-	PlansAndPrices,
-	CheckoutSession,
-	CheckoutSessionOptions,
-	Subscription,
-	SubscriptionUpdateOptions,
-	CustomerPortalSession,
-	CustomerPortalOptions,
-	Invoice,
-	WebhookEvent,
+import  {
+	type PaymentProvider,
+	type Product,
+	type Price,
+	type PlansAndPrices,
+	type CheckoutSession,
+	type CheckoutSessionOptions,
+	type Subscription,
+	type SubscriptionUpdateOptions,
+	type CustomerPortalSession,
+	type CustomerPortalOptions,
+	type Invoice,
+	type WebhookEvent,
 } from '../types'
 
 export class StripeProvider implements PaymentProvider {

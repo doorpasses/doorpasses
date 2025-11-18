@@ -1,6 +1,5 @@
+import  { type Meta, type StoryObj } from '@storybook/react'
 import { useRef, useState } from 'react'
-import type { Meta, StoryObj } from '@storybook/react'
-import { Button } from './button'
 import {
 	ArrowLeftIcon,
 	type ArrowLeftIconHandle,
@@ -54,6 +53,7 @@ import {
 	UserRoundPlusIcon,
 	type UserRoundPlusIconHandle,
 } from './animated-icons/user-round-plus'
+import { Button } from './button'
 
 const meta = {
 	title: 'Components/Animated Icons',

@@ -1,6 +1,6 @@
+import  { type PrismaClient } from '@prisma/client'
 import { type LoaderFunctionArgs, redirect } from 'react-router'
 import type Stripe from 'stripe'
-import type { PrismaClient } from '@prisma/client'
 
 export interface StripeCheckoutDependencies {
 	stripe: Stripe

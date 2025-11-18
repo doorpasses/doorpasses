@@ -2,7 +2,7 @@ import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { useState } from 'react'
 import { useFetcher } from 'react-router'
-import { Trans, t } from '@lingui/macro'
+import { Trans } from '@lingui/macro'
 import { useLingui } from '@lingui/react'
 import { z } from 'zod'
 import {
