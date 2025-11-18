@@ -1,5 +1,5 @@
 import { parseWithZod } from '@conform-to/zod'
-import { AnnotatedLayout, AnnotatedSection } from '@repo/ui'
+import { AnnotatedLayout, AnnotatedSection } from '@repo/ui/annotated-layout'
 import { invariant } from '@epic-web/invariant'
 import {
 	type ActionFunctionArgs,
@@ -123,6 +123,7 @@ const InviteSchema = z.object({
 })
 
 export async function action({ request, params }: ActionFunctionArgs) {
+	const userId = await requireUserId(request)
 	const organization = await requireUserOrganization(request, params.orgSlug, {
 		id: true,
 		name: true,

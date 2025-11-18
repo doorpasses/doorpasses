@@ -10,11 +10,11 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle,
-	Label,
-	Switch as ShadcnSwitch,
-	Icon,
-	StatusButton,
-} from '@repo/ui'
+} from '@repo/ui/card'
+import { Label } from '@repo/ui/label'
+import { Icon } from '@repo/ui/icon'
+import { StatusButton } from '@repo/ui/status-button'
+import { Switch as ShadcnSwitch } from '@repo/ui/switch'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { useRef } from 'react'
 import { useFetcher } from 'react-router'
@@ -196,8 +196,8 @@ export function S3StorageCard({
 												<Trans>
 													Your S3 credentials will be encrypted and stored
 													securely. However, we recommend using IAM credentials
-													with minimal required permissions (read/write access to
-													the specific bucket only).
+													with minimal required permissions (read/write access
+													to the specific bucket only).
 												</Trans>
 											</p>
 										</div>
