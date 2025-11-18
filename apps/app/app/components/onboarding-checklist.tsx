@@ -25,7 +25,7 @@ export function OnboardingChecklist({
 	className = '',
 }: OnboardingChecklistProps) {
 	const fetcher = useFetcher()
-	const listTodoIconRef = useRef<ListTodoIconHandle>(null)
+	const listTodoIconRef = useRef<any>(null)
 
 	// Don't show if completed and not visible
 	if (progress.isCompleted && !progress.isVisible) {

@@ -5,6 +5,7 @@ import {
 	type OrganizationPermissionString,
 } from '@repo/auth'
 import { getUserId } from './auth.server.ts'
+import { invariant } from '@epic-web/invariant'
 
 /**
  * Require user to have organization permission - throws 403 if not
