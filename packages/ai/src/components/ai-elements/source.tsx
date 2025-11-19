@@ -21,6 +21,7 @@ export const Sources = ({ className, ...props }: SourcesProps) => (
 
 export type SourcesTriggerProps = ComponentProps<typeof CollapsibleTrigger> & {
 	count: number
+	_className?: string
 }
 
 export const SourcesTrigger = ({

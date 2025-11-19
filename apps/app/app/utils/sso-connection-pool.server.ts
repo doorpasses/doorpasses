@@ -57,7 +57,7 @@ export class SSOConnectionPool {
 			pool.lastUsed = Date.now()
 
 			return response
-		} catch {
+		} catch (error) {
 			pool.errorCount++
 			throw error
 		} finally {
@@ -129,7 +129,7 @@ export class SSOConnectionPool {
 		try {
 			const url = new URL(baseUrl)
 			return `${url.protocol}//${url.host}`
-		} catch {
+		} catch (error) {
 			return baseUrl
 		}
 	}
@@ -141,7 +141,7 @@ export class SSOConnectionPool {
 		try {
 			const urlObj = new URL(url)
 			return `${urlObj.protocol}//${urlObj.host}`
-		} catch {
+		} catch (error) {
 			return url
 		}
 	}

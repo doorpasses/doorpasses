@@ -45,7 +45,7 @@ export function Status({
 			}
 			const data = await response.json()
 			setStatus(data)
-		} catch {
+		} catch (error) {
 			console.error('Error fetching status:', error)
 			setStatus({
 				status: 'degraded',
@@ -71,7 +71,7 @@ export function Status({
 		return (
 			<div className={`inline-flex items-center gap-2 ${className}`}>
 				<span className="text-gray-400">●</span>
-				<span className="text-sm text-muted-foreground">Loading status...</span>
+				<span className="text-muted-foreground text-sm">Loading status...</span>
 			</div>
 		)
 	}
@@ -85,7 +85,7 @@ export function Status({
 			<span className={statusColors[status.status]}>
 				{statusIcons[status.status]}
 			</span>
-			<span className="text-sm text-muted-foreground">{status.message}</span>
+			<span className="text-muted-foreground text-sm">{status.message}</span>
 		</div>
 	)
 }

@@ -34,8 +34,8 @@ export const PromptInput = ({ className, ...props }: PromptInputProps) => (
 )
 
 export type PromptInputTextareaProps = ComponentProps<typeof Textarea> & {
-	minHeight?: number
-	maxHeight?: number
+	_minHeight?: number
+	_maxHeight?: number
 }
 
 export const PromptInputTextarea = ({

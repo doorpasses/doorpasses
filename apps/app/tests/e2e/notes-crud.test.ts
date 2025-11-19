@@ -1,5 +1,7 @@
+import { faker } from '@faker-js/faker'
 import { createTestOrganization } from '#tests/test-utils.ts'
 import { expect, test } from '#tests/playwright-utils.ts'
+import { prisma } from '#app/utils/db.server.ts'
 
 test.describe('Notes CRUD Operations', () => {
 	test('Users can create notes', async ({ page, login, navigate }) => {
@@ -161,7 +163,11 @@ test.describe('Notes CRUD Operations', () => {
 		}
 	})
 
-	test('Users can filter notes by status', async ({ page, login, navigate }) => {
+	test('Users can filter notes by status', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user
@@ -210,7 +216,11 @@ test.describe('Notes CRUD Operations', () => {
 		}
 	})
 
-	test('Users can change note visibility', async ({ page, login, navigate }) => {
+	test('Users can change note visibility', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user

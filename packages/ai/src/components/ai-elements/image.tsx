@@ -5,6 +5,7 @@ export type ImageProps = Experimental_GeneratedImage & {
 	className?: string
 	alt?: string
 	mediaType?: string
+	_uint8Array?: Uint8Array
 }
 
 export const Image = ({

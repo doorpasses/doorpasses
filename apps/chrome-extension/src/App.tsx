@@ -52,7 +52,7 @@ function App() {
 				if (mounted) {
 					await checkAuthStatus()
 				}
-			} catch {
+			} catch (error) {
 				console.error('Error initializing popup:', error)
 				if (mounted) {
 					setUrl('Invalid URL.')
@@ -131,7 +131,7 @@ function App() {
 					lastChecked: Date.now(),
 				},
 			})
-		} catch {
+		} catch (error) {
 			console.error('Error checking auth status:', error)
 			setIsLoggedIn(false)
 		} finally {
@@ -153,7 +153,7 @@ function App() {
 			})
 
 			window.close()
-		} catch {
+		} catch (error) {
 			console.error('Error granting permission:', error)
 		}
 	}

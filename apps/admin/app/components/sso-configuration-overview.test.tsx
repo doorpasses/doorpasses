@@ -87,7 +87,7 @@ describe('SSOConfigurationOverview', () => {
 	}
 
 	const defaultProps = {
-		organizationId: 'org-123',
+		_organizationId: 'org-123',
 		ssoConfig: mockSSOConfig,
 		ssoStats: mockSSOStats,
 		onEdit: vi.fn(),

@@ -269,7 +269,7 @@ export async function action({ request }: Route.ActionArgs) {
 			status: 400,
 			headers: { 'Content-Type': 'application/json' },
 		})
-	} catch {
+	} catch (error) {
 		console.error('API error:', error)
 		return new Response(JSON.stringify({ error: 'Internal server error' }), {
 			status: 500,

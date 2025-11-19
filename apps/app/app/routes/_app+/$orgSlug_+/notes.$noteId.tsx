@@ -174,7 +174,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 				ORG_PERMISSIONS.READ_NOTE_ANY,
 			)
 			// If we reach here, user can read all organization notes
-		} catch {
+		} catch (error) {
 			// User doesn't have org-wide read access, check for personal access
 			const hasPersonalAccess =
 				note.createdById === userId ||
@@ -263,7 +263,9 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	}
 
 	// Serialize comments for client (convert Date to string)
-	const serializeComment = (comment: CommentWithReplies): SerializedComment => ({
+	const serializeComment = (
+		comment: CommentWithReplies,
+	): SerializedComment => ({
 		...comment,
 		createdAt: comment.createdAt.toISOString(),
 		replies: comment.replies.map(serializeComment),
@@ -443,7 +445,7 @@ export async function action({ request }: ActionFunctionArgs) {
 				ORG_PERMISSIONS.DELETE_NOTE_ANY,
 			)
 			canDelete = true
-		} catch {
+		} catch (error) {
 			// If not admin-level delete, check if they can delete their own note
 			if (note.createdById === userId) {
 				try {
@@ -453,7 +455,7 @@ export async function action({ request }: ActionFunctionArgs) {
 						ORG_PERMISSIONS.DELETE_NOTE_OWN,
 					)
 					canDelete = true
-				} catch {
+				} catch (error) {
 					// User doesn't have delete permissions at all
 				}
 			}
@@ -526,7 +528,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			})
 
 			return data({ result: { status: 'success' } })
-		} catch {
+		} catch (error) {
 			return data(
 				{
 					result: {
@@ -595,7 +597,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			}
 
 			return data({ result: { status: 'success' } })
-		} catch {
+		} catch (error) {
 			return data(
 				{
 					result: {
@@ -636,7 +638,7 @@ export async function action({ request }: ActionFunctionArgs) {
 				await integrationManager.getAvailableChannels(integrationId)
 
 			return data({ channels })
-		} catch {
+		} catch (error) {
 			// For demo purposes, return empty channels array instead of error
 			// This allows the UI to show "No channels available" instead of crashing
 			return data({
@@ -697,7 +699,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			})
 
 			return data({ result: { status: 'success' } })
-		} catch {
+		} catch (error) {
 			return data(
 				{
 					result: {
@@ -783,7 +785,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			})
 
 			return data({ result: { status: 'success' } })
-		} catch {
+		} catch (error) {
 			return data(
 				{
 					result: {
@@ -841,7 +843,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			})
 
 			return data({ result: { status: 'success' } })
-		} catch {
+		} catch (error) {
 			return data(
 				{
 					result: {
@@ -1013,7 +1015,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			}
 
 			return data({ result: { status: 'success' } })
-		} catch {
+		} catch (error) {
 			return data(
 				{
 					result: {
@@ -1072,7 +1074,7 @@ export async function action({ request }: ActionFunctionArgs) {
 					note.organizationId,
 					ORG_PERMISSIONS.READ_NOTE_ANY,
 				)
-			} catch {
+			} catch (error) {
 				// Check personal access to this specific note
 				const hasPersonalAccess =
 					note.createdById === userId ||
@@ -1217,7 +1219,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			}
 
 			return data({ result: { status: 'success' } })
-		} catch {
+		} catch (error) {
 			return data(
 				{
 					result: {
@@ -1285,7 +1287,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			}
 
 			return data({ result: { status: 'success' } })
-		} catch {
+		} catch (error) {
 			return data(
 				{
 					result: {
@@ -1341,7 +1343,7 @@ export async function action({ request }: ActionFunctionArgs) {
 					note.organizationId,
 					ORG_PERMISSIONS.READ_NOTE_ANY,
 				)
-			} catch {
+			} catch (error) {
 				// Check personal access to this specific note
 				const hasPersonalAccess =
 					note.createdById === userId ||
@@ -1380,7 +1382,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			}
 
 			return data({ result: { status: 'success' } })
-		} catch {
+		} catch (error) {
 			return data(
 				{
 					result: {

@@ -197,7 +197,7 @@ export class IntegrationManager {
 			// Standard OAuth 2.0 state validation
 			try {
 				stateData = OAuthStateManager.validateState(params.state)
-			} catch {
+			} catch (error) {
 				throw new Error('Invalid OAuth state')
 			}
 
@@ -564,7 +564,7 @@ export class IntegrationManager {
 			)
 
 			return channels
-		} catch {
+		} catch (error) {
 			// Log error
 			await this.logIntegrationActivity(
 				integrationId,
@@ -667,7 +667,7 @@ export class IntegrationManager {
 					changeType: message.changeType,
 				},
 			)
-		} catch {
+		} catch (error) {
 			// Log error but don't throw to allow other connections to succeed
 			await this.logIntegrationActivity(
 				connection.integrationId,
@@ -738,7 +738,7 @@ export class IntegrationManager {
 			)
 
 			return updatedIntegration
-		} catch {
+		} catch (error) {
 			// Log error
 			await this.logIntegrationActivity(
 				integrationId,
@@ -794,7 +794,7 @@ export class IntegrationManager {
 					invalid++
 					errors.push(`Connection ${connection.id} is invalid`)
 				}
-			} catch {
+			} catch (error) {
 				invalid++
 				const errorMsg =
 					error instanceof Error ? error.message : 'Unknown error'
@@ -990,7 +990,7 @@ export class IntegrationManager {
 	private safeJsonParse(jsonString: string): Record<string, any> | undefined {
 		try {
 			return JSON.parse(jsonString) as Record<string, any>
-		} catch {
+		} catch (error) {
 			return undefined
 		}
 	}

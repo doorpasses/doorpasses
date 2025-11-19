@@ -59,11 +59,11 @@ export class NoteHooks {
 							`Note creation notified ${result.connectionsNotified} connections`,
 						)
 					}
-				} catch {
+				} catch (error) {
 					console.error('Error in afterNoteCreated hook:', error)
 				}
 			})
-		} catch {
+		} catch (error) {
 			// Don't throw errors from hooks to avoid breaking the main flow
 			console.error('Error setting up afterNoteCreated hook:', error)
 		}
@@ -96,11 +96,11 @@ export class NoteHooks {
 							`Note update notified ${result.connectionsNotified} connections`,
 						)
 					}
-				} catch {
+				} catch (error) {
 					console.error('Error in afterNoteUpdated hook:', error)
 				}
 			})
-		} catch {
+		} catch (error) {
 			console.error('Error setting up afterNoteUpdated hook:', error)
 		}
 	}
@@ -142,11 +142,11 @@ export class NoteHooks {
 							`Note deletion notified ${result.connectionsNotified} connections`,
 						)
 					}
-				} catch {
+				} catch (error) {
 					console.error('Error in beforeNoteDeleted hook:', error)
 				}
 			})
-		} catch {
+		} catch (error) {
 			console.error('Error setting up beforeNoteDeleted hook:', error)
 		}
 	}
@@ -212,7 +212,7 @@ export class NoteHooks {
 			})
 
 			return note
-		} catch {
+		} catch (error) {
 			console.error('Error capturing note snapshot:', error)
 			return null
 		}
@@ -256,7 +256,7 @@ export class NoteHooks {
 								}
 								break
 						}
-					} catch {
+					} catch (error) {
 						console.error(
 							`Error processing ${change.type} change for note ${change.noteId}:`,
 							error,
@@ -264,7 +264,7 @@ export class NoteHooks {
 					}
 				}
 			})
-		} catch {
+		} catch (error) {
 			console.error('Error setting up batch change processing:', error)
 		}
 	}

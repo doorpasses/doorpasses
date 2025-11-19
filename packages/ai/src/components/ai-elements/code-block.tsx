@@ -134,7 +134,7 @@ export const CodeBlockCopyButton = ({
 			setIsCopied(true)
 			onCopy?.()
 			setTimeout(() => setIsCopied(false), timeout)
-		} catch {
+		} catch (error) {
 			onError?.(error as Error)
 		}
 	}

@@ -1,12 +1,14 @@
-import {
-	createTestOrganization,
-} from '#tests/test-utils.ts'
+import { createTestOrganization } from '#tests/test-utils.ts'
 import { prisma } from '#app/utils/db.server.ts'
 // Removed prisma import - using test utilities instead
 import { expect, test } from '#tests/playwright-utils.ts'
 
 test.describe('Mobile Responsiveness', () => {
-	test('Dashboard is responsive on mobile devices', async ({ page, login, navigate }) => {
+	test('Dashboard is responsive on mobile devices', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user
@@ -96,7 +98,11 @@ test.describe('Mobile Responsiveness', () => {
 		}
 	})
 
-	test('Forms are usable on mobile devices', async ({ page, login, navigate }) => {
+	test('Forms are usable on mobile devices', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user
@@ -183,7 +189,11 @@ test.describe('Mobile Responsiveness', () => {
 		}
 	})
 
-	test('Touch interactions work correctly', async ({ page, login, navigate }) => {
+	test('Touch interactions work correctly', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user
@@ -219,7 +229,7 @@ test.describe('Mobile Responsiveness', () => {
 						try {
 							await button.click({ timeout: 2000 })
 							await page.waitForTimeout(100) // Brief wait after interaction
-						} catch {
+						} catch (error) {
 							// Button moved or became unavailable, that's okay
 							console.log(`Button ${i} could not be clicked, skipping`)
 						}
@@ -251,7 +261,11 @@ test.describe('Mobile Responsiveness', () => {
 		}
 	})
 
-	test('Text is readable on mobile devices', async ({ page, login, navigate }) => {
+	test('Text is readable on mobile devices', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user
@@ -397,7 +411,11 @@ test.describe('Mobile Responsiveness', () => {
 		expect(bodyScrollWidth).toBeLessThanOrEqual(viewportWidth + 1)
 	})
 
-	test('Loading states are appropriate for mobile', async ({ page, login, navigate }) => {
+	test('Loading states are appropriate for mobile', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user

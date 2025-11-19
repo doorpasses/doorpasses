@@ -45,7 +45,7 @@ export async function getSSOStrategy(organizationId: string) {
 		if (existingStrategy) {
 			return strategyName
 		}
-	} catch {
+	} catch (error) {
 		// Strategy doesn't exist, we'll create it below
 	}
 
@@ -70,7 +70,7 @@ export async function refreshSSOStrategy(organizationId: string) {
 	// Remove existing strategy if it exists
 	try {
 		;(authenticator as any)._strategies.delete(strategyName)
-	} catch {
+	} catch (error) {
 		// Strategy might not exist, that's fine
 	}
 
@@ -475,7 +475,7 @@ export async function checkIsCommonPassword(password: string) {
 			const [hashSuffix, _prevalenceCount] = line.split(':')
 			return hashSuffix === suffix
 		})
-	} catch {
+	} catch (error) {
 		if (error instanceof DOMException && error.name === 'TimeoutError') {
 			console.warn('Password check timed out')
 			return false

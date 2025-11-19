@@ -66,7 +66,7 @@ export async function action({ request }: Route.ActionArgs) {
 		if (!email) {
 			try {
 				email = await requireOnboardingEmail(request)
-			} catch {
+			} catch (error) {
 				return data(
 					{
 						success: false,
@@ -93,7 +93,7 @@ export async function action({ request }: Route.ActionArgs) {
 		// Check honeypot
 		try {
 			await checkHoneypot(formData)
-		} catch {
+		} catch (error) {
 			return data(
 				{
 					success: false,
@@ -169,7 +169,7 @@ export async function action({ request }: Route.ActionArgs) {
 		}
 
 		return data(response)
-	} catch {
+	} catch (error) {
 		console.error('Onboarding action error:', error)
 		return data(
 			{

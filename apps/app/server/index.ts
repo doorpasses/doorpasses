@@ -25,15 +25,15 @@ if (SENTRY_ENABLED) {
 const viteDevServer = IS_PROD
 	? undefined
 	: await import('vite').then((vite) =>
-		vite.createServer({
-			server: {
-				middlewareMode: true,
-			},
-			// We tell Vite we are running a custom app instead of
-			// the SPA default so it doesn't run HTML middleware
-			appType: 'custom',
-		}),
-	)
+			vite.createServer({
+				server: {
+					middlewareMode: true,
+				},
+				// We tell Vite we are running a custom app instead of
+				// the SPA default so it doesn't run HTML middleware
+				appType: 'custom',
+			}),
+		)
 
 const app = express()
 
@@ -45,10 +45,10 @@ app.use((req, res, next) => {
 		// Allow localhost origins for development (mobile app)
 		...(IS_DEV
 			? [
-				'http://localhost:8081',
-				'http://localhost:8082',
-				'http://localhost:19006', // Default Expo web port
-			]
+					'http://localhost:8081',
+					'http://localhost:8082',
+					'http://localhost:19006', // Default Expo web port
+				]
 			: []),
 	]
 
@@ -140,7 +140,7 @@ app.get(['/img/*', '/favicons/*'], (_req, res) => {
 morgan.token('url', (req) => {
 	try {
 		return decodeURIComponent(req.url ?? '')
-	} catch {
+	} catch (error) {
 		return req.url ?? ''
 	}
 })
@@ -168,7 +168,7 @@ app.use(async (req, res, next) => {
 				code: 'IP_BLACKLISTED',
 			})
 		}
-	} catch {
+	} catch (error) {
 		// If there's an error checking blacklist, log it but don't block the request
 		logger.error({ err: error }, 'Error checking IP blacklist')
 	}
@@ -188,7 +188,7 @@ app.use(async (req, res, next) => {
 					referer: req.get('referer'),
 					statusCode: res.statusCode,
 				})
-			} catch {
+			} catch (error) {
 				// Silently fail to not break the app
 				logger.error({ err: error }, 'IP tracking error')
 			}
@@ -204,7 +204,7 @@ setInterval(
 		try {
 			const ipTracking = await import('../app/utils/ip-tracking.server.js')
 			ipTracking.cleanupRequestCounts()
-		} catch {
+		} catch (error) {
 			logger.error({ err: error }, 'Error cleaning up request counts')
 		}
 	},
@@ -277,10 +277,10 @@ async function getBuild() {
 		const build = viteDevServer
 			? await viteDevServer.ssrLoadModule('virtual:react-router/server-build')
 			: // @ts-expect-error - the file might not exist yet but it will
-			await import('../build/server/index.js')
+				await import('../build/server/index.js')
 
 		return { build: build as unknown as ServerBuild, error: null }
-	} catch {
+	} catch (error) {
 		// Catch error and return null to make express happy and avoid an unrecoverable crash
 		sentryLogger.error({ err: error }, 'Error creating build')
 		return { error: error, build: null as unknown as ServerBuild }

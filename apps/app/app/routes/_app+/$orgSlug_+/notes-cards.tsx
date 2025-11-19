@@ -196,7 +196,7 @@ export const NoteCard = ({
 					.filter(Boolean)
 			}
 			return []
-		} catch {
+		} catch (error) {
 			return []
 		}
 	})()

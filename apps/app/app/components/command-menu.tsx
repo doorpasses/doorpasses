@@ -2,7 +2,15 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouteLoaderData, useFetcher, Link } from 'react-router'
 import { Trans, t } from '@lingui/macro'
 import { useLingui } from '@lingui/react'
-import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandShortcut } from '@repo/ui/command'
+import {
+	CommandDialog,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+	CommandShortcut,
+} from '@repo/ui/command'
 import { Icon } from '@repo/ui/icon'
 import { type loader as rootLoader } from '#app/root.tsx'
 
@@ -60,7 +68,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 					const data = (await response.json()) as { notes: Note[] }
 					setNotes(data.notes)
 				}
-			} catch {
+			} catch (error) {
 				console.error('Failed to search notes:', error)
 				setNotes([])
 			} finally {
@@ -94,7 +102,11 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 			/>
 			<CommandList className="md:min-h-[400px]">
 				<CommandEmpty>
-					{loading ? <Trans>Loading notes...</Trans> : <Trans>No notes found.</Trans>}
+					{loading ? (
+						<Trans>Loading notes...</Trans>
+					) : (
+						<Trans>No notes found.</Trans>
+					)}
 				</CommandEmpty>
 
 				<CommandGroup heading={_(t`Actions`)}>
@@ -142,7 +154,9 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 					<CommandItem asChild>
 						<Link to="/profile" onClick={() => onOpenChange(false)}>
 							<Icon name="user" />
-							<span><Trans>Account settings</Trans></span>
+							<span>
+								<Trans>Account settings</Trans>
+							</span>
 							<CommandShortcut>⌘P</CommandShortcut>
 						</Link>
 					</CommandItem>
@@ -152,7 +166,9 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 							onClick={() => onOpenChange(false)}
 						>
 							<Icon name="credit-card" />
-							<span><Trans>Billing</Trans></span>
+							<span>
+								<Trans>Billing</Trans>
+							</span>
 							<CommandShortcut>⌘B</CommandShortcut>
 						</Link>
 					</CommandItem>
@@ -162,7 +178,9 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 							onClick={() => onOpenChange(false)}
 						>
 							<Icon name="settings" />
-							<span><Trans>Settings</Trans></span>
+							<span>
+								<Trans>Settings</Trans>
+							</span>
 							<CommandShortcut>⌘S</CommandShortcut>
 						</Link>
 					</CommandItem>

@@ -14,9 +14,20 @@ import { Button } from '@repo/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/card'
 import { Icon } from '@repo/ui/icon'
 import { Input } from '@repo/ui/input'
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@repo/ui/input-group'
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupButton,
+	InputGroupInput,
+} from '@repo/ui/input-group'
 import { Separator } from '@repo/ui/separator'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/select'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@repo/ui/select'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { useState } from 'react'
 import { Form } from 'react-router'
@@ -113,7 +124,7 @@ export function OrganizationInvitations({
 				await navigator.clipboard.writeText(inviteUrl)
 				setLinkCopied(true)
 				setTimeout(() => setLinkCopied(false), 2000)
-			} catch {
+			} catch (error) {
 				console.error('Failed to copy link:', error)
 				// Fallback for browsers that don't support clipboard API
 				const textArea = document.createElement('textarea')

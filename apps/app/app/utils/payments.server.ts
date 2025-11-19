@@ -184,7 +184,7 @@ export async function createCheckoutSession(
 					success: true,
 				})
 			}
-		} catch {
+		} catch (error) {
 			console.error('Error checking existing subscription:', error)
 			// Continue with checkout if we can't retrieve subscription
 		}
@@ -202,9 +202,11 @@ export async function createCheckoutSession(
 	) {
 		try {
 			const testClock = await paymentProvider.createTestClock()
-			const testCustomer = await paymentProvider.createTestCustomer(testClock.id)
+			const testCustomer = await paymentProvider.createTestCustomer(
+				testClock.id,
+			)
 			testCustomerId = testCustomer.id
-		} catch {
+		} catch (error) {
 			// Ignore test customer creation errors
 		}
 	}
@@ -281,7 +283,7 @@ export async function handleSubscriptionChange(subscription: {
 				console.log(
 					`Cancelled old subscription: ${organization.stripeSubscriptionId}`,
 				)
-			} catch {
+			} catch (error) {
 				console.error('Error cancelling old subscription:', error)
 			}
 		}
@@ -413,7 +415,7 @@ export async function getTrialStatus(userId: string, organizationSlug: string) {
 		} else {
 			return { isActive: false, daysRemaining: 0 }
 		}
-	} catch {
+	} catch (error) {
 		throw new Error('Failed to fetch subscription status')
 	}
 }
@@ -553,7 +555,7 @@ export async function cleanupDuplicateSubscriptions(
 		})
 
 		console.log(`Kept subscription: ${keepSubscription.id}`)
-	} catch {
+	} catch (error) {
 		console.error('Error cleaning up duplicate subscriptions:', error)
 	}
 }

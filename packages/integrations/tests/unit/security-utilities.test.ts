@@ -181,7 +181,7 @@ class MockSecurityValidator {
 				parsed.organizationId === expectedOrganizationId &&
 				parsed.providerName === expectedProviderName
 			)
-		} catch {
+		} catch (error) {
 			return false
 		}
 	}
@@ -217,7 +217,7 @@ class MockSecurityValidator {
 					parsedUrl.hostname === domain ||
 					parsedUrl.hostname.endsWith(`.${domain}`),
 			)
-		} catch {
+		} catch (error) {
 			return false
 		}
 	}

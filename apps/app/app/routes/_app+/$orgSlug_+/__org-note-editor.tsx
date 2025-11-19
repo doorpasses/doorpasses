@@ -175,7 +175,7 @@ export function OrgNoteEditor({
 						}
 					}
 					return ''
-				} catch {
+				} catch (error) {
 					return ''
 				}
 			})(),
@@ -313,14 +313,16 @@ export function OrgNoteEditor({
 							</div>
 							<LazyLoadErrorBoundary
 								fallback={
-									<div className="rounded-md border border-destructive/50 bg-destructive/10 p-4 text-center">
-										<div className="text-sm text-destructive">
+									<div className="border-destructive/50 bg-destructive/10 rounded-md border p-4 text-center">
+										<div className="text-destructive text-sm">
 											Failed to load media upload component
 										</div>
 									</div>
 								}
 							>
-								<Suspense fallback={<div className="h-20 animate-pulse bg-muted" />}>
+								<Suspense
+									fallback={<div className="bg-muted h-20 animate-pulse" />}
+								>
 									<MultiMediaUpload
 										meta={fields.media}
 										formId={form.id}

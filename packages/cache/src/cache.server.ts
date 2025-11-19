@@ -256,7 +256,7 @@ export async function getAllCacheKeysWithDetails(limit: number): Promise<{
 		let metadata: any = {}
 		try {
 			metadata = JSON.parse(row.metadata)
-		} catch {
+		} catch (error) {
 			// ignore parse errors
 		}
 
@@ -321,7 +321,7 @@ export async function searchCacheKeysWithDetails(
 		let metadata: any = {}
 		try {
 			metadata = JSON.parse(row.metadata)
-		} catch {
+		} catch (error) {
 			// ignore parse errors
 		}
 
@@ -372,7 +372,7 @@ export async function getCacheKeyDetails(
 		let metadata: any = {}
 		try {
 			metadata = JSON.parse(row.metadata)
-		} catch {
+		} catch (error) {
 			// ignore parse errors
 		}
 

@@ -22,7 +22,14 @@ import {
 	ErrorList,
 	convertErrorsToFieldFormat,
 } from '#app/components/forms.tsx'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@repo/ui/card'
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from '@repo/ui/card'
 import { Input } from '@repo/ui/input'
 import { StatusButton } from '@repo/ui/status-button'
 import { Icon } from '@repo/ui/icon'
@@ -138,7 +145,7 @@ export async function action({ request }: Route.ActionArgs) {
 				// Return early with error response
 				return data({ result: null }, { status: 400, statusText: errorMessage })
 			}
-		} catch {
+		} catch (error) {
 			// If Arcjet fails, log error but continue with login process
 			console.error('Arcjet protection failed:', error)
 		}
@@ -247,15 +254,19 @@ export default function LoginPage({
 	return (
 		<Card className="bg-muted/80 border-0 shadow-2xl">
 			<CardHeader>
-				<CardTitle className="text-xl"><Trans>Welcome back</Trans></CardTitle>
+				<CardTitle className="text-xl">
+					<Trans>Welcome back</Trans>
+				</CardTitle>
 				<CardDescription>
-					{ssoAvailable && discoveredOrganization && !usePassword
-						? `Sign in to ${discoveredOrganization.name}`
-						: (discoveredUsername && ssoAvailable === false) ||
-							  usePassword ||
-							  organization
-							? <Trans>Continue with your password</Trans>
-							: <Trans>Sign in to your account</Trans>}
+					{ssoAvailable && discoveredOrganization && !usePassword ? (
+						`Sign in to ${discoveredOrganization.name}`
+					) : (discoveredUsername && ssoAvailable === false) ||
+					  usePassword ||
+					  organization ? (
+						<Trans>Continue with your password</Trans>
+					) : (
+						<Trans>Sign in to your account</Trans>
+					)}
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -263,10 +274,15 @@ export default function LoginPage({
 					<div className="border-destructive bg-destructive/10 mb-4 rounded-lg border p-4">
 						<div className="text-destructive flex items-center gap-2">
 							<Icon name="lock" className="h-5 w-5" />
-							<h3 className="font-semibold"><Trans>Account Suspended</Trans></h3>
+							<h3 className="font-semibold">
+								<Trans>Account Suspended</Trans>
+							</h3>
 						</div>
 						<p className="text-destructive/80 mt-2 text-sm">
-							<Trans>Your account has been suspended. Please contact support if you believe this is an error.</Trans>
+							<Trans>
+								Your account has been suspended. Please contact support if you
+								believe this is an error.
+							</Trans>
 						</p>
 					</div>
 				)}
@@ -275,10 +291,14 @@ export default function LoginPage({
 					<div className="mb-4 rounded-lg border border-orange-500 bg-orange-50 p-4">
 						<div className="flex items-center gap-2 text-orange-700">
 							<Icon name="alert-triangle" className="h-5 w-5" />
-							<h3 className="font-semibold"><Trans>Login Error</Trans></h3>
+							<h3 className="font-semibold">
+								<Trans>Login Error</Trans>
+							</h3>
 						</div>
 						<p className="mt-2 text-sm text-orange-600">
-							<Trans>There was an issue with your login attempt. Please try again.</Trans>
+							<Trans>
+								There was an issue with your login attempt. Please try again.
+							</Trans>
 						</p>
 					</div>
 				)}
@@ -537,7 +557,8 @@ function SSOLoginStep({
 		<div className="space-y-4">
 			<div className="space-y-2 text-center">
 				<div className="text-muted-foreground text-sm">
-					<Trans>Signing in as</Trans> <span className="font-medium">{username}</span>
+					<Trans>Signing in as</Trans>{' '}
+					<span className="font-medium">{username}</span>
 				</div>
 				<div className="text-muted-foreground text-xs">
 					<Trans>We found your organization:</Trans> {organization.name}
@@ -562,7 +583,8 @@ function SSOLoginStep({
 						/>
 						<div className="flex flex-col items-start">
 							<span className="font-medium">
-								<Trans>Continue with</Trans> {getProviderDisplayName(ssoConfig.providerName)}
+								<Trans>Continue with</Trans>{' '}
+								{getProviderDisplayName(ssoConfig.providerName)}
 							</span>
 							<span className="text-xs opacity-90">
 								<Trans>Recommended for</Trans> {organization.name}
@@ -709,7 +731,8 @@ function PasswordLoginStep({
 			{username && (
 				<div className="space-y-2 text-center">
 					<div className="text-muted-foreground text-sm">
-						<Trans>Signing in as</Trans> <span className="font-medium">{username}</span>
+						<Trans>Signing in as</Trans>{' '}
+						<span className="font-medium">{username}</span>
 					</div>
 					{organization && (
 						<div className="text-muted-foreground text-xs">
@@ -739,16 +762,22 @@ function PasswordLoginStep({
 						data-invalid={fields.username.errors?.length ? true : undefined}
 					>
 						<FieldLabel htmlFor={fields.username.id}>
-							{username
-								? username.includes('@')
-									? <Trans>Email</Trans>
-									: <Trans>Username</Trans>
-								: <Trans>Email or Username</Trans>}
+							{username ? (
+								username.includes('@') ? (
+									<Trans>Email</Trans>
+								) : (
+									<Trans>Username</Trans>
+								)
+							) : (
+								<Trans>Email or Username</Trans>
+							)}
 						</FieldLabel>
 						<Input
 							{...getInputProps(fields.username, { type: 'text' })}
 							autoComplete="username"
-							placeholder={username ? username : t`Enter your email or username`}
+							placeholder={
+								username ? username : t`Enter your email or username`
+							}
 							readOnly={!!username}
 							className={username ? 'bg-muted' : ''}
 							aria-invalid={fields.username.errors?.length ? true : undefined}
@@ -762,7 +791,9 @@ function PasswordLoginStep({
 						data-invalid={fields.password.errors?.length ? true : undefined}
 					>
 						<div className="flex items-center">
-							<FieldLabel htmlFor={fields.password.id}><Trans>Password</Trans></FieldLabel>
+							<FieldLabel htmlFor={fields.password.id}>
+								<Trans>Password</Trans>
+							</FieldLabel>
 							<Link
 								to="/forgot-password"
 								className="ml-auto text-sm underline-offset-4 hover:underline"
@@ -785,9 +816,12 @@ function PasswordLoginStep({
 					<Field orientation="horizontal">
 						<Checkbox
 							{...(() => {
-								const { type: _type, ...props } = getInputProps(fields.remember, {
-									type: 'checkbox',
-								})
+								const { type: _type, ...props } = getInputProps(
+									fields.remember,
+									{
+										type: 'checkbox',
+									},
+								)
 								return props
 							})()}
 							id={fields.remember.id}

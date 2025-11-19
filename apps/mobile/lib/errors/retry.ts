@@ -53,7 +53,7 @@ export class RetryManager {
 				const result = await fn()
 				this.reset()
 				return result
-			} catch {
+			} catch (error) {
 				this.state.attempt++
 				this.state.lastError = categorizeError(error)
 

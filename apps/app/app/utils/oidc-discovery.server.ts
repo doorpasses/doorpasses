@@ -180,7 +180,7 @@ export async function discoverOIDCEndpoints(
 			endpoints,
 			discoveryDocument: discoveryDoc,
 		}
-	} catch {
+	} catch (error) {
 		if (error instanceof Error) {
 			if (error.name === 'AbortError') {
 				return {
@@ -415,7 +415,7 @@ export async function testEndpointConnectivity(
 				`Authorization endpoint returned unexpected status: ${authResponse.status}`,
 			)
 		}
-	} catch {
+	} catch (error) {
 		results.errors.push(
 			`Authorization endpoint unreachable: ${error instanceof Error ? error.message : 'Unknown error'}`,
 		)
@@ -435,7 +435,7 @@ export async function testEndpointConnectivity(
 				`Token endpoint returned unexpected status: ${tokenResponse.status}`,
 			)
 		}
-	} catch {
+	} catch (error) {
 		results.errors.push(
 			`Token endpoint unreachable: ${error instanceof Error ? error.message : 'Unknown error'}`,
 		)
@@ -457,7 +457,7 @@ export async function testEndpointConnectivity(
 					`UserInfo endpoint returned unexpected status: ${userinfoResponse.status}`,
 				)
 			}
-		} catch {
+		} catch (error) {
 			results.userinfoEndpoint = false
 			results.errors.push(
 				`UserInfo endpoint unreachable: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -483,7 +483,7 @@ export async function testEndpointConnectivity(
 					`Revocation endpoint returned unexpected status: ${revocationResponse.status}`,
 				)
 			}
-		} catch {
+		} catch (error) {
 			results.revocationEndpoint = false
 			results.errors.push(
 				`Revocation endpoint unreachable: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -514,7 +514,7 @@ export function normalizeIssuerUrl(input: string): string {
 		new URL(url) // This will throw if invalid
 
 		return url
-	} catch {
+	} catch (error) {
 		throw new Error(`Invalid issuer URL format: ${input}`)
 	}
 }
@@ -526,7 +526,7 @@ function isValidUrl(urlString: string): boolean {
 	try {
 		const url = new URL(urlString)
 		return url.protocol === 'http:' || url.protocol === 'https:'
-	} catch {
+	} catch (error) {
 		return false
 	}
 }

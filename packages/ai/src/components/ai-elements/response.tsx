@@ -166,27 +166,27 @@ export type ResponseProps = HTMLAttributes<HTMLDivElement> & {
 }
 
 const components: Options['components'] = {
-	ol: ({ _node, children, className, ...props }) => (
+	ol: ({ children, className, ...props }: any) => (
 		<ol className={cn('ml-4 list-outside list-decimal', className)} {...props}>
 			{children}
 		</ol>
 	),
-	li: ({ _node, children, className, ...props }) => (
+	li: ({ children, className, ...props }: any) => (
 		<li className={cn('py-1', className)} {...props}>
 			{children}
 		</li>
 	),
-	ul: ({ _node, children, className, ...props }) => (
+	ul: ({ children, className, ...props }: any) => (
 		<ul className={cn('ml-4 list-outside list-decimal', className)} {...props}>
 			{children}
 		</ul>
 	),
-	strong: ({ _node, children, className, ...props }) => (
+	strong: ({ children, className, ...props }: any) => (
 		<span className={cn('font-semibold', className)} {...props}>
 			{children}
 		</span>
 	),
-	a: ({ _node, children, className, ...props }) => (
+	a: ({ children, className, ...props }: any) => (
 		<a
 			className={cn('text-primary font-medium underline', className)}
 			rel="noreferrer"
@@ -196,7 +196,7 @@ const components: Options['components'] = {
 			{children}
 		</a>
 	),
-	h1: ({ _node, children, className, ...props }) => (
+	h1: ({ children, className, ...props }: any) => (
 		<h1
 			className={cn('mt-6 mb-2 text-3xl font-semibold', className)}
 			{...props}
@@ -204,7 +204,7 @@ const components: Options['components'] = {
 			{children}
 		</h1>
 	),
-	h2: ({ _node, children, className, ...props }) => (
+	h2: ({ children, className, ...props }: any) => (
 		<h2
 			className={cn('mt-6 mb-2 text-2xl font-semibold', className)}
 			{...props}
@@ -212,17 +212,17 @@ const components: Options['components'] = {
 			{children}
 		</h2>
 	),
-	h3: ({ _node, children, className, ...props }) => (
+	h3: ({ children, className, ...props }: any) => (
 		<h3 className={cn('mt-6 mb-2 text-xl font-semibold', className)} {...props}>
 			{children}
 		</h3>
 	),
-	h4: ({ _node, children, className, ...props }) => (
+	h4: ({ children, className, ...props }: any) => (
 		<h4 className={cn('mt-6 mb-2 text-lg font-semibold', className)} {...props}>
 			{children}
 		</h4>
 	),
-	h5: ({ _node, children, className, ...props }) => (
+	h5: ({ children, className, ...props }: any) => (
 		<h5
 			className={cn('mt-6 mb-2 text-base font-semibold', className)}
 			{...props}
@@ -230,7 +230,7 @@ const components: Options['components'] = {
 			{children}
 		</h5>
 	),
-	h6: ({ _node, children, className, ...props }) => (
+	h6: ({ children, className, ...props }: any) => (
 		<h6 className={cn('mt-6 mb-2 text-sm font-semibold', className)} {...props}>
 			{children}
 		</h6>

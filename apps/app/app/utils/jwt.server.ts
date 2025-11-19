@@ -52,7 +52,7 @@ export function verifyAccessToken(token: string): JWTPayload | null {
 			audience: 'mobile-app',
 		}) as JWTPayload
 		return decoded
-	} catch {
+	} catch (error) {
 		return null
 	}
 }
@@ -229,7 +229,7 @@ export function requireAuth(request: Request): JWTPayload {
 export function optionalAuth(request: Request): JWTPayload | null {
 	try {
 		return requireAuth(request)
-	} catch {
+	} catch (error) {
 		return null
 	}
 }

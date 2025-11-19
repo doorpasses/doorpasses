@@ -243,15 +243,11 @@ export async function action({ request, params }: Route['ActionArgs']) {
 						{ providerName: configData.providerName },
 					)
 
-					return redirectWithToast(
-						`/organizations/${organizationId}/sso`,
-						{
-							type: 'success',
-							title: 'SSO Configuration Updated',
-							description:
-								'The SSO configuration has been successfully updated.',
-						},
-					)
+					return redirectWithToast(`/organizations/${organizationId}/sso`, {
+						type: 'success',
+						title: 'SSO Configuration Updated',
+						description: 'The SSO configuration has been successfully updated.',
+					})
 				} else {
 					// Create new configuration
 					await ssoConfigurationService.createConfiguration(
@@ -268,15 +264,11 @@ export async function action({ request, params }: Route['ActionArgs']) {
 						{ providerName: configData.providerName },
 					)
 
-					return redirectWithToast(
-						`/organizations/${organizationId}/sso`,
-						{
-							type: 'success',
-							title: 'SSO Configuration Created',
-							description:
-								'The SSO configuration has been successfully created.',
-						},
-					)
+					return redirectWithToast(`/organizations/${organizationId}/sso`, {
+						type: 'success',
+						title: 'SSO Configuration Created',
+						description: 'The SSO configuration has been successfully created.',
+					})
 				}
 			}
 
@@ -398,7 +390,7 @@ export async function action({ request, params }: Route['ActionArgs']) {
 					{ status: 400 },
 				)
 		}
-	} catch {
+	} catch (error) {
 		console.error('SSO configuration error:', error)
 		return Response.json(
 			{
@@ -434,7 +426,7 @@ export default function AdminOrganizationSSOPage() {
 
 			{/* SSO Configuration Overview */}
 			<SSOConfigurationOverview
-				organizationId={(organization as any).id}
+				_organizationId={(organization as any).id}
 				ssoConfig={ssoConfig}
 				ssoStats={ssoStats}
 				onEdit={() => {

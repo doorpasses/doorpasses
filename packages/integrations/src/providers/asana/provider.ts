@@ -228,7 +228,7 @@ export class AsanaProvider extends BaseIntegrationProvider {
 					workspaces,
 				},
 			}
-		} catch {
+		} catch (error) {
 			console.error('Error exchanging OAuth code for Asana token:', error)
 			throw new Error(
 				`Failed to exchange OAuth code: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -284,7 +284,7 @@ export class AsanaProvider extends BaseIntegrationProvider {
 				refreshToken: tokenData.refresh_token || refreshToken,
 				expiresAt,
 			}
-		} catch {
+		} catch (error) {
 			throw new Error(
 				`Failed to refresh token: ${error instanceof Error ? error.message : 'Unknown error'}`,
 			)
@@ -339,7 +339,7 @@ export class AsanaProvider extends BaseIntegrationProvider {
 							})
 						}
 					}
-				} catch {
+				} catch (error) {
 					console.warn(
 						`Failed to fetch projects for workspace ${workspace.name}:`,
 						error,
@@ -349,7 +349,7 @@ export class AsanaProvider extends BaseIntegrationProvider {
 			}
 
 			return channels.sort((a, b) => a.name.localeCompare(b.name))
-		} catch {
+		} catch (error) {
 			throw new Error(
 				`Failed to fetch Asana projects: ${error instanceof Error ? error.message : 'Unknown error'}`,
 			)
@@ -437,7 +437,7 @@ export class AsanaProvider extends BaseIntegrationProvider {
 					if (errorData.errors && errorData.errors.length > 0) {
 						errorMessage += ` - ${errorData.errors[0]?.message || 'Unknown error'}`
 					}
-				} catch {
+				} catch (error) {
 					// If we can't parse the error, use the raw text
 					errorMessage += ` - ${errorText}`
 				}
@@ -447,7 +447,7 @@ export class AsanaProvider extends BaseIntegrationProvider {
 			}
 
 			const _result = (await response.json()) as AsanaCreateTaskResponse
-		} catch {
+		} catch (error) {
 			throw new Error(
 				`Failed to create Asana task: ${error instanceof Error ? error.message : 'Unknown error'}`,
 			)
@@ -498,7 +498,7 @@ export class AsanaProvider extends BaseIntegrationProvider {
 
 			const _project = await response.json()
 			return true
-		} catch {
+		} catch (error) {
 			return false
 		}
 	}

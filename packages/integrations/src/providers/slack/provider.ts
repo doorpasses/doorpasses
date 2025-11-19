@@ -131,7 +131,7 @@ export class SlackProvider extends BaseIntegrationProvider {
 		// Parse and validate the OAuth state using the standardized format
 		try {
 			this.parseOAuthState(state)
-		} catch {
+		} catch (error) {
 			throw new Error(
 				`Invalid OAuth state: ${error instanceof Error ? error.message : 'Unknown error'}`,
 			)
@@ -191,7 +191,7 @@ export class SlackProvider extends BaseIntegrationProvider {
 					botUserId: data.bot_user_id,
 				},
 			}
-		} catch {
+		} catch (error) {
 			console.error('Error exchanging OAuth code for Slack token:', error)
 			throw new Error(
 				`Failed to exchange OAuth code: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -347,7 +347,7 @@ export class SlackProvider extends BaseIntegrationProvider {
 				)
 				.sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
 			return channels
-		} catch {
+		} catch (error) {
 			const errorMessage =
 				error instanceof Error ? error.message : 'Unknown error'
 			console.error('Error fetching Slack channels:', errorMessage)
@@ -505,7 +505,7 @@ export class SlackProvider extends BaseIntegrationProvider {
 			if (!data.ok) {
 				throw new Error(`Slack API error: ${data.error || 'Unknown error'}`)
 			}
-		} catch {
+		} catch (error) {
 			const errorMessage =
 				error instanceof Error ? error.message : 'Unknown error'
 
@@ -676,7 +676,7 @@ export class SlackProvider extends BaseIntegrationProvider {
 		try {
 			const parsedUrl = new URL(url)
 			return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:'
-		} catch {
+		} catch (error) {
 			return false
 		}
 	}

@@ -115,10 +115,24 @@ function sanitizeForSentry(obj: any): any {
 
 	// List of sensitive key patterns (case-insensitive)
 	const sensitivePatterns = [
-		'password', 'token', 'secret', 'key', 'apikey', 'api_key',
-		'accesstoken', 'refreshtoken', 'authorization', 'cookie',
-		'credential', 'privatekey', 'saml', 'assertion', 'ssn',
-		'creditcard', 'cardnumber', 'cvv'
+		'password',
+		'token',
+		'secret',
+		'key',
+		'apikey',
+		'api_key',
+		'accesstoken',
+		'refreshtoken',
+		'authorization',
+		'cookie',
+		'credential',
+		'privatekey',
+		'saml',
+		'assertion',
+		'ssn',
+		'creditcard',
+		'cardnumber',
+		'cvv',
 	]
 
 	function redactObject(data: any): any {
@@ -128,8 +142,8 @@ function sanitizeForSentry(obj: any): any {
 			const keyLower = key.toLowerCase()
 
 			// Check if key matches sensitive pattern
-			const isSensitive = sensitivePatterns.some(pattern =>
-				keyLower.includes(pattern)
+			const isSensitive = sensitivePatterns.some((pattern) =>
+				keyLower.includes(pattern),
 			)
 
 			if (isSensitive) {
@@ -160,7 +174,7 @@ function validateIpAddress(ip: string): string {
 	if (ipv4Match) {
 		// Verify each octet is 0-255
 		const octets = [ipv4Match[1]!, ipv4Match[2]!, ipv4Match[3]!, ipv4Match[4]!]
-		const valid = octets.every(octet => {
+		const valid = octets.every((octet) => {
 			const num = parseInt(octet, 10)
 			return num >= 0 && num <= 255
 		})
@@ -188,22 +202,37 @@ export function sanitizeUrl(url: string): string {
 	try {
 		const parsed = new URL(url)
 		const sensitiveParams = [
-			'token', 'access_token', 'accessToken', 'refresh_token', 'refreshToken',
-			'password', 'api_key', 'apikey', 'apiKey', 'key',
-			'session', 'sessionId', 'session_id',
-			'secret', 'code', 'authorization',
-			'reset_token', 'resetToken', 'verification_token',
-			'client_secret', 'clientSecret'
+			'token',
+			'access_token',
+			'accessToken',
+			'refresh_token',
+			'refreshToken',
+			'password',
+			'api_key',
+			'apikey',
+			'apiKey',
+			'key',
+			'session',
+			'sessionId',
+			'session_id',
+			'secret',
+			'code',
+			'authorization',
+			'reset_token',
+			'resetToken',
+			'verification_token',
+			'client_secret',
+			'clientSecret',
 		]
 
-		sensitiveParams.forEach(param => {
+		sensitiveParams.forEach((param) => {
 			if (parsed.searchParams.has(param)) {
 				parsed.searchParams.set(param, '[REDACTED]')
 			}
 		})
 
 		return parsed.toString()
-	} catch {
+	} catch (error) {
 		return '[INVALID_URL]'
 	}
 }
@@ -256,8 +285,11 @@ const createLogger = (): PinoLogger => {
 					},
 				},
 			})
-		} catch {
-			console.warn('pino-pretty not available, falling back to JSON logs:', error)
+		} catch (error) {
+			console.warn(
+				'pino-pretty not available, falling back to JSON logs:',
+				error,
+			)
 			return pino(baseConfig)
 		}
 	}
@@ -286,13 +318,10 @@ export const createSentryLogger = (baseLogger: PinoLogger = logger) => {
 
 			// Send warnings to Sentry with lower severity (sanitized)
 			if (typeof obj === 'object' && obj !== null) {
-				Sentry.captureMessage(
-					msg || obj.message || 'Warning logged',
-					{
-						level: 'warning',
-						extra: sanitizeForSentry(obj),
-					}
-				)
+				Sentry.captureMessage(msg || obj.message || 'Warning logged', {
+					level: 'warning',
+					extra: sanitizeForSentry(obj),
+				})
 			}
 		},
 
@@ -303,10 +332,14 @@ export const createSentryLogger = (baseLogger: PinoLogger = logger) => {
 			if (obj instanceof Error) {
 				Sentry.captureException(obj, {
 					extra: sanitizeForSentry(
-						typeof msg === 'string' ? { message: msg } : msg
+						typeof msg === 'string' ? { message: msg } : msg,
 					),
 				})
-			} else if (typeof obj === 'object' && obj !== null && obj.err instanceof Error) {
+			} else if (
+				typeof obj === 'object' &&
+				obj !== null &&
+				obj.err instanceof Error
+			) {
 				Sentry.captureException(obj.err, {
 					extra: sanitizeForSentry({ ...obj, message: msg }),
 				})
@@ -326,10 +359,14 @@ export const createSentryLogger = (baseLogger: PinoLogger = logger) => {
 				Sentry.captureException(obj, {
 					level: 'fatal',
 					extra: sanitizeForSentry(
-						typeof msg === 'string' ? { message: msg } : msg
+						typeof msg === 'string' ? { message: msg } : msg,
 					),
 				})
-			} else if (typeof obj === 'object' && obj !== null && obj.err instanceof Error) {
+			} else if (
+				typeof obj === 'object' &&
+				obj !== null &&
+				obj.err instanceof Error
+			) {
 				Sentry.captureException(obj.err, {
 					level: 'fatal',
 					extra: sanitizeForSentry({ ...obj, message: msg }),
@@ -380,11 +417,13 @@ export function sanitizeIpAddress(ip: string): string {
 	if (ipv4Match) {
 		// Verify valid octets
 		const octets = [ipv4Match[1]!, ipv4Match[2]!, ipv4Match[3]!]
-		const valid = octets.every(octet => {
+		const valid = octets.every((octet) => {
 			const num = parseInt(octet, 10)
 			return num >= 0 && num <= 255
 		})
-		return valid ? `${ipv4Match[1]}.${ipv4Match[2]}.${ipv4Match[3]}.xxx` : 'unknown'
+		return valid
+			? `${ipv4Match[1]}.${ipv4Match[2]}.${ipv4Match[3]}.xxx`
+			: 'unknown'
 	}
 
 	// IPv6: keep first 48 bits (first 3 groups), mask the rest

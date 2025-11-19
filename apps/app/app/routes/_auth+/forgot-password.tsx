@@ -5,13 +5,7 @@ import { Trans, t } from '@lingui/macro'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { brand, getPageTitle } from '@repo/config/brand'
 import { ForgotPasswordEmail } from '@repo/email'
-import {
-	data,
-	redirect,
-	Link,
-	Form,
-	useActionData,
-} from 'react-router'
+import { data, redirect, Link, Form, useActionData } from 'react-router'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
@@ -19,7 +13,14 @@ import {
 	ErrorList,
 	convertErrorsToFieldFormat,
 } from '#app/components/forms.tsx'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@repo/ui/card'
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from '@repo/ui/card'
 import { Input } from '@repo/ui/input'
 import { StatusButton } from '@repo/ui/status-button'
 import { Field, FieldLabel, FieldError, FieldGroup } from '@repo/ui/field'
@@ -97,7 +98,7 @@ export async function action({ request }: Route.ActionArgs) {
 				// Return early with error response
 				return data({ result: null }, { status: 400, statusText: errorMessage })
 			}
-		} catch {
+		} catch (error) {
 			// If Arcjet fails, log error but continue with forgot password process
 			console.error('Arcjet protection failed:', error)
 		}
@@ -182,7 +183,9 @@ export default function ForgotPasswordRoute() {
 	return (
 		<Card className="bg-muted/80 border-0 shadow-2xl">
 			<CardHeader>
-				<CardTitle className="text-xl"><Trans>Forgot Password</Trans></CardTitle>
+				<CardTitle className="text-xl">
+					<Trans>Forgot Password</Trans>
+				</CardTitle>
 				<CardDescription>
 					<Trans>No worries, we'll send you reset instructions.</Trans>
 				</CardDescription>

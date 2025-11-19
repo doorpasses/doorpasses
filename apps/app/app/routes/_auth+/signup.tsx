@@ -13,7 +13,14 @@ import {
 	ErrorList,
 	convertErrorsToFieldFormat,
 } from '#app/components/forms.tsx'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@repo/ui/card'
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from '@repo/ui/card'
 import { Input } from '@repo/ui/input'
 import { StatusButton } from '@repo/ui/status-button'
 import { Field, FieldLabel, FieldError, FieldGroup } from '@repo/ui/field'
@@ -128,7 +135,7 @@ export async function action(args: Route.ActionArgs) {
 						})
 						return
 					}
-				} catch {
+				} catch (error) {
 					// If Arcjet fails, log error but continue with signup process
 					console.error('Arcjet protection failed:', error)
 				}
@@ -198,12 +205,18 @@ export default function SignupRoute({
 		<Card className="bg-muted/80 border-0 shadow-2xl">
 			<CardHeader>
 				<CardTitle className="text-xl">
-					{inviteToken ? <Trans>Join organization</Trans> : <Trans>Create an account</Trans>}
+					{inviteToken ? (
+						<Trans>Join organization</Trans>
+					) : (
+						<Trans>Create an account</Trans>
+					)}
 				</CardTitle>
 				<CardDescription>
-					{inviteToken
-						? <Trans>Complete your signup to join the organization</Trans>
-						: <Trans>Sign up with your social account or email</Trans>}
+					{inviteToken ? (
+						<Trans>Complete your signup to join the organization</Trans>
+					) : (
+						<Trans>Sign up with your social account or email</Trans>
+					)}
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -234,7 +247,9 @@ export default function SignupRoute({
 							<Field
 								data-invalid={fields.email.errors?.length ? true : undefined}
 							>
-								<FieldLabel htmlFor={fields.email.id}><Trans>Email</Trans></FieldLabel>
+								<FieldLabel htmlFor={fields.email.id}>
+									<Trans>Email</Trans>
+								</FieldLabel>
 								<Input
 									{...getInputProps(fields.email, { type: 'email' })}
 									autoFocus

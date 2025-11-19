@@ -232,7 +232,7 @@ export async function testS3Connection(
 				const { url: deleteUrl, headers: deleteHeaders } =
 					getSignedDeleteRequestInfo(testKey, config)
 				await fetch(deleteUrl, { method: 'DELETE', headers: deleteHeaders })
-			} catch {
+			} catch (error) {
 				// Ignore delete errors - test file will remain in bucket
 			}
 
@@ -247,7 +247,7 @@ export async function testS3Connection(
 				message: `Failed to upload test file: ${response.status} ${response.statusText}`,
 			}
 		}
-	} catch {
+	} catch (error) {
 		return {
 			success: false,
 			message: `Connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -271,7 +271,11 @@ export function createStorageClient(defaultConfig: StorageConfig) {
 			},
 		): Promise<StorageConfig> {
 			// If organization ID is provided and config retrieval function exists
-			if (organizationId && options?.getOrganizationConfig && options?.decrypt) {
+			if (
+				organizationId &&
+				options?.getOrganizationConfig &&
+				options?.decrypt
+			) {
 				const s3Config = await options.getOrganizationConfig(organizationId)
 
 				// If organization has S3 enabled, use custom config

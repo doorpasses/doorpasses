@@ -279,7 +279,7 @@ export class JiraProvider extends BaseIntegrationProvider {
 					resources,
 				},
 			}
-		} catch {
+		} catch (error) {
 			console.error('Jira OAuth callback error:', error)
 			throw new Error(
 				`Failed to complete Jira OAuth: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -333,7 +333,7 @@ export class JiraProvider extends BaseIntegrationProvider {
 				expiresAt,
 				scope: tokenData.scope,
 			}
-		} catch {
+		} catch (error) {
 			console.error('Jira token refresh error:', error)
 			throw new Error(
 				`Failed to refresh Jira token: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -400,7 +400,7 @@ export class JiraProvider extends BaseIntegrationProvider {
 					avatarUrls: project.avatarUrls,
 				},
 			}))
-		} catch {
+		} catch (error) {
 			console.error('Error fetching Jira projects:', error)
 			throw new Error(
 				`Failed to fetch Jira projects: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -538,7 +538,7 @@ export class JiraProvider extends BaseIntegrationProvider {
 				}
 
 				return { valid: true }
-			} catch {
+			} catch (error) {
 				return {
 					valid: false,
 					reason: `Validation error: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -583,7 +583,7 @@ export class JiraProvider extends BaseIntegrationProvider {
 				connection.integration,
 				(accessToken) => this.createIssue(accessToken, issueData),
 			)
-		} catch {
+		} catch (error) {
 			console.error('Error posting message to Jira:', error)
 			throw new Error(
 				`Failed to create Jira issue: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -612,7 +612,7 @@ export class JiraProvider extends BaseIntegrationProvider {
 				(accessToken) => this.getProject(accessToken, projectKey),
 			)
 			return true
-		} catch {
+		} catch (error) {
 			console.error('Jira connection validation failed:', error)
 			return false
 		}
@@ -684,7 +684,7 @@ export class JiraProvider extends BaseIntegrationProvider {
 			const { decryptToken } = await import('../../encryption')
 			const accessToken = await decryptToken(integration.accessToken!)
 			return await apiCall(accessToken)
-		} catch {
+		} catch (error) {
 			// Check if it's an authorization error
 			if (error instanceof Error && error.message.includes('Unauthorized')) {
 				try {
@@ -991,7 +991,7 @@ export class JiraProvider extends BaseIntegrationProvider {
 				// Fallback to the first available issue type
 				issueType = availableIssueTypes[0]?.name || 'Task'
 			}
-		} catch {
+		} catch (error) {
 			issueType = 'Task' // Final fallback
 		}
 
@@ -1011,7 +1011,10 @@ export class JiraProvider extends BaseIntegrationProvider {
 		}
 
 		// Get the reporter account ID (bot user or connected user)
-		const _reporterAccountId = this.getReporterAccountId(integration, connection)
+		const _reporterAccountId = this.getReporterAccountId(
+			integration,
+			connection,
+		)
 
 		return {
 			fields: {

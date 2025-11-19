@@ -202,7 +202,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			},
 			payload: {},
 		})
-	} catch {
+	} catch (error) {
 		// Error triggering workflow
 	}
 
@@ -284,7 +284,9 @@ export default function OrganizationDashboard() {
 		<div className="py-8 md:p-8">
 			<PageTitle
 				title={_(t`Welcome ${user?.name || 'User'}!`)}
-				description={_(t`Welcome to your organization dashboard. Here you can manage your organization's settings and view analytics.`)}
+				description={_(
+					t`Welcome to your organization dashboard. Here you can manage your organization's settings and view analytics.`,
+				)}
 			/>
 
 			<Form method="post">

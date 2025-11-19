@@ -39,7 +39,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 		return redirectWithToast('/waitlist', {
 			type: 'error',
 			title: 'Discord Verification Failed',
-			description: 'There was an error connecting to Discord. Please try again.',
+			description:
+				'There was an error connecting to Discord. Please try again.',
 		})
 	}
 
@@ -53,8 +54,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 			return redirectWithToast('/waitlist', {
 				type: 'error',
 				title: 'Discord Not Configured',
-				description:
-					'Discord OAuth is not configured. Please contact support.',
+				description: 'Discord OAuth is not configured. Please contact support.',
 			})
 		}
 
@@ -138,7 +138,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 			title: 'Discord Verified!',
 			description: 'You have earned 2 points for joining our Discord server!',
 		})
-	} catch {
+	} catch (error) {
 		console.error('Discord verification error:', error)
 		return redirectWithToast('/waitlist', {
 			type: 'error',

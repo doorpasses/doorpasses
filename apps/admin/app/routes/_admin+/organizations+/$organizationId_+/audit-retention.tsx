@@ -1,12 +1,28 @@
 import { useLoaderData, Form, useNavigation } from 'react-router'
 import { Button } from '@repo/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/ui/card'
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from '@repo/ui/card'
 import { Icon } from '@repo/ui/icon'
 import { Input } from '@repo/ui/input'
 import { Label } from '@repo/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/select'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@repo/ui/select'
 import { Badge } from '@repo/ui/badge'
-import { auditService, AuditAction, AuditService } from '#app/utils/audit.server.ts'
+import {
+	auditService,
+	AuditAction,
+	AuditService,
+} from '#app/utils/audit.server.ts'
 import { requireUserWithRole } from '#app/utils/permissions.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
 import { redirectWithToast } from '#app/utils/toast.server.ts'
@@ -114,7 +130,8 @@ export async function action({
 			`/organizations/${params.organizationId}/audit-retention`,
 			{
 				title: 'Retention Policy Updated',
-				description: 'Audit log retention policy has been updated successfully.',
+				description:
+					'Audit log retention policy has been updated successfully.',
 				type: 'success',
 			},
 		)
@@ -124,7 +141,7 @@ export async function action({
 		const presetType = formData.get('presetType') as string
 		const presets = AuditService.getCompliancePresets()
 
-		const preset = presets[presetType]
+		const preset = presets[presetType as keyof typeof presets]
 		if (!preset) {
 			return Response.json({ error: 'Invalid preset type' }, { status: 400 })
 		}
@@ -217,9 +234,7 @@ export default function AuditRetentionPage() {
 
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">
-							Archived Logs
-						</CardTitle>
+						<CardTitle className="text-sm font-medium">Archived Logs</CardTitle>
 						<Icon name="folder" className="text-muted-foreground h-4 w-4" />
 					</CardHeader>
 					<CardContent>
@@ -234,9 +249,7 @@ export default function AuditRetentionPage() {
 
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">
-							Oldest Log
-						</CardTitle>
+						<CardTitle className="text-sm font-medium">Oldest Log</CardTitle>
 						<Icon name="clock" className="text-muted-foreground h-4 w-4" />
 					</CardHeader>
 					<CardContent>
@@ -259,42 +272,45 @@ export default function AuditRetentionPage() {
 				</CardHeader>
 				<CardContent>
 					<div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-						{Object.entries(compliancePresets).map(([key, preset]: [string, any]) => (
-							<Form method="post" key={key}>
-								<input type="hidden" name="intent" value="apply-preset" />
-								<input type="hidden" name="presetType" value={key} />
-								<Card className="relative">
-									<CardHeader>
-										<CardTitle className="flex items-center justify-between text-base">
-											{key.replace(/_/g, ' ')}
-											{retentionPolicy.complianceType === preset.complianceType && (
-												<Badge variant="default">Active</Badge>
-											)}
-										</CardTitle>
-									</CardHeader>
-									<CardContent className="space-y-2">
-										<div className="text-sm">
-											<p className="text-muted-foreground">
-												Retention: {preset.retentionDays} days (
-												{Math.floor(preset.retentionDays / 365)} years)
-											</p>
-											<p className="text-muted-foreground">
-												Hot storage: {preset.hotStorageDays} days
-											</p>
-										</div>
-										<Button
-											type="submit"
-											variant="outline"
-											size="sm"
-											className="w-full"
-											disabled={isSubmitting}
-										>
-											Apply Preset
-										</Button>
-									</CardContent>
-								</Card>
-							</Form>
-						))}
+						{Object.entries(compliancePresets).map(
+							([key, preset]: [string, any]) => (
+								<Form method="post" key={key}>
+									<input type="hidden" name="intent" value="apply-preset" />
+									<input type="hidden" name="presetType" value={key} />
+									<Card className="relative">
+										<CardHeader>
+											<CardTitle className="flex items-center justify-between text-base">
+												{key.replace(/_/g, ' ')}
+												{retentionPolicy.complianceType ===
+													preset.complianceType && (
+													<Badge variant="default">Active</Badge>
+												)}
+											</CardTitle>
+										</CardHeader>
+										<CardContent className="space-y-2">
+											<div className="text-sm">
+												<p className="text-muted-foreground">
+													Retention: {preset.retentionDays} days (
+													{Math.floor(preset.retentionDays / 365)} years)
+												</p>
+												<p className="text-muted-foreground">
+													Hot storage: {preset.hotStorageDays} days
+												</p>
+											</div>
+											<Button
+												type="submit"
+												variant="outline"
+												size="sm"
+												className="w-full"
+												disabled={isSubmitting}
+											>
+												Apply Preset
+											</Button>
+										</CardContent>
+									</Card>
+								</Form>
+							),
+						)}
 					</div>
 				</CardContent>
 			</Card>
@@ -313,9 +329,7 @@ export default function AuditRetentionPage() {
 
 						<div className="grid gap-6 md:grid-cols-2">
 							<div className="space-y-2">
-								<Label htmlFor="retentionDays">
-									Retention Period (days)
-								</Label>
+								<Label htmlFor="retentionDays">Retention Period (days)</Label>
 								<Input
 									id="retentionDays"
 									name="retentionDays"
@@ -423,9 +437,7 @@ export default function AuditRetentionPage() {
 			<Card>
 				<CardHeader>
 					<CardTitle>Manual Actions</CardTitle>
-					<CardDescription>
-						Run maintenance tasks on audit logs
-					</CardDescription>
+					<CardDescription>Run maintenance tasks on audit logs</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<Form method="post">

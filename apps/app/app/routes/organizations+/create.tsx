@@ -19,9 +19,18 @@ import {
 } from 'react-router'
 import { z } from 'zod'
 import { Trans } from '@lingui/macro'
-import { ErrorList, convertErrorsToFieldFormat } from '#app/components/forms.tsx'
+import {
+	ErrorList,
+	convertErrorsToFieldFormat,
+} from '#app/components/forms.tsx'
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/select'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@repo/ui/select'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
@@ -30,9 +39,7 @@ import {
 	createOrganizationInvitation,
 	sendOrganizationInvitationEmail,
 } from '#app/utils/organization-invitation.server.ts'
-import {
-	createOrganization,
-} from '#app/utils/organizations.server.ts'
+import { createOrganization } from '#app/utils/organizations.server.ts'
 import { uploadOrganizationImage } from '#app/utils/storage.server.ts'
 import {
 	getTrialConfig,
@@ -43,7 +50,13 @@ import { shouldBeOnWaitlist } from '#app/utils/waitlist.server.ts'
 import { Button } from '@repo/ui/button'
 import { Input } from '@repo/ui/input'
 import { Textarea } from '@repo/ui/textarea'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/ui/card'
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from '@repo/ui/card'
 import { Icon } from '@repo/ui/icon'
 import { Field, FieldLabel, FieldError, FieldGroup } from '@repo/ui/field'
 import { Badge } from '@repo/ui/badge'
@@ -157,7 +170,7 @@ export async function loader({ request }: { request: Request }) {
 	if (shouldShowPricing) {
 		try {
 			plansAndPrices = await getPlansAndPrices()
-		} catch {
+		} catch (error) {
 			console.error('Failed to fetch plans and prices:', error)
 		}
 	}
@@ -222,7 +235,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			return redirect(
 				`/organizations/create?step=${nextStep}&orgId=${organization.id}`,
 			)
-		} catch {
+		} catch (error) {
 			console.error('Failed to create organization', error)
 			return submission.reply({
 				formErrors: ['Failed to create organization'],
@@ -273,7 +286,7 @@ export async function action({ request }: ActionFunctionArgs) {
 						})
 					}),
 				)
-			} catch {
+			} catch (error) {
 				console.error('Error sending invitations:', error)
 				return Response.json(
 					{
@@ -326,7 +339,7 @@ export async function action({ request }: ActionFunctionArgs) {
 				from: 'checkout',
 				isCreationFlow: true,
 			})
-		} catch {
+		} catch (error) {
 			console.error('Failed to create checkout session', error)
 			return submission.reply({
 				formErrors: ['Failed to create subscription'],
@@ -369,7 +382,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			})
 
 			return redirect(`/${organization?.slug}?celebrate=true`)
-		} catch {
+		} catch (error) {
 			console.error('Failed to complete setup', error)
 			return submission.reply({
 				formErrors: ['Failed to complete setup'],
@@ -932,8 +945,7 @@ function Step4({ orgId, actionData }: { orgId: string; actionData: any }) {
 				</CardTitle>
 				<CardDescription>
 					<Trans>
-						This helps us customize your experience and provide better
-						insights.
+						This helps us customize your experience and provide better insights.
 					</Trans>
 				</CardDescription>
 			</CardHeader>

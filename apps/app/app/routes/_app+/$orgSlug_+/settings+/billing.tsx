@@ -50,8 +50,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	}
 
 	// Fetch plans (will be null if in beta and no active subscription)
-	const shouldFetchPlans =
-		launchStatus === 'LAUNCHED' || hasActiveSubscription
+	const shouldFetchPlans = launchStatus === 'LAUNCHED' || hasActiveSubscription
 	const plansAndPrices = shouldFetchPlans ? await getPlansAndPrices() : null
 	const invoices = await getOrganizationInvoices(organization)
 
@@ -64,7 +63,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 				organization.stripeSubscriptionId,
 			)
 			currentPriceId = subscription.items.data[0]?.price.id || null
-		} catch {
+		} catch (error) {
 			console.error('Error fetching current subscription:', error)
 		}
 	}
@@ -146,12 +145,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function BillingSettings() {
-	const {
-		organization,
-		plansAndPrices,
-		invoices,
-		currentPriceId,
-	} = useLoaderData<typeof loader>()
+	const { organization, plansAndPrices, invoices, currentPriceId } =
+		useLoaderData<typeof loader>()
 
 	return (
 		<AnnotatedLayout>

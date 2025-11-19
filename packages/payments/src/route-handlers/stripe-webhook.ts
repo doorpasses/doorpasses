@@ -1,4 +1,4 @@
-import  { type ActionFunctionArgs } from 'react-router'
+import { type ActionFunctionArgs } from 'react-router'
 import type Stripe from 'stripe'
 
 export interface StripeWebhookDependencies {
@@ -54,7 +54,7 @@ export async function handleStripeWebhook(
 			signature,
 			deps.webhookSecret,
 		)
-	} catch {
+	} catch (error) {
 		console.error('Webhook signature verification failed:', error)
 		return new Response('Invalid signature', { status: 400 })
 	}
@@ -142,7 +142,7 @@ export async function handleStripeWebhook(
 		}
 
 		return new Response('Webhook processed successfully', { status: 200 })
-	} catch {
+	} catch (error) {
 		console.error(`Error processing webhook ${event.type}:`, error)
 		return new Response('Webhook processing failed', { status: 500 })
 	}

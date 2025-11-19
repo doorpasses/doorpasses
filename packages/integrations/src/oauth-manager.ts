@@ -99,7 +99,7 @@ export class OAuthStateManager {
 		try {
 			const decoded = Buffer.from(statePayload, 'base64').toString()
 			stateData = JSON.parse(decoded) as OAuthState
-		} catch {
+		} catch (error) {
 			throw new Error(`Invalid state: failed to parse data: ${error}`)
 		}
 
@@ -243,7 +243,7 @@ export class TokenRefreshManager {
 			}
 
 			return tokenData
-		} catch {
+		} catch (error) {
 			const errorMessage =
 				error instanceof Error ? error.message : 'Unknown error'
 

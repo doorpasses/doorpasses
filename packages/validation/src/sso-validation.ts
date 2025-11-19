@@ -18,7 +18,7 @@ export const UrlSchema = z
 				parsed.protocol === 'https:' ||
 				(process.env.NODE_ENV === 'development' && parsed.protocol === 'http:')
 			)
-		} catch {
+		} catch (error) {
 			return false
 		}
 	}, 'URL must use HTTPS (or HTTP in development)')
@@ -93,7 +93,7 @@ export const AttributeMappingSchema = z
 				return false
 			}
 			return true
-		} catch {
+		} catch (error) {
 			return false
 		}
 	}, 'Invalid attribute mapping JSON format')
@@ -111,7 +111,7 @@ export const AttributeMappingSchema = z
 				}
 			}
 			return JSON.stringify(sanitized)
-		} catch {
+		} catch (error) {
 			return null
 		}
 	})
@@ -210,7 +210,12 @@ export function validateSSOConfigurationUpdate(
 // Security validation helpers
 export function sanitizeSSOConfigInput(input: any): any {
 	// Remove any potentially dangerous fields
-	const { __proto__, constructor: _constructor, prototype: _prototype, ...sanitized } = input || {}
+	const {
+		__proto__,
+		constructor: _constructor,
+		prototype: _prototype,
+		...sanitized
+	} = input || {}
 
 	// Sanitize string fields
 	if (sanitized.providerName && typeof sanitized.providerName === 'string') {
@@ -258,7 +263,7 @@ export function sanitizeSSOConfigInput(input: any): any {
 			} else {
 				sanitized.attributeMapping = null
 			}
-		} catch {
+		} catch (error) {
 			sanitized.attributeMapping = null
 		}
 	}

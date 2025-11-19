@@ -107,10 +107,7 @@ export async function sendNewDeviceSigninEmail({
 	})
 
 	if (!user) {
-		logger.error(
-			{ userId },
-			'User not found for new device signin email',
-		)
+		logger.error({ userId }, 'User not found for new device signin email')
 		return
 	}
 
@@ -151,11 +148,8 @@ export async function sendNewDeviceSigninEmail({
 			{ email: user.email, device: deviceInfo.deviceName },
 			'New device sign-in email sent',
 		)
-	} catch {
-		logger.error(
-			{ error },
-			'Failed to send new device sign-in email',
-		)
+	} catch (error) {
+		logger.error({ error }, 'Failed to send new device sign-in email')
 		// Don't throw - we don't want to block login if email fails
 	}
 }
@@ -208,23 +202,22 @@ export async function handleNewDeviceSignin({
 				'New device sign-in detected',
 			)
 		}
-	} catch {
+	} catch (error) {
 		// Log error but don't throw - we don't want to block login
-		logger.error(
-			{ error },
-			'Error handling new device sign-in',
-		)
+		logger.error({ error }, 'Error handling new device sign-in')
 	}
 }
 
 /**
  * Format location string from IP address data
  */
-function formatLocation(ipRecord: {
-	city: string | null
-	region: string | null
-	country: string | null
-} | null): string | undefined {
+function formatLocation(
+	ipRecord: {
+		city: string | null
+		region: string | null
+		country: string | null
+	} | null,
+): string | undefined {
 	if (!ipRecord) return undefined
 
 	const parts = [ipRecord.city, ipRecord.region, ipRecord.country].filter(

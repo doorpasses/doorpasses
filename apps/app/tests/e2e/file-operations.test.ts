@@ -1,6 +1,4 @@
-import {
-	createTestOrganization,
-} from '#tests/test-utils.ts'
+import { createTestOrganization } from '#tests/test-utils.ts'
 // Removed prisma import - using test utilities instead
 import { expect, test } from '#tests/playwright-utils.ts'
 import path from 'path'
@@ -42,7 +40,11 @@ test.describe('File Operations', () => {
 		}
 	})
 
-	test('Users can upload organization logos', async ({ page, login, navigate }) => {
+	test('Users can upload organization logos', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user
@@ -81,7 +83,11 @@ test.describe('File Operations', () => {
 		}
 	})
 
-	test('Users can upload images to notes', async ({ page, login, navigate }) => {
+	test('Users can upload images to notes', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user
@@ -165,7 +171,11 @@ test.describe('File Operations', () => {
 		}
 	})
 
-	test('File upload validates file types', async ({ page, login, navigate }) => {
+	test('File upload validates file types', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		await login()
 
 		// Navigate to profile settings
@@ -219,7 +229,7 @@ test.describe('File Operations', () => {
 				// Verify error message for file too large
 				await expect(page.getByText(/file too large/i)).toBeVisible() // Fixed .first() syntax - using conditional logic instead
 				// expect(page.getByText(/maximum file size/i)).toBeVisible())
-			} catch {
+			} catch (error) {
 				// File might not exist in fixtures, skip this test
 				console.log(
 					'Large test file not found, skipping file size validation test',
@@ -228,7 +238,11 @@ test.describe('File Operations', () => {
 		}
 	})
 
-	test('Users can remove uploaded images', async ({ page, login, navigate }) => {
+	test('Users can remove uploaded images', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		await login()
 
 		// Navigate to profile settings
@@ -257,7 +271,11 @@ test.describe('File Operations', () => {
 		}
 	})
 
-	test('File upload shows progress indicator', async ({ page, login, navigate }) => {
+	test('File upload shows progress indicator', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		await login()
 
 		// Navigate to profile settings
@@ -287,7 +305,11 @@ test.describe('File Operations', () => {
 		}
 	})
 
-	test('Users can preview images before upload', async ({ page, login, navigate }) => {
+	test('Users can preview images before upload', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user
@@ -359,7 +381,11 @@ test.describe('File Operations', () => {
 		}
 	})
 
-	test('Users can bulk download organization data', async ({ page, login, navigate }) => {
+	test('Users can bulk download organization data', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user

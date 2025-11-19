@@ -146,7 +146,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 						organizations: orgs,
 						currentOrganization: defaultOrg || orgs[0],
 					}
-				} catch {
+				} catch (error) {
 					console.error('Failed to load user organizations', error)
 					return undefined
 				}
@@ -284,8 +284,7 @@ function AppWithProviders() {
 
 	// Only load NovuProvider if user is logged in and has an organization
 	const shouldLoadNovu =
-		data.user &&
-		data.userOrganizations?.currentOrganization?.organization?.id
+		data.user && data.userOrganizations?.currentOrganization?.organization?.id
 
 	return (
 		<HoneypotProvider {...data.honeyProps}>

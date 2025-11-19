@@ -120,7 +120,7 @@ export function parseDeepLink(url: string): {
 			pathname: parsed.path || undefined,
 			params: (parsed.queryParams as Record<string, string>) || undefined,
 		}
-	} catch {
+	} catch (error) {
 		console.error('Failed to parse deep link:', error)
 		return {}
 	}
@@ -207,7 +207,7 @@ export function handleDeepLink(url: string): boolean {
 		}
 
 		return false
-	} catch {
+	} catch (error) {
 		console.error('Failed to handle deep link:', error)
 		return false
 	}

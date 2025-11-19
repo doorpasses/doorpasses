@@ -44,7 +44,7 @@ interface CommentItemProps {
 
 export function CommentItem({
 	comment,
-	noteId: _noteId,
+	noteId,
 	currentUserId,
 	users,
 	depth = 0,

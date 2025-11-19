@@ -57,10 +57,7 @@ export class IntegrationEncryptionService {
 		const key = getEncryptionKey(ENCRYPTION_KEY_ENV)
 
 		// Encrypt access token
-		const encryptedAccessToken = await encryptAsync(
-			tokenData.accessToken,
-			key,
-		)
+		const encryptedAccessToken = await encryptAsync(tokenData.accessToken, key)
 
 		// Encrypt refresh token if present
 		let encryptedRefreshToken: string | undefined
@@ -94,7 +91,10 @@ export class IntegrationEncryptionService {
 		// Decrypt refresh token if present
 		let refreshToken: string | undefined
 		if (encryptedData.encryptedRefreshToken) {
-			refreshToken = await decryptAsync(encryptedData.encryptedRefreshToken, key)
+			refreshToken = await decryptAsync(
+				encryptedData.encryptedRefreshToken,
+				key,
+			)
 		}
 
 		return {
@@ -183,7 +183,7 @@ export class IntegrationEncryptionService {
 				organizationId: stateData.organizationId,
 				providerName: stateData.providerName,
 			}
-		} catch {
+		} catch (error) {
 			throw new Error('Invalid or expired OAuth state')
 		}
 	}

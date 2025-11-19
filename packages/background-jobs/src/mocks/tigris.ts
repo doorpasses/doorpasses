@@ -86,7 +86,7 @@ export const handlers = [
 						'Cache-Control': 'public, max-age=31536000, immutable',
 					},
 				})
-			} catch {
+			} catch (error) {
 				return new HttpResponse('Not found', { status: 404 })
 			}
 		},

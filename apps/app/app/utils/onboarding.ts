@@ -84,7 +84,7 @@ export async function getOnboardingProgress(
 				isCompleted: false,
 			},
 		})
-	} catch {
+	} catch (error) {
 		console.error('Error upserting onboarding progress:', error)
 		// Return safe default if foreign key constraint fails - show onboarding if steps exist
 		return {
@@ -222,7 +222,7 @@ export async function markStepCompleted(
 				completedAt: isCompleted ? new Date() : null,
 			},
 		})
-	} catch {
+	} catch (error) {
 		// Log the error but don't throw it to prevent breaking the main flow
 		console.error('Error marking onboarding step as completed:', error)
 		// If it's a unique constraint error, it means the record already exists, which is fine
@@ -317,11 +317,11 @@ export async function autoDetectCompletedSteps(
 						})
 					}
 				}
-			} catch {
+			} catch (error) {
 				console.error(`Error auto-detecting step ${step.key}:`, error)
 			}
 		}
-	} catch {
+	} catch (error) {
 		console.error('Error in autoDetectCompletedSteps:', error)
 		// Fail silently to avoid breaking the app
 		return

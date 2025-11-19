@@ -122,7 +122,7 @@ export class SSOHealthChecker {
 					sessions: sessionCount,
 				},
 			}
-		} catch {
+		} catch (error) {
 			return {
 				status: 'fail',
 				message: `Database check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -191,7 +191,7 @@ export class SSOHealthChecker {
 					},
 				},
 			}
-		} catch {
+		} catch (error) {
 			return {
 				status: 'fail',
 				message: `Cache check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -243,7 +243,7 @@ export class SSOHealthChecker {
 					pools: poolStats,
 				},
 			}
-		} catch {
+		} catch (error) {
 			return {
 				status: 'fail',
 				message: `Connection pool check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -276,7 +276,7 @@ export class SSOHealthChecker {
 					} else {
 						invalidConfigs++
 					}
-				} catch {
+				} catch (error) {
 					invalidConfigs++
 				}
 			}
@@ -308,7 +308,7 @@ export class SSOHealthChecker {
 					warnings: configsWithWarnings,
 				},
 			}
-		} catch {
+		} catch (error) {
 			return {
 				status: 'fail',
 				message: `Configuration check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -355,7 +355,7 @@ export class SSOHealthChecker {
 								? connectivityResult.errors.join(', ')
 								: undefined,
 						}
-					} catch {
+					} catch (error) {
 						return {
 							config: config.id,
 							status: 'fail',
@@ -405,7 +405,7 @@ export class SSOHealthChecker {
 					results,
 				},
 			}
-		} catch {
+		} catch (error) {
 			return {
 				status: 'fail',
 				message: `Identity provider check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -463,7 +463,7 @@ export class SSOHealthChecker {
 				cacheHitRate: Math.round(cacheHitRate * 100) / 100,
 				averageResponseTime: Math.round(averageResponseTime * 100) / 100,
 			}
-		} catch {
+		} catch (error) {
 			return {
 				totalConfigurations: 0,
 				enabledConfigurations: 0,
@@ -567,7 +567,7 @@ export class SSOHealthChecker {
 				issues,
 				lastValidated: new Date().toISOString(),
 			}
-		} catch {
+		} catch (error) {
 			return {
 				configurationId,
 				organizationId: 'unknown',
@@ -599,7 +599,7 @@ export class SSOHealthChecker {
 		} else {
 			try {
 				new URL(config.issuerUrl)
-			} catch {
+			} catch (error) {
 				issues.push({
 					type: 'error',
 					code: 'INVALID_ISSUER_URL',
@@ -690,7 +690,7 @@ export class SSOHealthChecker {
 						'Check identity provider configuration and network connectivity',
 				})
 			}
-		} catch {
+		} catch (error) {
 			issues.push({
 				type: 'error',
 				code: 'CONNECTION_ERROR',
@@ -735,7 +735,7 @@ export class SSOHealthChecker {
 						suggestion: 'Map at least one of name or username fields',
 					})
 				}
-			} catch {
+			} catch (error) {
 				issues.push({
 					type: 'error',
 					code: 'INVALID_ATTRIBUTE_MAPPING',

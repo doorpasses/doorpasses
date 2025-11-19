@@ -94,7 +94,7 @@ function NotificationItem({ notification }: { notification: Notification }) {
 			try {
 				// Implement read functionality here
 				await notification.read()
-			} catch {
+			} catch (error) {
 				console.error('Error marking notification as read:', error)
 			}
 		}
@@ -109,7 +109,7 @@ function NotificationItem({ notification }: { notification: Notification }) {
 			} else {
 				await notification.read()
 			}
-		} catch {
+		} catch (error) {
 			console.error('Error toggling read status:', error)
 		}
 	}
@@ -255,7 +255,7 @@ function EmptyState() {
 function useOptionalNovu() {
 	try {
 		return useNovu()
-	} catch {
+	} catch (error) {
 		return null
 	}
 }
@@ -263,7 +263,7 @@ function useOptionalNovu() {
 function useOptionalNotifications(filter?: { read?: boolean }) {
 	try {
 		return useNotifications(filter)
-	} catch {
+	} catch (error) {
 		return null
 	}
 }
@@ -310,7 +310,7 @@ function NotificationBellComponent() {
 		if (!readAll) return
 		try {
 			await readAll()
-		} catch {
+		} catch (error) {
 			console.error('Error marking all notifications as read:', error)
 		}
 	}

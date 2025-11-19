@@ -18,7 +18,7 @@ export async function action({ request }: Route.ActionArgs) {
 		// Check honeypot
 		try {
 			await checkHoneypot(formData)
-		} catch {
+		} catch (error) {
 			return data(
 				{
 					success: false,
@@ -81,7 +81,7 @@ export async function action({ request }: Route.ActionArgs) {
 				...(process.env.NODE_ENV === 'development' && { otp }),
 			},
 		})
-	} catch {
+	} catch (error) {
 		console.error('Signup action error:', error)
 		return data(
 			{

@@ -46,7 +46,7 @@ export function sanitizeUrl(input: string): string {
 
 		// Return normalized URL
 		return url.toString()
-	} catch {
+	} catch (error) {
 		throw new Error(
 			`Invalid URL: ${error instanceof Error ? error.message : 'Unknown error'}`,
 		)
@@ -147,7 +147,7 @@ export function sanitizeJsonInput(input: string): string | null {
 		return Object.keys(limitedMappings).length > 0
 			? JSON.stringify(limitedMappings)
 			: null
-	} catch {
+	} catch (error) {
 		throw new Error(
 			`Invalid JSON: ${error instanceof Error ? error.message : 'Parse error'}`,
 		)
@@ -197,7 +197,7 @@ export function sanitizeRedirectUrl(input: string): string | null {
 		}
 
 		return decoded.substring(0, 200) // Limit length
-	} catch {
+	} catch (error) {
 		return null
 	}
 }
@@ -342,7 +342,7 @@ export function sanitizeOIDCUserInfo(userInfo: any): any {
 	if (userInfo.picture) {
 		try {
 			sanitized.picture = sanitizeUrl(String(userInfo.picture))
-		} catch {
+		} catch (error) {
 			// Ignore invalid picture URLs
 		}
 	}

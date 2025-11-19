@@ -1,7 +1,13 @@
 import { useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@repo/ui/avatar'
 import { Button } from '@repo/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/ui/card'
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from '@repo/ui/card'
 import { Input } from '@repo/ui/input'
 import { Label } from '@repo/ui/label'
 import { toast } from 'sonner'
@@ -54,7 +60,7 @@ export function JiraBotUserSearch({
 
 			const userData = (await response.json()) as JiraUser
 			setCurrentUser(userData)
-		} catch {
+		} catch (error) {
 			console.error('Error fetching current user:', error)
 			toast.error('Failed to fetch current user information')
 		}
@@ -83,7 +89,7 @@ export function JiraBotUserSearch({
 
 			const usersData = (await response.json()) as JiraUser[]
 			setUsers(usersData)
-		} catch {
+		} catch (error) {
 			console.error('Error searching users:', error)
 			toast.error('Failed to search for users')
 		} finally {

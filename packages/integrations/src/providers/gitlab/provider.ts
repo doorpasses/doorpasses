@@ -276,7 +276,7 @@ export class GitLabProvider extends BaseIntegrationProvider {
 					},
 				},
 			}
-		} catch {
+		} catch (error) {
 			throw new Error(
 				`GitLab OAuth callback failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
 			)
@@ -334,7 +334,7 @@ export class GitLabProvider extends BaseIntegrationProvider {
 				expiresAt,
 				scope: tokenData.scope,
 			}
-		} catch {
+		} catch (error) {
 			throw new Error(
 				`GitLab token refresh failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
 			)
@@ -432,7 +432,7 @@ export class GitLabProvider extends BaseIntegrationProvider {
 					return !!project
 				},
 			)
-		} catch {
+		} catch (error) {
 			console.error('GitLab connection validation failed:', error)
 			return false
 		}
@@ -510,7 +510,7 @@ export class GitLabProvider extends BaseIntegrationProvider {
 			const { decryptToken } = await import('../../encryption')
 			const accessToken = await decryptToken(integration.accessToken)
 			return await apiCall(accessToken)
-		} catch {
+		} catch (error) {
 			// If token is expired, try to refresh it
 			if (error instanceof Error && error.message.includes('401')) {
 				if (!integration.refreshToken) {

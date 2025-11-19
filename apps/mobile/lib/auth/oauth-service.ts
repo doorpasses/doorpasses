@@ -125,7 +125,7 @@ export class OAuthService {
 					errorDescription: 'User cancelled the authentication flow',
 				}
 			}
-		} catch {
+		} catch (error) {
 			return {
 				success: false,
 				error: 'oauth_error',
@@ -163,7 +163,7 @@ export class OAuthService {
 				error: 'invalid_callback',
 				errorDescription: 'Invalid callback URL parameters',
 			}
-		} catch {
+		} catch (error) {
 			return {
 				success: false,
 				error: 'callback_error',

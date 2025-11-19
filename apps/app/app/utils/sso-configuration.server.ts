@@ -91,7 +91,7 @@ export class SSOConfigurationService {
 			ssoCache.setConfiguration(organizationId, ssoConfig)
 
 			return ssoConfig
-		} catch {
+		} catch (error) {
 			// Track suspicious activity for invalid configurations
 			if (createdById) {
 				trackSuspiciousActivity(createdById, 'invalid_config')
@@ -263,7 +263,7 @@ export class SSOConfigurationService {
 			ssoCache.invalidateConfiguration(existingConfig.organizationId)
 
 			return updatedConfig
-		} catch {
+		} catch (error) {
 			// Track suspicious activity for invalid configurations
 			if (updatedById) {
 				trackSuspiciousActivity(updatedById, 'invalid_config')
@@ -516,7 +516,7 @@ export class SSOConfigurationService {
 					revocationUrl: endpoints.revocationUrl,
 				},
 			}
-		} catch {
+		} catch (error) {
 			const errorMessage =
 				error instanceof Error ? error.message : 'Unknown error occurred'
 
@@ -568,7 +568,7 @@ export class SSOConfigurationService {
 
 		try {
 			return JSON.parse(config.attributeMapping) as Record<string, string>
-		} catch {
+		} catch (error) {
 			// Return default mapping if parsing fails
 			return {
 				email: 'email',

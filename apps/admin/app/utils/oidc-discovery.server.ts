@@ -328,7 +328,7 @@ export async function discoverOIDCEndpoints(
 			endpoints,
 			discoveryDocument: discoveryDoc,
 		}
-	} catch {
+	} catch (error) {
 		console.log('OIDC discovery failed with error:', error)
 
 		// For development/testing purposes, provide a fallback when network requests fail
@@ -651,7 +651,7 @@ export async function testEndpointConnectivity(
 				`Authorization endpoint test passed with status: ${authResponse.status}`,
 			)
 		}
-	} catch {
+	} catch (error) {
 		console.log('Authorization endpoint test failed:', error)
 		// In development with network issues, assume endpoint is reachable if we got the discovery document
 		if (process.env.NODE_ENV === 'development') {
@@ -684,7 +684,7 @@ export async function testEndpointConnectivity(
 				`Token endpoint test passed with status: ${tokenResponse.status}`,
 			)
 		}
-	} catch {
+	} catch (error) {
 		console.log('Token endpoint test failed:', error)
 		// In development with network issues, assume endpoint is reachable if we got the discovery document
 		if (process.env.NODE_ENV === 'development') {
@@ -713,7 +713,7 @@ export async function testEndpointConnectivity(
 					`UserInfo endpoint returned unexpected status: ${userinfoResponse.status}`,
 				)
 			}
-		} catch {
+		} catch (error) {
 			results.userinfoEndpoint = false
 			results.errors.push(
 				`UserInfo endpoint unreachable: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -739,7 +739,7 @@ export async function testEndpointConnectivity(
 					`Revocation endpoint returned unexpected status: ${revocationResponse.status}`,
 				)
 			}
-		} catch {
+		} catch (error) {
 			results.revocationEndpoint = false
 			results.errors.push(
 				`Revocation endpoint unreachable: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -770,7 +770,7 @@ export function normalizeIssuerUrl(input: string): string {
 		new URL(url) // This will throw if invalid
 
 		return url
-	} catch {
+	} catch (error) {
 		throw new Error(`Invalid issuer URL format: ${input}`)
 	}
 }
@@ -782,7 +782,7 @@ function isValidUrl(urlString: string): boolean {
 	try {
 		const url = new URL(urlString)
 		return url.protocol === 'http:' || url.protocol === 'https:'
-	} catch {
+	} catch (error) {
 		return false
 	}
 }

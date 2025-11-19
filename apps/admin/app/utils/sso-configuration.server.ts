@@ -250,7 +250,7 @@ export class SSOConfigurationService {
 					revocationUrl: endpoints.revocationUrl,
 				},
 			}
-		} catch {
+		} catch (error) {
 			const errorMessage =
 				error instanceof Error ? error.message : 'Unknown error occurred'
 			return {
@@ -284,7 +284,7 @@ export class SSOConfigurationService {
 
 		try {
 			return JSON.parse(config.attributeMapping) as Record<string, string>
-		} catch {
+		} catch (error) {
 			// Return default mapping if parsing fails
 			return {
 				email: 'email',

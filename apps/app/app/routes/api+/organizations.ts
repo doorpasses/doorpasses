@@ -115,7 +115,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 			success: true,
 			data: { organizations },
 		})
-	} catch {
+	} catch (error) {
 		if (error instanceof Error && error.message.includes('authorization')) {
 			return data(
 				{

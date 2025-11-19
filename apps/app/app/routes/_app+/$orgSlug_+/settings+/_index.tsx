@@ -145,7 +145,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				})
 
 				return Response.json({ status: 'success' })
-			} catch {
+			} catch (error) {
 				return Response.json(
 					{ error: 'Failed to upload organization logo' },
 					{ status: 500 },
@@ -160,7 +160,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				})
 
 				return Response.json({ status: 'success' })
-			} catch {
+			} catch (error) {
 				return Response.json(
 					{ error: 'Failed to delete organization logo' },
 					{ status: 500 },
@@ -197,7 +197,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					completedVia: 'organization_settings_update',
 					updatedFields: { name, slug },
 				})
-			} catch {
+			} catch (error) {
 				// Don't fail the settings update if onboarding tracking fails
 			}
 
@@ -206,7 +206,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				description: "Your organization's settings have been updated.",
 				type: 'success',
 			})
-		} catch {
+		} catch (error) {
 			return Response.json({
 				result: submission.reply({
 					formErrors: [
@@ -239,7 +239,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				description: 'Your organization team size has been updated.',
 				type: 'success',
 			})
-		} catch {
+		} catch (error) {
 			return Response.json({
 				result: submission.reply({
 					formErrors: ['Failed to update team size. Please try again.'],
@@ -337,16 +337,15 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					})
 				}
 
-
 				// Update seat quantity for billing if users were added
 				if (usersWithMatchingDomain.length > 0) {
 					try {
 						await updateSeatQuantity(organization.id)
-					} catch {
+					} catch (error) {
 						// Failed to update seat quantity
+					}
 				}
-			}
-		})
+			})
 
 			return redirectWithToast(`/${organization.slug}/settings`, {
 				title: 'Verified domain updated',
@@ -354,7 +353,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					'Your organization verified domain has been updated and matching users have been automatically added.',
 				type: 'success',
 			})
-		} catch {
+		} catch (error) {
 			return Response.json({
 				result: submission.reply({
 					formErrors: ['Failed to update verified domain. Please try again.'],
@@ -371,7 +370,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			})
 
 			return Response.json({ status: 'success' })
-		} catch {
+		} catch (error) {
 			return Response.json(
 				{ error: 'Failed to remove verified domain' },
 				{ status: 500 },
@@ -385,7 +384,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			if (organization.stripeSubscriptionId) {
 				try {
 					await deleteSubscription(organization.stripeSubscriptionId)
-				} catch {
+				} catch (error) {
 					// Don't fail the deletion if subscription cancellation fails
 				}
 			}
@@ -400,7 +399,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				description: 'Your organization has been permanently deleted.',
 				type: 'success',
 			})
-		} catch {
+		} catch (error) {
 			return Response.json(
 				{ error: 'Failed to delete organization' },
 				{ status: 500 },
@@ -484,7 +483,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					: 'S3 storage has been disabled. Using default storage.',
 				type: 'success',
 			})
-		} catch {
+		} catch (error) {
 			return Response.json({
 				result: submission.reply({
 					formErrors: [

@@ -1,11 +1,17 @@
 import { formatDistanceToNow } from 'date-fns'
 import { Badge } from '@repo/ui/badge'
 import { Button } from '@repo/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/ui/card'
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from '@repo/ui/card'
 import { Icon } from '@repo/ui/icon'
 
 interface SSOConfigurationOverviewProps {
-	organizationId: string
+	_organizationId: string
 	ssoConfig: {
 		id: string
 		providerName: string

@@ -14,14 +14,39 @@ import { CacheConfirmationDialog } from '#app/components/admin-cache-confirmatio
 import { GeneralErrorBoundary } from '#app/components/error-boundary.tsx'
 import { useToast } from '#app/components/toaster.tsx'
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@repo/ui/dropdown-menu'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from '@repo/ui/dropdown-menu'
 import { Icon } from '@repo/ui/icon'
 import { Badge } from '@repo/ui/badge'
 import { Button } from '@repo/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/ui/card'
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from '@repo/ui/card'
 import { Input } from '@repo/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/table'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/select'
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '@repo/ui/table'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@repo/ui/select'
 
 import {
 	cache,
@@ -171,7 +196,7 @@ export async function action({ request }: Route.ActionArgs) {
 				throw new Error(`Unknown action type: ${actionType}`)
 			}
 		}
-	} catch {
+	} catch (error) {
 		console.error('Cache action error:', error)
 		return redirectWithToast(url.pathname + url.search, {
 			type: 'error',

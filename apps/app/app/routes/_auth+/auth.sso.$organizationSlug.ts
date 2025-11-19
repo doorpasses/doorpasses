@@ -9,9 +9,7 @@ import {
 	sanitizeRedirectUrl,
 	validateSSOOrganization,
 } from '#app/utils/sso-sanitization.server.ts'
-import {
-	trackSuspiciousActivity,
-} from '#app/utils/sso-rate-limit.server.ts'
+import { trackSuspiciousActivity } from '#app/utils/sso-rate-limit.server.ts'
 import {
 	handleSSOError,
 	createSSOError,
@@ -49,7 +47,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 			// Process the SSO callback
 			return await ssoAuthService.handleCallback(organization.id, request)
-		} catch {
+		} catch (error) {
 			console.error('SSO callback error:', error)
 			// Redirect to login with error
 			return redirect('/login?error=sso_callback_failed')

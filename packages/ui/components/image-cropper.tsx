@@ -115,7 +115,7 @@ export function ImageCropper({
 				onCropComplete(blob)
 				setDialogOpen(false)
 			}
-		} catch {
+		} catch (error) {
 			console.error('Error cropping image:', error)
 		}
 	}

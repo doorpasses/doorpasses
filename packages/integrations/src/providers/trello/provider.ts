@@ -253,7 +253,7 @@ export class TrelloProvider extends BaseIntegrationProvider {
 			})
 
 			return `${this.authBaseUrl}/authorize?${authParams.toString()}`
-		} catch {
+		} catch (error) {
 			console.error('Trello auth URL generation failed:', error)
 			throw new Error(
 				`Failed to generate Trello auth URL: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -335,7 +335,7 @@ export class TrelloProvider extends BaseIntegrationProvider {
 				refreshToken: accessTokenSecret, // Store token secret as refresh token
 				// Trello tokens don't expire, so no expiresAt date
 			}
-		} catch {
+		} catch (error) {
 			console.error('Trello OAuth callback failed:', error)
 			throw new Error(
 				`Trello OAuth callback failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -388,14 +388,14 @@ export class TrelloProvider extends BaseIntegrationProvider {
 					// Try to parse as JSON first
 					const errorData = (await boardsResponse.json()) as TrelloApiError
 					errorMessage = `Failed to fetch boards: ${errorData.message || errorData.error || 'Unknown error'}`
-				} catch {
+				} catch (error) {
 					// If JSON parsing fails, try to get plain text error
 					try {
 						const errorText = await boardsResponse.text()
 						if (errorText) {
 							errorMessage = `Failed to fetch boards: ${errorText}`
 						}
-					} catch {
+					} catch (error) {
 						// If both fail, use the status text
 					}
 				}
@@ -434,7 +434,7 @@ export class TrelloProvider extends BaseIntegrationProvider {
 			}
 
 			return channels
-		} catch {
+		} catch (error) {
 			console.error('Failed to get Trello channels:', error)
 			throw new Error(
 				`Failed to get Trello channels: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -532,20 +532,20 @@ export class TrelloProvider extends BaseIntegrationProvider {
 					// Try to parse as JSON first
 					const errorData = (await response.json()) as TrelloApiError
 					errorMessage = `Failed to create card: ${errorData.message || errorData.error || 'Unknown error'}`
-				} catch {
+				} catch (error) {
 					// If JSON parsing fails, try to get plain text error
 					try {
 						const errorText = await response.text()
 						if (errorText) {
 							errorMessage = `Failed to create card: ${errorText}`
 						}
-					} catch {
+					} catch (error) {
 						// If both fail, use the status text
 					}
 				}
 				throw new Error(errorMessage)
 			}
-		} catch {
+		} catch (error) {
 			throw new Error(
 				`Failed to post message to Trello: ${error instanceof Error ? error.message : 'Unknown error'}`,
 			)
@@ -579,7 +579,7 @@ export class TrelloProvider extends BaseIntegrationProvider {
 			)
 
 			return response.ok
-		} catch {
+		} catch (error) {
 			console.error('Trello connection validation failed:', error)
 			return false
 		}

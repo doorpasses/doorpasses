@@ -49,7 +49,7 @@ export async function handleUpdateIntegrationConfig(
 	let config: any
 	try {
 		config = JSON.parse(configString)
-	} catch {
+	} catch (error) {
 		return Response.json({ error: 'Invalid config JSON' }, { status: 400 })
 	}
 
@@ -81,7 +81,7 @@ export async function handleUpdateIntegrationConfig(
 						integration,
 						config.botUser.accountId,
 					)
-				} catch {
+				} catch (error) {
 					console.error('Error validating bot user:', error)
 					return Response.json(
 						{
@@ -104,7 +104,7 @@ export async function handleUpdateIntegrationConfig(
 		})
 
 		return Response.json({ success: true, integration: updatedIntegration })
-	} catch {
+	} catch (error) {
 		console.error('Error updating integration config:', error)
 		return Response.json(
 			{

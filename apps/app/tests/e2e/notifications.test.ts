@@ -1,9 +1,14 @@
+import { faker } from '@faker-js/faker'
 import { prisma } from '#app/utils/db.server.ts'
 import { createTestOrganization } from '#tests/test-utils.ts'
 import { expect, test } from '#tests/playwright-utils.ts'
 
 test.describe('Notifications', () => {
-	test('Users can access notification settings', async ({ page, login, navigate }) => {
+	test('Users can access notification settings', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		await login()
 
 		// Navigate to notification settings
@@ -111,7 +116,11 @@ test.describe('Notifications', () => {
 		}
 	})
 
-	test('Users can view notification history', async ({ page, login, navigate }) => {
+	test('Users can view notification history', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user
@@ -192,7 +201,11 @@ test.describe('Notifications', () => {
 		await expect(page.getByText(org.name)).toBeVisible()
 	})
 
-	test('Users can mark notifications as read', async ({ page, login, navigate }) => {
+	test('Users can mark notifications as read', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user
@@ -293,7 +306,11 @@ test.describe('Notifications', () => {
 		}
 	})
 
-	test('Users can configure notification channels', async ({ page, login, navigate }) => {
+	test('Users can configure notification channels', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		await login()
 
 		// Navigate to notification settings
@@ -353,7 +370,11 @@ test.describe('Notifications', () => {
 		expect(hasToggles || isLoading || hasNoPreferences || hasError).toBe(true)
 	})
 
-	test('Users can test notification delivery', async ({ page, login, navigate }) => {
+	test('Users can test notification delivery', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		await login()
 
 		// Navigate to notification settings

@@ -125,7 +125,7 @@ export class SSOAuthService {
 			await strategy.authenticate(request)
 			// If we get here, it means authentication failed or there's an issue
 			throw new Error('Unexpected authentication result')
-		} catch {
+		} catch (error) {
 			if (error instanceof Response) {
 				return error
 			}
@@ -609,7 +609,7 @@ export class SSOAuthService {
 					client_secret: clientSecret,
 				}),
 			})
-		} catch {
+		} catch (error) {
 			// Token revocation is best-effort, don't throw on failure
 			console.warn('Token revocation failed:', error)
 		}

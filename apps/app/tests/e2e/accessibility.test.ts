@@ -3,7 +3,11 @@ import { prisma } from '#app/utils/db.server.ts'
 import { createTestOrganization } from '#tests/test-utils.ts'
 
 test.describe('Accessibility', () => {
-	test('All pages have proper heading structure', async ({ page, login, navigate }) => {
+	test('All pages have proper heading structure', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user
@@ -299,7 +303,7 @@ test.describe('Accessibility', () => {
 
 						expect(hasFocusIndicator).toBeTruthy()
 					}
-				} catch {
+				} catch (error) {
 					// Skip elements that can't be focused
 					continue
 				}
@@ -310,7 +314,11 @@ test.describe('Accessibility', () => {
 		expect(focusableElementsFound).toBeGreaterThan(0)
 	})
 
-	test('ARIA landmarks are properly used', async ({ page, login, navigate }) => {
+	test('ARIA landmarks are properly used', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user
@@ -492,7 +500,11 @@ test.describe('Accessibility', () => {
 		await expect(dialog).not.toBeVisible()
 	})
 
-	test('Tables have proper headers and captions', async ({ page, login, navigate }) => {
+	test('Tables have proper headers and captions', async ({
+		page,
+		login,
+		navigate,
+	}) => {
 		const user = await login()
 
 		// Create an organization for the user

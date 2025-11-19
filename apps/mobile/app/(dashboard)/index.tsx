@@ -35,7 +35,7 @@ export default function DashboardScreen() {
 					try {
 						await logout()
 						router.replace('/(auth)/sign-in')
-					} catch {
+					} catch (error) {
 						console.error('Logout error:', error)
 					}
 				},

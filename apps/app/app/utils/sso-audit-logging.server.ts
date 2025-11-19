@@ -100,7 +100,7 @@ export class SSOAuditLogger {
 			if (logEntry.severity === 'critical') {
 				await this.handleCriticalEvent(logEntry)
 			}
-		} catch {
+		} catch (error) {
 			logger.error({ err: error }, 'Failed to log SSO audit event')
 		}
 	}
@@ -279,7 +279,7 @@ export class SSOAuditLogger {
 					activeConfigurations: 0, // Would count from database
 				},
 			}
-		} catch {
+		} catch (error) {
 			return {
 				status: 'unhealthy',
 				issues: [
@@ -386,12 +386,14 @@ export class SSOAuditLogger {
 
 		// Remove control characters and ANSI escape sequences
 		// eslint-disable-next-line no-control-regex
-		return message
-			// eslint-disable-next-line no-control-regex
-			.replace(/[\x00-\x1F\x7F]/g, '') // Remove control characters
-			// eslint-disable-next-line no-control-regex
-			.replace(/\x1b\[[0-9;]*m/g, '') // Remove ANSI escape sequences
-			.substring(0, 2000) // Limit message length
+		return (
+			message
+				// eslint-disable-next-line no-control-regex
+				.replace(/[\x00-\x1F\x7F]/g, '') // Remove control characters
+				// eslint-disable-next-line no-control-regex
+				.replace(/\x1b\[[0-9;]*m/g, '') // Remove ANSI escape sequences
+				.substring(0, 2000)
+		) // Limit message length
 	}
 
 	/**
@@ -450,7 +452,7 @@ export class SSOAuditLogger {
 			//     createdAt: entry.timestamp,
 			//   },
 			// })
-		} catch {
+		} catch (error) {
 			logger.error({ err: error }, 'Failed to store audit log in database')
 		}
 	}
@@ -474,7 +476,7 @@ export class SSOAuditLogger {
 			if (process.env.SENTRY_DSN) {
 				// await sendToSentry(entry)
 			}
-		} catch {
+		} catch (error) {
 			logger.error({ err: error }, 'Failed to send audit log to monitoring')
 		}
 	}
@@ -495,7 +497,7 @@ export class SSOAuditLogger {
 			if (process.env.PAGERDUTY_INTEGRATION_KEY) {
 				// await sendPagerDutyAlert(entry)
 			}
-		} catch {
+		} catch (error) {
 			logger.error({ err: error }, 'Failed to handle critical SSO event')
 		}
 	}
@@ -529,7 +531,7 @@ export class SSOAuditLogger {
 			// Check for disabled configurations
 			// Check for configurations with invalid settings
 			// This would query the SSO configurations and validate them
-		} catch {
+		} catch (error) {
 			issues.push(
 				`Configuration health check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
 			)

@@ -124,7 +124,7 @@ export default function OnboardingScreen() {
 				setShowSuccess(false)
 				navigateAfterAuth(redirectTo)
 			}, 2000)
-		} catch {
+		} catch (error) {
 			// Trigger error haptic feedback
 			await triggerErrorHaptic()
 			console.error('Onboarding error:', error)

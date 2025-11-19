@@ -99,7 +99,7 @@ export class NoteEventHandler {
 			}
 
 			return await this.processNoteEvent(event)
-		} catch {
+		} catch (error) {
 			console.error('Error handling note creation:', error)
 			return {
 				success: false,
@@ -166,7 +166,7 @@ export class NoteEventHandler {
 			}
 
 			return await this.processNoteEvent(event)
-		} catch {
+		} catch (error) {
 			console.error('Error handling note update:', error)
 			return {
 				success: false,
@@ -201,7 +201,7 @@ export class NoteEventHandler {
 			}
 
 			return await this.processNoteEvent(event)
-		} catch {
+		} catch (error) {
 			console.error('Error handling note deletion:', error)
 			return {
 				success: false,
@@ -271,7 +271,7 @@ export class NoteEventHandler {
 				connectionsNotified: connections.length,
 				errors: [],
 			}
-		} catch {
+		} catch (error) {
 			console.error('Error processing note event:', error)
 			return {
 				success: false,
@@ -295,7 +295,7 @@ export class NoteEventHandler {
 			try {
 				const result = await this.processNoteEvent(event)
 				results.push(result)
-			} catch {
+			} catch (error) {
 				results.push({
 					success: false,
 					connectionsNotified: 0,
@@ -355,7 +355,9 @@ export class NoteEventHandler {
 			const successfulEvents = logs.filter(
 				(log: any) => log.status === 'success',
 			).length
-			const failedEvents = logs.filter((log: any) => log.status === 'error').length
+			const failedEvents = logs.filter(
+				(log: any) => log.status === 'error',
+			).length
 
 			// Count unique connections notified
 			const uniqueConnections = new Set()
@@ -369,7 +371,7 @@ export class NoteEventHandler {
 						if (data.noteId && data.channelId) {
 							uniqueConnections.add(`${data.noteId}-${data.channelId}`)
 						}
-					} catch {
+					} catch (error) {
 						// Ignore parsing errors
 					}
 				}
@@ -381,7 +383,7 @@ export class NoteEventHandler {
 				failedEvents,
 				connectionsNotified: uniqueConnections.size,
 			}
-		} catch {
+		} catch (error) {
 			console.error('Error getting event stats:', error)
 			return {
 				totalEvents: 0,

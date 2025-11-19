@@ -13,13 +13,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	}
 
 	try {
-		const { getUserDefaultOrganization } = await import('#app/utils/organizations.server.ts')
+		const { getUserDefaultOrganization } = await import(
+			'#app/utils/organizations.server.ts'
+		)
 		const defaultOrg = await getUserDefaultOrganization(userId)
 
 		if (defaultOrg?.organization?.slug) {
 			return redirect(`/${defaultOrg.organization.slug}`)
 		}
-	} catch {
+	} catch (error) {
 		// Error getting default organization
 	}
 

@@ -198,7 +198,9 @@ export class AuditService {
 					userId: input.userId || null,
 					organizationId: input.organizationId || null,
 					details: this.sanitizeLogMessage(input.details),
-					metadata: sanitizedMetadata ? JSON.stringify(sanitizedMetadata) : null,
+					metadata: sanitizedMetadata
+						? JSON.stringify(sanitizedMetadata)
+						: null,
 					ipAddress,
 					userAgent,
 					resourceType: input.resourceType || null,
@@ -216,7 +218,7 @@ export class AuditService {
 				userAgent,
 				sanitizedMetadata,
 			})
-		} catch {
+		} catch (error) {
 			// Never fail the primary operation due to audit logging errors
 			// But ensure we log the failure
 			logger.error(
@@ -450,7 +452,9 @@ export class AuditService {
 				log.organization?.name || log.organizationId || 'N/A',
 				`"${this.escapeCsvValue(log.details)}"`,
 				metadata.ipAddress || 'N/A',
-				metadata.userAgent ? `"${this.escapeCsvValue(metadata.userAgent)}"` : 'N/A',
+				metadata.userAgent
+					? `"${this.escapeCsvValue(metadata.userAgent)}"`
+					: 'N/A',
 			]
 		})
 
@@ -474,17 +478,17 @@ export class AuditService {
 			action: log.action,
 			user: log.user
 				? {
-					id: log.user.id,
-					email: log.user.email,
-					name: log.user.name,
-				}
+						id: log.user.id,
+						email: log.user.email,
+						name: log.user.name,
+					}
 				: null,
 			organization: log.organization
 				? {
-					id: log.organization.id,
-					name: log.organization.name,
-					slug: log.organization.slug,
-				}
+						id: log.organization.id,
+						name: log.organization.name,
+						slug: log.organization.slug,
+					}
 				: null,
 			details: log.details,
 			metadata: log.metadata ? JSON.parse(log.metadata) : null,
@@ -509,44 +513,40 @@ export class AuditService {
 			if (filters.endDate) where.createdAt.lte = filters.endDate
 		}
 
-		const [
-			totalEvents,
-			eventsByAction,
-			eventsByUser,
-			recentSecurityEvents,
-		] = await Promise.all([
-			prisma.auditLog.count({ where }),
-			prisma.auditLog.groupBy({
-				by: ['action'],
-				where,
-				_count: true,
-				orderBy: { _count: { action: 'desc' } },
-				take: 10,
-			}),
-			prisma.auditLog.groupBy({
-				by: ['userId'],
-				where: { ...where, userId: { not: null } },
-				_count: true,
-				orderBy: { _count: { userId: 'desc' } },
-				take: 10,
-			}),
-			prisma.auditLog.findMany({
-				where: {
-					...where,
-					action: {
-						in: [
-							AuditAction.SUSPICIOUS_ACTIVITY_DETECTED,
-							AuditAction.RATE_LIMIT_EXCEEDED,
-							AuditAction.USER_LOGIN_FAILED,
-							AuditAction.SSO_LOGIN_FAILED,
-							AuditAction.IP_BLACKLISTED,
-						],
+		const [totalEvents, eventsByAction, eventsByUser, recentSecurityEvents] =
+			await Promise.all([
+				prisma.auditLog.count({ where }),
+				prisma.auditLog.groupBy({
+					by: ['action'],
+					where,
+					_count: true,
+					orderBy: { _count: { action: 'desc' } },
+					take: 10,
+				}),
+				prisma.auditLog.groupBy({
+					by: ['userId'],
+					where: { ...where, userId: { not: null } },
+					_count: true,
+					orderBy: { _count: { userId: 'desc' } },
+					take: 10,
+				}),
+				prisma.auditLog.findMany({
+					where: {
+						...where,
+						action: {
+							in: [
+								AuditAction.SUSPICIOUS_ACTIVITY_DETECTED,
+								AuditAction.RATE_LIMIT_EXCEEDED,
+								AuditAction.USER_LOGIN_FAILED,
+								AuditAction.SSO_LOGIN_FAILED,
+								AuditAction.IP_BLACKLISTED,
+							],
+						},
 					},
-				},
-				orderBy: { createdAt: 'desc' },
-				take: 10,
-			}),
-		])
+					orderBy: { createdAt: 'desc' },
+					take: 10,
+				}),
+			])
 
 		return {
 			totalEvents,
@@ -610,12 +610,14 @@ export class AuditService {
 		if (!message) return message
 
 		// Remove control characters and limit length
-		return message
-			// eslint-disable-next-line no-control-regex
-			.replace(/[\x00-\x1F\x7F]/g, '')
-			// eslint-disable-next-line no-control-regex
-			.replace(/\x1b\[[0-9;]*m/g, '')
-			.substring(0, 2000)
+		return (
+			message
+				// eslint-disable-next-line no-control-regex
+				.replace(/[\x00-\x1F\x7F]/g, '')
+				// eslint-disable-next-line no-control-regex
+				.replace(/\x1b\[[0-9;]*m/g, '')
+				.substring(0, 2000)
+		)
 	}
 
 	private escapeCsvValue(value: string): string {
@@ -667,7 +669,7 @@ export class AuditService {
 			const date = new Date()
 			date.setDate(date.getDate() + retentionDays)
 			return date
-		} catch {
+		} catch (error) {
 			// Fall back to default 1 year retention
 			const date = new Date()
 			date.setFullYear(date.getFullYear() + 1)

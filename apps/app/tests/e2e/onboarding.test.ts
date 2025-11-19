@@ -101,7 +101,11 @@ test('onboarding with link', async ({ page, getOnboardingData, navigate }) => {
 	await expect(page.getByText(/thanks for signing up/i)).toBeVisible()
 })
 
-test('onboarding with a short code', async ({ page, getOnboardingData, navigate }) => {
+test('onboarding with a short code', async ({
+	page,
+	getOnboardingData,
+	navigate,
+}) => {
 	const onboardingData = getOnboardingData()
 
 	await navigate('/signup')
@@ -347,7 +351,7 @@ test('login as existing user', async ({ page, insertNewUser, navigate }) => {
 	try {
 		// Wait for either successful redirect to home page or stay on login page
 		await page.waitForURL('/organizations/create')
-	} catch {
+	} catch (error) {
 		// If we didn't redirect to home, we're probably still on login page
 		console.log('Login did not redirect to home page. Current URL:', page.url())
 
@@ -377,7 +381,11 @@ test('login as existing user', async ({ page, insertNewUser, navigate }) => {
 	).toBeVisible()
 })
 
-test('reset password with a link', async ({ page, insertNewUser, navigate }) => {
+test('reset password with a link', async ({
+	page,
+	insertNewUser,
+	navigate,
+}) => {
 	const originalPassword = faker.internet.password()
 	const user = await insertNewUser({ password: originalPassword })
 	invariant(user.name, 'User name not found')
@@ -469,7 +477,11 @@ test('reset password with a link', async ({ page, insertNewUser, navigate }) => 
 	).toBeVisible()
 })
 
-test('reset password with a short code', async ({ page, insertNewUser, navigate }) => {
+test('reset password with a short code', async ({
+	page,
+	insertNewUser,
+	navigate,
+}) => {
 	const user = await insertNewUser()
 	await navigate('/login')
 	await page

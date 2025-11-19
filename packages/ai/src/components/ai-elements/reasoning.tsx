@@ -118,7 +118,7 @@ export const Reasoning = memo(
 export type ReasoningTriggerProps = ComponentProps<
 	typeof CollapsibleTrigger
 > & {
-	title?: string
+	_title?: string
 }
 
 export const ReasoningTrigger = memo(

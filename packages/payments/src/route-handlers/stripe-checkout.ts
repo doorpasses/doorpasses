@@ -1,4 +1,4 @@
-import  { type PrismaClient } from '@prisma/client'
+import { type PrismaClient } from '@prisma/client'
 import { type LoaderFunctionArgs, redirect } from 'react-router'
 import type Stripe from 'stripe'
 
@@ -112,7 +112,7 @@ export async function handleStripeCheckout(
 
 		// Regular checkout flow - go to dashboard
 		return redirect(`/${tenant.slug}/dashboard`)
-	} catch {
+	} catch (error) {
 		console.error('Error handling successful checkout:', error)
 		return redirect('/error')
 	}

@@ -130,7 +130,7 @@ app.get(['/img/*', '/favicons/*'], (_req, res) => {
 morgan.token('url', (req) => {
 	try {
 		return decodeURIComponent(req.url ?? '')
-	} catch {
+	} catch (error) {
 		return req.url ?? ''
 	}
 })
@@ -158,7 +158,7 @@ app.use(async (req, res, next) => {
 				code: 'IP_BLACKLISTED',
 			})
 		}
-	} catch {
+	} catch (error) {
 		// If there's an error checking blacklist, log it but don't block the request
 		console.error('Error checking IP blacklist:', error)
 	}
@@ -178,7 +178,7 @@ app.use(async (req, res, next) => {
 					referer: req.get('referer'),
 					statusCode: res.statusCode,
 				})
-			} catch {
+			} catch (error) {
 				// Silently fail to not break the app
 				console.error('IP tracking error:', error)
 			}
@@ -194,7 +194,7 @@ setInterval(
 		try {
 			const ipTracking = await import('../app/utils/ip-tracking.server.js')
 			ipTracking.cleanupRequestCounts()
-		} catch {
+		} catch (error) {
 			console.error('Error cleaning up request counts:', error)
 		}
 	},
@@ -270,7 +270,7 @@ async function getBuild() {
 				await import('../build/server/index.js')
 
 		return { build: build as unknown as ServerBuild, error: null }
-	} catch {
+	} catch (error) {
 		// Catch error and return null to make express happy and avoid an unrecoverable crash
 		console.error('Error creating build:', error)
 		return { error: error, build: null as unknown as ServerBuild }

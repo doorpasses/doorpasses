@@ -165,7 +165,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 		}
 
 		return data(response)
-	} catch {
+	} catch (error) {
 		console.error('OAuth callback error:', error)
 		return data(
 			{

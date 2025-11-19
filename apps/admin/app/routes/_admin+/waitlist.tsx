@@ -12,7 +12,14 @@ import { Badge } from '@repo/ui/badge'
 import { Button } from '@repo/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/card'
 import { Input } from '@repo/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/table'
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '@repo/ui/table'
 import { Icon } from '@repo/ui/icon'
 import { getLaunchStatus } from '#app/utils/env.server.ts'
 import {
@@ -158,7 +165,7 @@ export async function action({ request }: Route.ActionArgs) {
 		}
 
 		return Response.json({ error: 'Invalid intent' }, { status: 400 })
-	} catch {
+	} catch (error) {
 		console.error('Waitlist action error:', error)
 		return Response.json(
 			{ error: 'Failed to process request' },
@@ -228,7 +235,9 @@ export default function AdminWaitlistPage() {
 	return (
 		<div className="space-y-6">
 			<div>
-				<h1 className="text-3xl font-bold tracking-tight">Waitlist Management</h1>
+				<h1 className="text-3xl font-bold tracking-tight">
+					Waitlist Management
+				</h1>
 				<p className="text-muted-foreground">
 					Manage waitlist users and grant early access
 				</p>
@@ -238,10 +247,14 @@ export default function AdminWaitlistPage() {
 				<Card className="border-yellow-500 bg-yellow-50 dark:bg-yellow-900/10">
 					<CardContent className="pt-6">
 						<div className="flex items-start gap-2">
-							<Icon name="help-circle" className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
+							<Icon
+								name="help-circle"
+								className="mt-0.5 h-5 w-5 text-yellow-600 dark:text-yellow-400"
+							/>
 							<div className="text-sm text-yellow-800 dark:text-yellow-200">
-								Launch status is currently <strong>{data.launchStatus}</strong>. The
-								waitlist is only active when LAUNCH_STATUS is set to CLOSED_BETA.
+								Launch status is currently <strong>{data.launchStatus}</strong>.
+								The waitlist is only active when LAUNCH_STATUS is set to
+								CLOSED_BETA.
 							</div>
 						</div>
 					</CardContent>
@@ -254,7 +267,7 @@ export default function AdminWaitlistPage() {
 				</CardHeader>
 				<CardContent>
 					<div className="flex flex-wrap gap-4">
-						<div className="flex-1 min-w-[200px]">
+						<div className="min-w-[200px] flex-1">
 							<Input
 								type="search"
 								placeholder="Search by name, email, or username..."
@@ -264,7 +277,7 @@ export default function AdminWaitlistPage() {
 						</div>
 
 						<select
-							className="px-3 py-2 border rounded-md"
+							className="rounded-md border px-3 py-2"
 							value={data.filters.status}
 							onChange={(e) => handleFilterChange('status', e.target.value)}
 						>
@@ -274,7 +287,7 @@ export default function AdminWaitlistPage() {
 						</select>
 
 						<select
-							className="px-3 py-2 border rounded-md"
+							className="rounded-md border px-3 py-2"
 							value={data.filters.sortBy}
 							onChange={(e) => handleFilterChange('sortBy', e.target.value)}
 						>
@@ -288,9 +301,7 @@ export default function AdminWaitlistPage() {
 
 			<Card>
 				<CardHeader>
-					<CardTitle>
-						Waitlist Entries ({data.pagination.totalCount})
-					</CardTitle>
+					<CardTitle>Waitlist Entries ({data.pagination.totalCount})</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<Table>
@@ -310,7 +321,10 @@ export default function AdminWaitlistPage() {
 						<TableBody>
 							{data.entries.length === 0 ? (
 								<TableRow>
-									<TableCell colSpan={9} className="text-center text-muted-foreground">
+									<TableCell
+										colSpan={9}
+										className="text-muted-foreground text-center"
+									>
 										No waitlist entries found
 									</TableCell>
 								</TableRow>
@@ -324,14 +338,18 @@ export default function AdminWaitlistPage() {
 													<Img
 														className="h-8 w-8 rounded-full object-cover"
 														src={entry.user.image.objectKey}
-														alt={entry.user.image.altText ?? entry.user.name ?? 'User'}
+														alt={
+															entry.user.image.altText ??
+															entry.user.name ??
+															'User'
+														}
 														width={32}
 														height={32}
 													/>
 												)}
 												<div>
 													<div className="font-medium">{entry.user.name}</div>
-													<div className="text-sm text-muted-foreground">
+													<div className="text-muted-foreground text-sm">
 														@{entry.user.username}
 													</div>
 												</div>
@@ -361,7 +379,11 @@ export default function AdminWaitlistPage() {
 										</TableCell>
 										<TableCell>
 											<Form method="post">
-												<input type="hidden" name="userId" value={entry.userId} />
+												<input
+													type="hidden"
+													name="userId"
+													value={entry.userId}
+												/>
 												{entry.hasEarlyAccess ? (
 													<Button
 														type="submit"
@@ -397,10 +419,10 @@ export default function AdminWaitlistPage() {
 
 					{/* Pagination */}
 					{data.pagination.totalPages > 1 && (
-						<div className="flex items-center justify-between mt-4">
-							<div className="text-sm text-muted-foreground">
-								Showing {(data.pagination.page - 1) * data.pagination.pageSize + 1}{' '}
-								to{' '}
+						<div className="mt-4 flex items-center justify-between">
+							<div className="text-muted-foreground text-sm">
+								Showing{' '}
+								{(data.pagination.page - 1) * data.pagination.pageSize + 1} to{' '}
 								{Math.min(
 									data.pagination.page * data.pagination.pageSize,
 									data.pagination.totalCount,
@@ -442,7 +464,9 @@ export default function AdminWaitlistPage() {
 												<Button
 													key={page}
 													variant={
-														page === data.pagination.page ? 'default' : 'outline'
+														page === data.pagination.page
+															? 'default'
+															: 'outline'
 													}
 													size="sm"
 													onClick={() => handlePageChange(page)}

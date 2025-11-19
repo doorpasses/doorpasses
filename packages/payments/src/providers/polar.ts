@@ -6,7 +6,7 @@
  */
 
 import { Polar } from '@polar-sh/sdk'
-import  {
+import {
 	type PaymentProvider,
 	type Product,
 	type Price,
@@ -70,7 +70,7 @@ export class PolarProvider implements PaymentProvider {
 				limit: 100,
 			})
 
-				const products: Product[] = []
+			const products: Product[] = []
 			for await (const page of productsIterator) {
 				const result = page.result
 				if (result.items) {
@@ -140,7 +140,9 @@ export class PolarProvider implements PaymentProvider {
 			return prices
 		} catch (error: any) {
 			console.error('PolarProvider: Failed to fetch prices:', error)
-			throw new Error(`Failed to fetch Polar prices: ${error?.message || error}`)
+			throw new Error(
+				`Failed to fetch Polar prices: ${error?.message || error}`,
+			)
 		}
 	}
 
@@ -187,7 +189,7 @@ export class PolarProvider implements PaymentProvider {
 					},
 				},
 			}
-		} catch {
+		} catch (error) {
 			console.error('PolarProvider: Error in getPlansAndPrices:', error)
 
 			// Return fallback data to prevent the app from hanging
@@ -237,7 +239,10 @@ export class PolarProvider implements PaymentProvider {
 				subscriptionId: undefined, // Polar checkouts don't include subscription ID in response
 			}
 		} catch (error: any) {
-			console.error('PolarProvider: Failed to retrieve checkout session:', error)
+			console.error(
+				'PolarProvider: Failed to retrieve checkout session:',
+				error,
+			)
 			throw new Error(
 				`Failed to retrieve Polar checkout: ${error?.message || error}`,
 			)

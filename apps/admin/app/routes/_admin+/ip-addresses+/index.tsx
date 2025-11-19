@@ -7,9 +7,24 @@ import {
 } from 'react-router'
 import { Badge } from '@repo/ui/badge'
 import { Button } from '@repo/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@repo/ui/dialog'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@repo/ui/dialog'
 import { Label } from '@repo/ui/label'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/table'
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '@repo/ui/table'
 import { Textarea } from '@repo/ui/textarea'
 
 import { getUserId } from '#app/utils/auth.server.ts'
@@ -123,7 +138,7 @@ export async function action({ request }: ActionFunctionArgs) {
 				message: `IP ${ip} has been removed from blacklist`,
 			}
 		}
-	} catch {
+	} catch (error) {
 		console.error('Error processing IP action:', error)
 		throw new Response('Failed to process request', { status: 500 })
 	}

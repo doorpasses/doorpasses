@@ -14,12 +14,8 @@ import {
 	redirectWithToast,
 } from '#app/utils/toast.server.ts'
 import { SSOCallbackSchema } from '@repo/validation'
-import {
-	validateSSOOrganization,
-} from '#app/utils/sso-sanitization.server.ts'
-import {
-	trackSuspiciousActivity,
-} from '#app/utils/sso-rate-limit.server.ts'
+import { validateSSOOrganization } from '#app/utils/sso-sanitization.server.ts'
+import { trackSuspiciousActivity } from '#app/utils/sso-rate-limit.server.ts'
 import {
 	handleSSOError,
 	createSSOError,
@@ -229,7 +225,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 			// The SSO auth service handles user provisioning and organization membership
 			// It will create the user if auto-provisioning is enabled, or throw an error if not
 			user = await ssoAuthService.provisionUser(userInfo, ssoConfig)
-		} catch {
+		} catch (error) {
 			console.error('User provisioning failed:', error)
 			trackSuspiciousActivity(activityKey, 'failed_auth')
 
@@ -319,7 +315,7 @@ async function makeSession(
 	// Create session using the SSO login function
 	const session = await loginWithSSO({
 		user: user as any, // Type assertion since we know the user structure matches
-		organizationId,
+		_organizationId: organizationId,
 	})
 
 	// Create SSO session to link with the regular session
@@ -334,7 +330,7 @@ async function makeSession(
 				tokens,
 			)
 		}
-	} catch {
+	} catch (error) {
 		console.warn('Failed to create SSO session tracking:', error)
 		// Don't fail the login if SSO session creation fails
 	}

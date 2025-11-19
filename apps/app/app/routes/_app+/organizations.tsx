@@ -132,7 +132,7 @@ export async function action({ request }: ActionFunctionArgs) {
 				// Update seat quantity for billing
 				try {
 					await updateSeatQuantity(invitation.organizationId)
-				} catch {
+				} catch (error) {
 					// Failed to update seat quantity
 				}
 			}
@@ -143,7 +143,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			})
 
 			return Response.json({ success: true })
-		} catch {
+		} catch (error) {
 			return Response.json(
 				{ error: 'Failed to accept invitation' },
 				{ status: 500 },
@@ -157,7 +157,7 @@ export async function action({ request }: ActionFunctionArgs) {
 				where: { id: invitationId },
 			})
 			return Response.json({ success: true })
-		} catch {
+		} catch (error) {
 			return Response.json(
 				{ error: 'Failed to decline invitation' },
 				{ status: 500 },
@@ -191,7 +191,9 @@ export default function OrganizationsPage() {
 				<div className="mb-8">
 					<PageTitle
 						title={_(t`Organizations`)}
-						description={_(t`Jump into an existing organization, accept pending invitations, or add a new one.`)}
+						description={_(
+							t`Jump into an existing organization, accept pending invitations, or add a new one.`,
+						)}
 					/>
 
 					<div className="mt-4 flex items-center gap-3">

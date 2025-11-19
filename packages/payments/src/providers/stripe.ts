@@ -3,7 +3,7 @@
  */
 
 import Stripe from 'stripe'
-import  {
+import {
 	type PaymentProvider,
 	type Product,
 	type Price,
@@ -33,8 +33,8 @@ export class StripeProvider implements PaymentProvider {
 		}
 
 		this.stripe = new Stripe(config.apiKey, {
-			apiVersion: (config.apiVersion as Stripe.LatestApiVersion) ||
-				'2025-08-27.basil',
+			apiVersion:
+				(config.apiVersion as Stripe.LatestApiVersion) || '2025-08-27.basil',
 			httpClient: Stripe.createFetchHttpClient(),
 		})
 	}
@@ -92,7 +92,9 @@ export class StripeProvider implements PaymentProvider {
 			}))
 		} catch (error: any) {
 			console.error('StripeProvider: Failed to fetch prices:', error)
-			throw new Error(`Failed to fetch Stripe prices: ${error?.message || error}`)
+			throw new Error(
+				`Failed to fetch Stripe prices: ${error?.message || error}`,
+			)
 		}
 	}
 
@@ -139,7 +141,7 @@ export class StripeProvider implements PaymentProvider {
 					},
 				},
 			}
-		} catch {
+		} catch (error) {
 			console.error('StripeProvider: Error in getPlansAndPrices:', error)
 
 			// Return fallback data to prevent the app from hanging
@@ -210,10 +212,9 @@ export class StripeProvider implements PaymentProvider {
 			productId: (sub.items.data[0]?.plan.product as string) || '',
 			priceId: sub.items.data[0]?.price.id || '',
 			trialEnd: sub.trial_end ? new Date(sub.trial_end * 1000) : null,
-			currentPeriodEnd:
-				(sub as any).current_period_end
-					? new Date((sub as any).current_period_end * 1000)
-					: undefined,
+			currentPeriodEnd: (sub as any).current_period_end
+				? new Date((sub as any).current_period_end * 1000)
+				: undefined,
 			cancelAtPeriodEnd: (sub as any).cancel_at_period_end,
 			quantity: sub.items.data[0]?.quantity,
 			items: sub.items.data.map((item) => ({
@@ -237,10 +238,9 @@ export class StripeProvider implements PaymentProvider {
 			productId: (sub.items.data[0]?.plan.product as string) || '',
 			priceId: sub.items.data[0]?.price.id || '',
 			trialEnd: sub.trial_end ? new Date(sub.trial_end * 1000) : null,
-			currentPeriodEnd:
-				(sub as any).current_period_end
-					? new Date((sub as any).current_period_end * 1000)
-					: undefined,
+			currentPeriodEnd: (sub as any).current_period_end
+				? new Date((sub as any).current_period_end * 1000)
+				: undefined,
 			cancelAtPeriodEnd: (sub as any).cancel_at_period_end,
 			quantity: sub.items.data[0]?.quantity,
 			items: sub.items.data.map((item) => ({
@@ -266,8 +266,7 @@ export class StripeProvider implements PaymentProvider {
 					quantity: options.quantity,
 				},
 			],
-			proration_behavior:
-				options.prorationBehavior || 'create_prorations',
+			proration_behavior: options.prorationBehavior || 'create_prorations',
 		}
 
 		// Preserve trial period if requested and subscription is currently trialing
@@ -293,10 +292,9 @@ export class StripeProvider implements PaymentProvider {
 			trialEnd: updatedSub.trial_end
 				? new Date(updatedSub.trial_end * 1000)
 				: null,
-			currentPeriodEnd:
-				(updatedSub as any).current_period_end
-					? new Date((updatedSub as any).current_period_end * 1000)
-					: undefined,
+			currentPeriodEnd: (updatedSub as any).current_period_end
+				? new Date((updatedSub as any).current_period_end * 1000)
+				: undefined,
 			cancelAtPeriodEnd: (updatedSub as any).cancel_at_period_end,
 			quantity: updatedSub.items.data[0]?.quantity,
 			items: updatedSub.items.data.map((item) => ({
@@ -317,10 +315,9 @@ export class StripeProvider implements PaymentProvider {
 			productId: (sub.items.data[0]?.plan.product as string) || '',
 			priceId: sub.items.data[0]?.price.id || '',
 			trialEnd: sub.trial_end ? new Date(sub.trial_end * 1000) : null,
-			currentPeriodEnd:
-				(sub as any).current_period_end
-					? new Date((sub as any).current_period_end * 1000)
-					: undefined,
+			currentPeriodEnd: (sub as any).current_period_end
+				? new Date((sub as any).current_period_end * 1000)
+				: undefined,
 			cancelAtPeriodEnd: (sub as any).cancel_at_period_end,
 			quantity: sub.items.data[0]?.quantity,
 			items: sub.items.data.map((item) => ({
@@ -425,7 +422,7 @@ export class StripeProvider implements PaymentProvider {
 				periodStart: invoice.period_start,
 				periodEnd: invoice.period_end,
 			}))
-		} catch {
+		} catch (error) {
 			console.error('StripeProvider: Error fetching invoices:', error)
 			return []
 		}
@@ -436,7 +433,11 @@ export class StripeProvider implements PaymentProvider {
 		signature: string,
 		secret: string,
 	): Promise<WebhookEvent> {
-		const event = this.stripe.webhooks.constructEvent(payload, signature, secret)
+		const event = this.stripe.webhooks.constructEvent(
+			payload,
+			signature,
+			secret,
+		)
 
 		return {
 			id: event.id,

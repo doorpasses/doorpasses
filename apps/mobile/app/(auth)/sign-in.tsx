@@ -104,7 +104,7 @@ export default function SignInScreen() {
 
 			// Reset form on success
 			reset()
-		} catch {
+		} catch (error) {
 			console.error('❌ Login submission error:', error)
 			// Trigger error haptic feedback
 			await triggerErrorHaptic()

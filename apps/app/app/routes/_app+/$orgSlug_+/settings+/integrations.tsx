@@ -65,7 +65,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			)
 
 			return Response.redirect(authUrl)
-		} catch {
+		} catch (error) {
 			return redirectWithToast(`/${organization.slug}/settings/integrations`, {
 				title: 'Integration failed',
 				description: `Failed to initiate OAuth: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -87,7 +87,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		try {
 			await integrationManager.disconnectIntegration(integrationId)
 			return Response.json({ success: true })
-		} catch {
+		} catch (error) {
 			return Response.json(
 				{
 					error: 'Failed to disconnect integration',
