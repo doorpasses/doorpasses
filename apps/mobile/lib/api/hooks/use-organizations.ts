@@ -1,7 +1,7 @@
+import { type UserOrganization } from '@repo/types'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../auth/hooks/use-auth'
 import { jwtAuthApi } from '../index'
-import type { UserOrganization } from '@repo/types'
 
 export function useOrganizations() {
 	const { user, isAuthenticated } = useAuth()

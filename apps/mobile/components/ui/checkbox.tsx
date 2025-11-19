@@ -4,7 +4,7 @@ import {
 	View,
 	Text,
 	StyleSheet,
-	TouchableOpacityProps,
+	type TouchableOpacityProps,
 } from 'react-native'
 import { triggerSelectionHaptic } from '../../lib/haptics'
 

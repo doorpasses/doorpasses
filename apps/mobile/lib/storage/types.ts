@@ -1,4 +1,4 @@
-import { TokenData } from '../../types'
+import { type TokenData } from '../../types'
 
 export interface StorageError extends Error {
 	code:

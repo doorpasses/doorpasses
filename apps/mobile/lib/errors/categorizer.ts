@@ -1,13 +1,13 @@
 import {
 	ErrorCategory,
-	AppErrorType,
-	NetworkError,
-	AuthenticationError,
-	ValidationError,
-	OAuthError,
-	RateLimitError,
-	BotDetectionError,
-	ServerError,
+	type AppErrorType,
+	type NetworkError,
+	type AuthenticationError,
+	type ValidationError,
+	type OAuthError,
+	type RateLimitError,
+	type BotDetectionError,
+	type ServerError,
 } from './types'
 
 // HTTP status code mappings

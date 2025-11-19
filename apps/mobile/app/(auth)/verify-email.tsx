@@ -1,3 +1,4 @@
+import { useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import {
 	View,
@@ -7,7 +8,6 @@ import {
 	TouchableOpacity,
 	Alert,
 } from 'react-native'
-import { useLocalSearchParams } from 'expo-router'
 import { Screen, Button, ErrorText } from '../../components/ui'
 import { navigateToSignIn } from '../../lib/navigation'
 
@@ -23,13 +23,6 @@ export default function VerifyEmailScreen() {
 		null,
 	)
 	const [isVerified, setIsVerified] = useState(false)
-
-	useEffect(() => {
-		// If we have a token, automatically attempt verification
-		if (token) {
-			void handleVerifyEmail(token)
-		}
-	}, [token])
 
 	const handleVerifyEmail = async (verificationToken: string) => {
 		setIsVerifying(true)
@@ -65,6 +58,13 @@ export default function VerifyEmailScreen() {
 			setIsVerifying(false)
 		}
 	}
+
+	useEffect(() => {
+		// If we have a token, automatically attempt verification
+		if (token) {
+			void handleVerifyEmail(token)
+		}
+	}, [token, handleVerifyEmail])
 
 	const handleResendVerification = async () => {
 		if (!email) {

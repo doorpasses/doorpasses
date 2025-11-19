@@ -1,5 +1,5 @@
 import { useRef, useCallback } from 'react'
-import { TextInput } from 'react-native'
+import { type TextInput } from 'react-native'
 import { dismissKeyboard } from '../lib/keyboard'
 
 export interface UseFocusManagerReturn {
@@ -14,7 +14,9 @@ export interface UseFocusManagerReturn {
  * Hook for managing focus between multiple input fields
  */
 export const useFocusManager = (inputCount: number): UseFocusManagerReturn => {
-	const refs = useRef<(TextInput | null)[]>(Array.from({ length: inputCount }, () => null))
+	const refs = useRef<(TextInput | null)[]>(
+		Array.from({ length: inputCount }, () => null),
+	)
 
 	const setRef = useCallback(
 		(index: number) => (ref: TextInput | null) => {

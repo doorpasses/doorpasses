@@ -1,5 +1,11 @@
 import React from 'react'
-import { View, StyleSheet, ViewProps, StatusBar, Platform } from 'react-native'
+import {
+	View,
+	StyleSheet,
+	type ViewProps,
+	StatusBar,
+	Platform,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 interface ScreenProps extends ViewProps {

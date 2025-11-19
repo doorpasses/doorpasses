@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { View, TextInput, StyleSheet, ViewStyle } from 'react-native'
+import { View, TextInput, StyleSheet, type ViewStyle } from 'react-native'
 
 interface InputOTPProps {
 	maxLength: number

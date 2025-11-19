@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, ViewProps } from 'react-native'
+import { View, Text, StyleSheet, type ViewProps } from 'react-native'
 
 interface DividerProps extends Omit<ViewProps, 'style'> {
 	text?: string

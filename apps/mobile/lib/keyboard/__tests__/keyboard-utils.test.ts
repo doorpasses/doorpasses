@@ -1,5 +1,5 @@
-import { getKeyboardConfig, dismissKeyboard } from '../keyboard-utils'
 import { Keyboard } from 'react-native'
+import { getKeyboardConfig, dismissKeyboard } from '../keyboard-utils'
 
 // Mock React Native Keyboard
 jest.mock('react-native', () => ({

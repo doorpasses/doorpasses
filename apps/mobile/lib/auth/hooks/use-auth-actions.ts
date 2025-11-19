@@ -1,5 +1,5 @@
+import { type LoginCredentials } from '../types'
 import { useAuth } from './use-auth'
-import type { LoginCredentials } from '../types'
 
 /**
  * Hook for accessing authentication actions

@@ -1,7 +1,7 @@
-import React from 'react'
 import { render, fireEvent } from '@testing-library/react-native'
-import { SocialButton } from '../social-button'
+import React from 'react'
 import { useOAuth } from '../../../lib/auth/hooks/use-oauth'
+import { SocialButton } from '../social-button'
 
 // Mock the OAuth hook
 jest.mock('../../../lib/auth/hooks/use-oauth')

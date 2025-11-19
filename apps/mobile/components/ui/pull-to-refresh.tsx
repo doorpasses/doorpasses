@@ -1,5 +1,5 @@
 import React from 'react'
-import { ScrollView, RefreshControl, ScrollViewProps } from 'react-native'
+import { ScrollView, RefreshControl, type ScrollViewProps } from 'react-native'
 import { triggerHaptic } from '../../lib/haptics'
 
 export interface PullToRefreshProps extends ScrollViewProps {

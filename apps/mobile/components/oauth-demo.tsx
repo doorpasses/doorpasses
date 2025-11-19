@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { View, Text, StyleSheet, Alert } from 'react-native'
-import { SocialButton, Button, ErrorText } from './ui'
-import { useOAuth, useOAuthProviders } from '../lib/auth/hooks/use-oauth'
 import { useAuth } from '../lib/auth/hooks/use-auth'
+import { useOAuth, useOAuthProviders } from '../lib/auth/hooks/use-oauth'
+import { SocialButton, Button, ErrorText } from './ui'
 
 /**
  * Demo component showing OAuth authentication flow

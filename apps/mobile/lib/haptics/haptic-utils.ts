@@ -1,5 +1,5 @@
 import * as Haptics from 'expo-haptics'
-import type { HapticFeedbackType } from './types'
+import { type HapticFeedbackType } from './types'
 
 /**
  * Trigger haptic feedback with error handling

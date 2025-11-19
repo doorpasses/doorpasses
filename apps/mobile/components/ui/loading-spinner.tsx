@@ -4,7 +4,7 @@ import {
 	ActivityIndicator,
 	Text,
 	StyleSheet,
-	ViewProps,
+	type ViewProps,
 } from 'react-native'
 
 interface LoadingSpinnerProps extends Omit<ViewProps, 'style'> {

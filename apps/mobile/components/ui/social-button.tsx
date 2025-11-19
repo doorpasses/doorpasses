@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
 import {
 	TouchableOpacity,
@@ -6,7 +7,6 @@ import {
 	View,
 	ActivityIndicator,
 } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
 import { useOAuth } from '../../lib/auth/hooks/use-oauth'
 
 export interface SocialButtonProps {

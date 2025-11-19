@@ -1,4 +1,4 @@
-import { TokenData } from '../../types'
+import { type TokenData } from '../../types'
 import { SecureStorage } from './secure-storage'
 
 export interface TokenValidationResult {

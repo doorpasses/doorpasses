@@ -1,4 +1,7 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useLocalSearchParams } from 'expo-router'
 import React from 'react'
+import { useForm, Controller } from 'react-hook-form'
 import {
 	View,
 	Text,
@@ -6,9 +9,6 @@ import {
 	ScrollView,
 	TouchableOpacity,
 } from 'react-native'
-import { useLocalSearchParams } from 'expo-router'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Screen, Input, Button, ErrorText } from '../../components/ui'
 import { navigateToSignIn } from '../../lib/navigation'

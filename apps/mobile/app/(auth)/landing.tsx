@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router'
 import React, { useState, useRef } from 'react'
 import {
 	StyleSheet,
@@ -8,7 +9,6 @@ import {
 	Dimensions,
 	StatusBar,
 } from 'react-native'
-import { useRouter } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const { width } = Dimensions.get('window')

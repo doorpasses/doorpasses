@@ -1,3 +1,4 @@
+import { useAuth } from '../use-auth'
 import {
 	useAuthActions,
 	useAuthState,
@@ -5,7 +6,6 @@ import {
 	useSignup,
 	useSocialLogin,
 } from '../use-auth-actions'
-import { useAuth } from '../use-auth'
 
 // Mock useAuth
 jest.mock('../use-auth')

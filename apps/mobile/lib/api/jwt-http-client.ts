@@ -1,6 +1,6 @@
-import { HttpClient } from './http-client'
+import { type RequestConfig, type ApiResponse } from '@repo/types'
 import { TokenManager } from '../storage/session-manager'
-import type { RequestConfig, ApiResponse } from '@repo/types'
+import { HttpClient } from './http-client'
 
 export interface JWTHttpClientConfig {
 	baseUrl: string

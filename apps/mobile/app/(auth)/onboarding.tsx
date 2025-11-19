@@ -1,15 +1,15 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useLocalSearchParams, router } from 'expo-router'
 import React, { useState, useRef } from 'react'
+import { useForm, Controller } from 'react-hook-form'
 import {
 	View,
 	Text,
 	StyleSheet,
 	ScrollView,
 	TouchableOpacity,
-	TextInput,
+	type TextInput,
 } from 'react-native'
-import { useLocalSearchParams, router } from 'expo-router'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import {
 	Screen,
@@ -21,12 +21,12 @@ import {
 	SuccessAnimation,
 } from '../../components/ui'
 import { useOnboarding } from '../../lib/auth/hooks'
-import { navigateAfterAuth } from '../../lib/navigation'
-import { dismissKeyboard } from '../../lib/keyboard/keyboard-utils'
 import {
 	triggerSuccessHaptic,
 	triggerErrorHaptic,
 } from '../../lib/haptics/haptic-utils'
+import { dismissKeyboard } from '../../lib/keyboard/keyboard-utils'
+import { navigateAfterAuth } from '../../lib/navigation'
 
 const OnboardingSchema = z
 	.object({

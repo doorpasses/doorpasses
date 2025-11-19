@@ -1,7 +1,7 @@
 import * as SecureStore from 'expo-secure-store'
+import { type TokenData } from '../../../types'
 import { SecureStorage } from '../secure-storage'
 import { StorageKeys } from '../types'
-import { TokenData } from '../../../types'
 
 // Mock expo-secure-store
 jest.mock('expo-secure-store', () => ({

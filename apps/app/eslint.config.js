@@ -8,7 +8,6 @@ export default [
 		files: ['**/tests/**/*.ts'],
 		rules: {
 			'react-hooks/rules-of-hooks': 'off',
-			'playwright/no-raw-locators': 'off',
 		},
 	},
 	{

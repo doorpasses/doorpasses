@@ -1,4 +1,8 @@
-import { ApiResponse, NetworkError, RequestConfig } from '@repo/types'
+import {
+	type ApiResponse,
+	type NetworkError,
+	type RequestConfig,
+} from '@repo/types'
 
 export interface HttpClientConfig {
 	baseUrl: string

@@ -1,4 +1,4 @@
-import { ApiResponse, AuthError } from '@repo/types'
+import { type ApiResponse, type AuthError } from '@repo/types'
 
 export type ErrorType =
 	| 'network'

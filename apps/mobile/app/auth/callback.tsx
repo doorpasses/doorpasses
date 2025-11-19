@@ -1,8 +1,8 @@
+import { useLocalSearchParams, router } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
-import { useLocalSearchParams, router } from 'expo-router'
-import { useOAuthCallback } from '../../lib/auth/hooks/use-oauth'
 import { Screen, Button, ErrorText } from '../../components/ui'
+import { useOAuthCallback } from '../../lib/auth/hooks/use-oauth'
 
 /**
  * OAuth callback screen that handles OAuth redirects

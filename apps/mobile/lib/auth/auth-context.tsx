@@ -5,10 +5,10 @@ import React, {
 	useEffect,
 	type ReactNode,
 } from 'react'
-import type { AuthContextType, LoginCredentials } from './types'
-import { authReducer, initialAuthState } from './auth-reducer'
-import { TokenManager } from '../storage/session-manager'
 import { jwtAuthApi } from '../api'
+import { TokenManager } from '../storage/session-manager'
+import { authReducer, initialAuthState } from './auth-reducer'
+import { type AuthContextType, type LoginCredentials } from './types'
 
 // Create the authentication context
 export const AuthContext = createContext<AuthContextType | null>(null)
@@ -23,142 +23,92 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	// Initialize token manager
 	const tokenManager = TokenManager.getInstance()
 
-	// Initialize authentication state from stored tokens
-	useEffect(() => {
-		const initializeAuth = async () => {
-			try {
-				dispatch({ type: 'SET_LOADING', payload: { isLoading: true } })
-
-				const storedTokens = await tokenManager.getCurrentTokens()
-				const storedUser = await tokenManager.getUser()
-
-				if (storedTokens && storedUser) {
-					// Check if tokens are still valid
-					const validation = await tokenManager.validateTokens()
-
-					if (validation.isValid) {
-						// Set auth token for API requests
-						await jwtAuthApi.setAuthToken(storedTokens.accessToken)
-
-						dispatch({
-							type: 'AUTH_SUCCESS',
-							payload: {
-								user: storedUser,
-								tokens: storedTokens,
-							},
-						})
-					} else if (validation.needsRefresh) {
-						// Try to refresh tokens
-						try {
-							await refreshTokens()
-						} catch {
-							// Refresh failed, clear storage
-							await tokenManager.clearTokens()
-							jwtAuthApi.clearAuthToken()
-						}
-					} else {
-						// Tokens expired, clear storage
-						await tokenManager.clearTokens()
-						jwtAuthApi.clearAuthToken()
-					}
-				}
-			} catch {
-				console.error('Failed to initialize auth')
-				dispatch({
-					type: 'AUTH_ERROR',
-					payload: { error: 'Failed to initialize authentication' },
-				})
-			} finally {
-				dispatch({ type: 'SET_LOADING', payload: { isLoading: false } })
-			}
-		}
-
-		void initializeAuth()
-	}, [])
-
 	// Login function
-	const login = useCallback(async (credentials: LoginCredentials) => {
-		try {
-			console.log('🔐 Auth Context: Starting login process')
-			dispatch({ type: 'AUTH_START' })
+	const login = useCallback(
+		async (credentials: LoginCredentials) => {
+			try {
+				console.log('🔐 Auth Context: Starting login process')
+				dispatch({ type: 'AUTH_START' })
 
-			const response = await jwtAuthApi.login(credentials)
-			console.log('📡 Auth Context: API response:', {
-				success: response.success,
-				error: response.error,
-				message: response.message,
-			})
-			console.log('📡 Auth Context: Full response:', response)
-			console.log('📡 Auth Context: Response data:', response.data)
-
-			if (
-				response.success &&
-				response?.data?.user &&
-				response.data?.accessToken
-			) {
-				console.log(
-					'✅ Auth Context: Login successful, setting user and tokens',
-				)
-
-				// Transform API response to match mobile app types
-				const user = {
-					id: response.data.user.id,
-					email: response.data.user.email,
-					username: response.data.user.username,
-					name: response.data.user.name || undefined,
-					image: response.data.user.image || undefined,
-					createdAt: response.data.user.createdAt,
-					updatedAt: response.data.user.updatedAt,
-				}
-
-				const tokens = {
-					accessToken: response.data.accessToken,
-					refreshToken: response.data.refreshToken,
-					expiresIn: response.data.expiresIn,
-					expiresAt: response.data.expiresAt,
-				}
-
-				// Store tokens and user data securely
-				await tokenManager.storeTokens(tokens)
-				await tokenManager.storeUser(user)
-
-				// Set auth token for API requests
-				await jwtAuthApi.setAuthToken(tokens.accessToken)
-
-				dispatch({
-					type: 'AUTH_SUCCESS',
-					payload: { user, tokens },
+				const response = await jwtAuthApi.login(credentials)
+				console.log('📡 Auth Context: API response:', {
+					success: response.success,
+					error: response.error,
+					message: response.message,
 				})
-			} else {
-				console.log(
-					'❌ Auth Context: Login failed:',
-					response.error || response.message,
-				)
+				console.log('📡 Auth Context: Full response:', response)
+				console.log('📡 Auth Context: Response data:', response.data)
+
+				if (
+					response.success &&
+					response?.data?.user &&
+					response.data?.accessToken
+				) {
+					console.log(
+						'✅ Auth Context: Login successful, setting user and tokens',
+					)
+
+					// Transform API response to match mobile app types
+					const user = {
+						id: response.data.user.id,
+						email: response.data.user.email,
+						username: response.data.user.username,
+						name: response.data.user.name || undefined,
+						image: response.data.user.image || undefined,
+						createdAt: response.data.user.createdAt,
+						updatedAt: response.data.user.updatedAt,
+					}
+
+					const tokens = {
+						accessToken: response.data.accessToken,
+						refreshToken: response.data.refreshToken,
+						expiresIn: response.data.expiresIn,
+						expiresAt: response.data.expiresAt,
+					}
+
+					// Store tokens and user data securely
+					await tokenManager.storeTokens(tokens)
+					await tokenManager.storeUser(user)
+
+					// Set auth token for API requests
+					await jwtAuthApi.setAuthToken(tokens.accessToken)
+
+					dispatch({
+						type: 'AUTH_SUCCESS',
+						payload: { user, tokens },
+					})
+				} else {
+					console.log(
+						'❌ Auth Context: Login failed:',
+						response.error || response.message,
+					)
+					const errorMessage =
+						response.error || response.message || 'Login failed'
+
+					dispatch({
+						type: 'AUTH_ERROR',
+						payload: { error: errorMessage },
+					})
+
+					// Throw error so calling components know login failed
+					throw new Error(errorMessage)
+				}
+			} catch (error) {
 				const errorMessage =
-					response.error || response.message || 'Login failed'
+					error instanceof Error ? error.message : 'Login failed'
+				console.log('❌ Auth Context: Login error:', errorMessage)
 
 				dispatch({
 					type: 'AUTH_ERROR',
 					payload: { error: errorMessage },
 				})
 
-				// Throw error so calling components know login failed
-				throw new Error(errorMessage)
+				// Re-throw the error so calling components know login failed
+				throw error
 			}
-		} catch (error) {
-			const errorMessage =
-				error instanceof Error ? error.message : 'Login failed'
-			console.log('❌ Auth Context: Login error:', errorMessage)
-
-			dispatch({
-				type: 'AUTH_ERROR',
-				payload: { error: errorMessage },
-			})
-
-			// Re-throw the error so calling components know login failed
-			throw error
-		}
-	}, [])
+		},
+		[tokenManager],
+	)
 
 	// Signup function
 	const signup = useCallback(async (email: string) => {
@@ -270,7 +220,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 				})
 			}
 		},
-		[],
+		[tokenManager],
 	)
 
 	// Logout function
@@ -298,7 +248,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 			jwtAuthApi.clearAuthToken()
 			dispatch({ type: 'LOGOUT' })
 		}
-	}, [])
+	}, [tokenManager])
 
 	// Refresh tokens function
 	const refreshTokens = useCallback(async () => {
@@ -366,7 +316,60 @@ export function AuthProvider({ children }: AuthProviderProps) {
 			// On refresh error, logout user
 			await logout()
 		}
-	}, [logout])
+	}, [logout, tokenManager])
+
+	// Initialize authentication state from stored tokens
+	useEffect(() => {
+		const initializeAuth = async () => {
+			try {
+				dispatch({ type: 'SET_LOADING', payload: { isLoading: true } })
+
+				const storedTokens = await tokenManager.getCurrentTokens()
+				const storedUser = await tokenManager.getUser()
+
+				if (storedTokens && storedUser) {
+					// Check if tokens are still valid
+					const validation = await tokenManager.validateTokens()
+
+					if (validation.isValid) {
+						// Set auth token for API requests
+						await jwtAuthApi.setAuthToken(storedTokens.accessToken)
+
+						dispatch({
+							type: 'AUTH_SUCCESS',
+							payload: {
+								user: storedUser,
+								tokens: storedTokens,
+							},
+						})
+					} else if (validation.needsRefresh) {
+						// Try to refresh tokens
+						try {
+							await refreshTokens()
+						} catch {
+							// Refresh failed, clear storage
+							await tokenManager.clearTokens()
+							jwtAuthApi.clearAuthToken()
+						}
+					} else {
+						// Tokens expired, clear storage
+						await tokenManager.clearTokens()
+						jwtAuthApi.clearAuthToken()
+					}
+				}
+			} catch {
+				console.error('Failed to initialize auth')
+				dispatch({
+					type: 'AUTH_ERROR',
+					payload: { error: 'Failed to initialize authentication' },
+				})
+			} finally {
+				dispatch({ type: 'SET_LOADING', payload: { isLoading: false } })
+			}
+		}
+
+		void initializeAuth()
+	}, [tokenManager, refreshTokens])
 
 	// Verify function
 	const verify = useCallback(
@@ -483,7 +486,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 				})
 			}
 		},
-		[],
+		[tokenManager],
 	)
 
 	// Clear error function

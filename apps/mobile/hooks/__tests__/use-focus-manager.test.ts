@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react-native'
-import { useFocusManager } from '../use-focus-manager'
 import { dismissKeyboard } from '../../lib/keyboard'
+import { useFocusManager } from '../use-focus-manager'
 
 // Mock keyboard utils
 jest.mock('../../lib/keyboard', () => ({

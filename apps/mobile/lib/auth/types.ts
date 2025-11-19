@@ -1,4 +1,4 @@
-import type { User, TokenData, LoginCredentials } from '../../types'
+import { type User, type TokenData, type LoginCredentials } from '../../types'
 
 // Re-export for convenience
 export type { LoginCredentials }

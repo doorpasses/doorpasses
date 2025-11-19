@@ -1,12 +1,12 @@
 import {
 	ErrorCategory,
-	AppErrorType,
-	NetworkError,
-	AuthenticationError,
-	ValidationError,
-	OAuthError,
-	RateLimitError,
-	ServerError,
+	type AppErrorType,
+	type NetworkError,
+	type AuthenticationError,
+	type ValidationError,
+	type OAuthError,
+	type RateLimitError,
+	type ServerError,
 } from './types'
 
 // User-friendly error messages

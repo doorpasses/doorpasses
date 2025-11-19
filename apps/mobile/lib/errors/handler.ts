@@ -1,4 +1,3 @@
-import { AppErrorType, ErrorDisplayConfig, ErrorCategory } from './types'
 import { categorizeError } from './categorizer'
 import {
 	getErrorMessage,
@@ -7,6 +6,11 @@ import {
 	formatValidationErrors,
 } from './messages'
 import { shouldShowRetryButton, getRateLimitRetryDelay } from './retry'
+import {
+	type AppErrorType,
+	type ErrorDisplayConfig,
+	ErrorCategory,
+} from './types'
 
 /**
  * Main error handler class that processes errors and determines display strategy

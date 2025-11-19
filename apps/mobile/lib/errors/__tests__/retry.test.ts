@@ -1,3 +1,4 @@
+import { categorizeError } from '../categorizer'
 import {
 	RetryManager,
 	createNetworkRetryManager,
@@ -6,7 +7,6 @@ import {
 	shouldShowRetryButton,
 	getRateLimitRetryDelay,
 } from '../retry'
-import { categorizeError } from '../categorizer'
 import { ErrorCategory } from '../types'
 
 // Mock setTimeout for testing

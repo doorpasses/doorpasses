@@ -1,5 +1,5 @@
 import { Keyboard } from 'react-native'
-import type { KeyboardConfig, InputType } from './types'
+import { type KeyboardConfig, type InputType } from './types'
 
 /**
  * Get optimized keyboard configuration for different input types

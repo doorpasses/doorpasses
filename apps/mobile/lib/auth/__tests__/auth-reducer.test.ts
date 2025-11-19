@@ -1,5 +1,5 @@
 import { authReducer, initialAuthState } from '../auth-reducer'
-import type { AuthAction, AuthState } from '../types'
+import { type AuthAction, type AuthState } from '../types'
 
 describe('authReducer', () => {
 	const mockUser = {

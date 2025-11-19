@@ -1,7 +1,7 @@
 // @ts-nocheck
-import { SessionManager } from '../session-manager'
+import { type SessionData } from '../../../types'
 import { SecureStorage } from '../secure-storage'
-import { SessionData } from '../../../types'
+import { SessionManager } from '../session-manager'
 
 // Mock SecureStorage
 jest.mock('../secure-storage')

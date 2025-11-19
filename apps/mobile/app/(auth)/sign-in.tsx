@@ -1,4 +1,8 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { MobileLoginFormSchema } from '@repo/validation'
+import { useLocalSearchParams } from 'expo-router'
 import React, { useState, useRef } from 'react'
+import { useForm, Controller } from 'react-hook-form'
 import {
 	View,
 	Text,
@@ -6,13 +10,9 @@ import {
 	Alert,
 	TouchableOpacity,
 	ScrollView,
-	TextInput,
+	type TextInput,
 } from 'react-native'
-import { useLocalSearchParams } from 'expo-router'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { MobileLoginFormSchema } from '@repo/validation'
-import type { z } from 'zod'
+import { type z } from 'zod'
 import {
 	Screen,
 	Input,
@@ -26,9 +26,9 @@ import {
 } from '../../components/ui'
 import { useLogin } from '../../lib/auth/hooks/use-auth-actions'
 import { useOAuthProviders } from '../../lib/auth/hooks/use-oauth'
-import { navigateToSignUp, navigateAfterAuth } from '../../lib/navigation'
-import { dismissKeyboard } from '../../lib/keyboard'
 import { triggerSuccessHaptic, triggerErrorHaptic } from '../../lib/haptics'
+import { dismissKeyboard } from '../../lib/keyboard'
+import { navigateToSignUp, navigateAfterAuth } from '../../lib/navigation'
 
 type LoginFormData = z.infer<typeof MobileLoginFormSchema>
 

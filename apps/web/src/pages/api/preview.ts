@@ -1,6 +1,6 @@
-import PreviewContent from '@/components/PreviewContent.astro'
-import type { APIRoute } from 'astro'
+import { type APIRoute } from 'astro'
 import { experimental_AstroContainer as AstroContainer } from 'astro/container'
+import PreviewContent from '@/components/PreviewContent.astro'
 
 export const prerender = false
 

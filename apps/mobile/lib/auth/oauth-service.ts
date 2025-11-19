@@ -1,6 +1,6 @@
 import * as AuthSession from 'expo-auth-session'
-import * as Linking from 'expo-linking'
 import Constants from 'expo-constants'
+import * as Linking from 'expo-linking'
 import { Platform } from 'react-native'
 
 export interface OAuthProvider {

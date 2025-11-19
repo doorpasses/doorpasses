@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react-native'
-import { useOAuth, useOAuthCallback, useOAuthProviders } from '../use-oauth'
 import { oauthService, type OAuthResult } from '../../oauth-service'
+import { useOAuth, useOAuthCallback, useOAuthProviders } from '../use-oauth'
 
 // Mock dependencies
 const mockSocialLogin = jest.fn()

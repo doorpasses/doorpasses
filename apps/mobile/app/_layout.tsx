@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react'
+import * as Linking from 'expo-linking'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
-import * as Linking from 'expo-linking'
-import { AuthProvider } from '../lib/auth/auth-context'
+import React, { useEffect } from 'react'
 import { AuthGuard } from '../components/auth-guard'
+import { AuthProvider } from '../lib/auth/auth-context'
 import { handleDeepLink } from '../lib/navigation'
 
 export default function RootLayout() {

@@ -4,7 +4,7 @@ import {
 	Text,
 	StyleSheet,
 	ActivityIndicator,
-	TouchableOpacityProps,
+	type TouchableOpacityProps,
 } from 'react-native'
 import { triggerButtonHaptic } from '../../lib/haptics'
 

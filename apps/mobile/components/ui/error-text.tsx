@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, StyleSheet, TextProps, View } from 'react-native'
+import { Text, StyleSheet, type TextProps, View } from 'react-native'
 
 export interface ErrorTextProps extends TextProps {
 	children: React.ReactNode

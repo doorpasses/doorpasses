@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router'
 import React from 'react'
 import {
 	StyleSheet,
@@ -7,7 +8,6 @@ import {
 	ScrollView,
 	Dimensions,
 } from 'react-native'
-import { useRouter } from 'expo-router'
 import { Screen, Button } from '../../components/ui'
 
 const { width, height } = Dimensions.get('window')

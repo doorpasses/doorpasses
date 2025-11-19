@@ -1,6 +1,6 @@
+import { router } from 'expo-router'
 import React from 'react'
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native'
-import { router } from 'expo-router'
 import {
 	Screen,
 	Card,
@@ -8,8 +8,8 @@ import {
 	CardContent,
 	Button,
 } from '../../components/ui'
-import { useAuth } from '../../lib/auth/hooks/use-auth'
 import { useOrganizations } from '../../lib/api/hooks/use-organizations'
+import { useAuth } from '../../lib/auth/hooks/use-auth'
 
 export default function DashboardScreen() {
 	const { user, logout, isLoading } = useAuth()

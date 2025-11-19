@@ -1,4 +1,7 @@
-import { KeyboardTypeOptions, ReturnKeyTypeOptions } from 'react-native'
+import {
+	type KeyboardTypeOptions,
+	type ReturnKeyTypeOptions,
+} from 'react-native'
 
 export interface KeyboardConfig {
 	keyboardType: KeyboardTypeOptions

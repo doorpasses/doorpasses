@@ -1,3 +1,4 @@
+import { type ApiResponse } from '@repo/types'
 import {
 	parseApiError,
 	parseNetworkError,
@@ -9,7 +10,6 @@ import {
 	getRetryDelay,
 	ErrorHandler,
 } from '../errors'
-import { ApiResponse } from '@repo/types'
 
 describe('Error Utilities', () => {
 	describe('parseApiError', () => {

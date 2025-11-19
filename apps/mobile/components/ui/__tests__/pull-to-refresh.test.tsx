@@ -1,5 +1,5 @@
-import React from 'react'
 import { render } from '@testing-library/react-native'
+import React from 'react'
 import { Text } from 'react-native'
 import { PullToRefresh } from '../pull-to-refresh'
 // Mock haptics

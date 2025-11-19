@@ -1,7 +1,7 @@
-import React from 'react'
 import { render, fireEvent, waitFor } from '@testing-library/react-native'
-import { Button } from '../button'
+import React from 'react'
 import { triggerButtonHaptic } from '../../../lib/haptics'
+import { Button } from '../button'
 
 // Mock haptics
 jest.mock('../../../lib/haptics', () => ({

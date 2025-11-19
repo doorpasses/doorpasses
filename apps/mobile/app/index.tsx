@@ -1,6 +1,6 @@
+import { Redirect } from 'expo-router'
 import React from 'react'
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
-import { Redirect } from 'expo-router'
 import { useAuth } from '../lib/auth/hooks/use-auth'
 
 /**

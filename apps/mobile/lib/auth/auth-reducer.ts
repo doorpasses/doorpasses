@@ -1,4 +1,4 @@
-import type { AuthAction, AuthState } from './types'
+import { type AuthAction, type AuthState } from './types'
 
 // Initial authentication state
 export const initialAuthState: AuthState = {

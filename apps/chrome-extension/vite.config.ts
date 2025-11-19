@@ -1,8 +1,8 @@
 import { crx, type ManifestV3Export } from '@crxjs/vite-plugin'
 import tailwindcss from '@tailwindcss/vite'
+import { brand } from '@repo/config/brand'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
-import { brand } from '@repo/config/brand'
 
 const BROWSER = process.env.BROWSER || 'chrome'
 

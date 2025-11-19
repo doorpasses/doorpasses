@@ -1,5 +1,5 @@
-import React from 'react'
 import { render } from '@testing-library/react-native'
+import React from 'react'
 
 // Mock the entire SignUp component to avoid React hooks compatibility issues
 jest.mock('../sign-up', () => {

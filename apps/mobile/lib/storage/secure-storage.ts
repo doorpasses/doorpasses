@@ -1,7 +1,7 @@
 import * as SecureStore from 'expo-secure-store'
 import { Platform } from 'react-native'
-import { TokenData } from '../../types'
-import { StorageError, StorageKeys } from './types'
+import { type TokenData } from '../../types'
+import { type StorageError, StorageKeys } from './types'
 
 // Web fallback using localStorage (less secure but functional for development)
 const WebStorage = {

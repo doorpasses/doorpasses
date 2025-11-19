@@ -1,5 +1,5 @@
-import { AppErrorType, ErrorCategory } from './types'
 import { categorizeError, isRetryableError } from './categorizer'
+import { type AppErrorType, ErrorCategory } from './types'
 
 export interface RetryConfig {
 	maxAttempts: number

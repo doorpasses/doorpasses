@@ -4,7 +4,7 @@ import {
 	Text,
 	StyleSheet,
 	TouchableOpacity,
-	ViewProps,
+	type ViewProps,
 } from 'react-native'
 
 export interface ErrorBannerProps extends ViewProps {

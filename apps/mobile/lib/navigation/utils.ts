@@ -1,5 +1,5 @@
-import { router } from 'expo-router'
 import * as Linking from 'expo-linking'
+import { router } from 'expo-router'
 
 /**
  * Navigation utilities for handling authentication flows and deep linking

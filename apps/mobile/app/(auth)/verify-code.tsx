@@ -1,4 +1,7 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useLocalSearchParams, router } from 'expo-router'
 import React, { useState } from 'react'
+import { useForm, Controller } from 'react-hook-form'
 import {
 	View,
 	Text,
@@ -8,18 +11,15 @@ import {
 	Alert,
 	TextInput,
 } from 'react-native'
-import { useLocalSearchParams, router } from 'expo-router'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Screen, Button, ErrorText, LoadingOverlay } from '../../components/ui'
 import { useVerify } from '../../lib/auth/hooks'
-import { navigateToSignIn } from '../../lib/navigation'
-import { dismissKeyboard } from '../../lib/keyboard/keyboard-utils'
 import {
 	triggerSuccessHaptic,
 	triggerErrorHaptic,
 } from '../../lib/haptics/haptic-utils'
+import { dismissKeyboard } from '../../lib/keyboard/keyboard-utils'
+import { navigateToSignIn } from '../../lib/navigation'
 
 const VerifyCodeSchema = z.object({
 	code: z

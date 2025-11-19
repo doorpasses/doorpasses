@@ -1,10 +1,10 @@
+import { categorizeError } from '../categorizer'
 import {
 	getErrorMessage,
 	getErrorActionText,
 	getErrorTitle,
 	formatValidationErrors,
 } from '../messages'
-import { categorizeError } from '../categorizer'
 import { ErrorCategory } from '../types'
 
 describe('getErrorMessage', () => {

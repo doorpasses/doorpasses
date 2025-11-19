@@ -1,6 +1,6 @@
 import {
-	KeyboardTypeOptions,
-	ReturnKeyTypeOptions,
+	type KeyboardTypeOptions,
+	type ReturnKeyTypeOptions,
 	Keyboard,
 } from 'react-native'
 

@@ -1,15 +1,14 @@
+import { Ionicons } from '@expo/vector-icons'
 import React, { forwardRef } from 'react'
 import {
 	TextInput,
-	TextInputProps,
+	type TextInputProps,
 	View,
 	Text,
 	StyleSheet,
 	TouchableOpacity,
 } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
-import { getKeyboardConfig } from '../../lib/keyboard'
-import type { InputType } from '../../lib/keyboard'
+import { getKeyboardConfig, type InputType } from '../../lib/keyboard'
 
 export interface InputProps extends Omit<TextInputProps, 'style'> {
 	label?: string
