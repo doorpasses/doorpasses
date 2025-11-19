@@ -38,7 +38,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/tabs'
 import { Textarea } from '@repo/ui/textarea'
 import { useState } from 'react'
-import { Form, Link, useSearchParams, useLoaderData , redirect  } from 'react-router'
+import { Form, Link, useLoaderData, redirect } from 'react-router'
 import { z } from 'zod'
 
 import { prisma } from '#app/utils/db.server.ts'
@@ -386,7 +386,6 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 export default function AdminRoleDetailPage() {
 	const { role, roleType, allPermissions } = useLoaderData<typeof loader>()
-	const [ignoredSearchParams] = useSearchParams()
 	const [selectedTab, setSelectedTab] = useState('feature')
 
 	// Group permissions by entity for better organization

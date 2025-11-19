@@ -1,12 +1,18 @@
 // import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 // import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { Button } from '@repo/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/ui/card'
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from '@repo/ui/card'
 import { Icon } from '@repo/ui/icon'
 import { Input } from '@repo/ui/input'
 import { Label } from '@repo/ui/label'
 import { Textarea } from '@repo/ui/textarea'
-import { Form, useActionData } from 'react-router'
+import { Form } from 'react-router'
 import { z } from 'zod'
 // import { Field, ErrorList, CheckboxField } from './forms.tsx'
 
@@ -82,11 +88,6 @@ export function SSOConfigurationForm({
 	isSubmitting = false,
 	testConnectionResult,
 }: SSOConfigurationFormProps) {
-	const ignoredActionData = useActionData<{
-		result?: any
-		errors?: any
-	}>()
-
 	// Simplified form without Conform for debugging
 
 	const autoDiscoveryEnabled = existingConfig?.autoDiscovery ?? true

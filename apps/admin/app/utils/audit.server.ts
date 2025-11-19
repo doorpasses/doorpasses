@@ -611,14 +611,10 @@ export class AuditService {
 		if (!message) return message
 
 		// Remove control characters and limit length
-		return (
-			message
-				 
-				.replace(/[\x00-\x1F\x7F]/g, '')
-				 
-				.replace(/\x1b\[[0-9;]*m/g, '')
-				.substring(0, 2000)
-		)
+		return message
+			.replace(/[\x00-\x1F\x7F]/g, '')
+			.replace(/\x1b\[[0-9;]*m/g, '')
+			.substring(0, 2000)
 	}
 
 	private escapeCsvValue(value: string): string {

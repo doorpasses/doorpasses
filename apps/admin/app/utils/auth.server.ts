@@ -374,7 +374,7 @@ export async function checkIsCommonPassword(password: string) {
 
 		const data = await response.text()
 		return data.split(/\r?\n/).some((line) => {
-			const [hashSuffix, ignoredPrevalenceCount] = line.split(':')
+			const [hashSuffix] = line.split(':')
 			return hashSuffix === suffix
 		})
 	} catch (error) {
