@@ -13,7 +13,8 @@ export function parseOrganizationPermissionString(
 	return {
 		action: action?.trim() || '',
 		entity: entity?.trim() || '',
-		access: access ? access.split(',').map((a) => a.trim()) : undefined,
+		access:
+			access !== undefined ? access.split(',').map((a) => a.trim()) : undefined,
 	}
 }
 
@@ -132,7 +133,10 @@ export function userHasOrganizationPermissionClient(
 		(p) =>
 			p.action === action &&
 			p.entity === entity &&
-			(!access || access.includes(p.access)),
+			(!access ||
+				access.length === 0 ||
+				access.includes('') ||
+				access.includes(p.access)),
 	)
 }
 

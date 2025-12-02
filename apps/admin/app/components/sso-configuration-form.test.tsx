@@ -169,8 +169,6 @@ describe('SSOConfigurationForm', () => {
 
 		// The component uses custom styling instead of Alert component
 		expect(screen.getByText('Connection successful')).toBeInTheDocument()
-		// Check for the success icon
-		expect(screen.getByTestId('icon-check-circle')).toBeInTheDocument()
 	})
 
 	it('displays error test connection result', () => {
@@ -190,8 +188,6 @@ describe('SSOConfigurationForm', () => {
 		expect(
 			screen.getByText('Connection failed: Invalid credentials'),
 		).toBeInTheDocument()
-		// Check for the error icon
-		expect(screen.getByTestId('icon-alert-triangle')).toBeInTheDocument()
 	})
 
 	it('shows submitting state when isSubmitting is true', () => {

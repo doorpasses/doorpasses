@@ -161,7 +161,7 @@ describe('IntegrationEncryptionService Edge Cases', () => {
 			const newService = new IntegrationEncryptionService()
 
 			await expect(newService.decryptTokenData(encrypted)).rejects.toThrow(
-				'Failed to decrypt token data',
+				/Decryption failed/,
 			)
 		})
 
@@ -516,7 +516,7 @@ describe('IntegrationEncryptionService Edge Cases', () => {
 			const tokenData: TokenData = { accessToken: 'token' }
 
 			await expect(newService.encryptTokenData(tokenData)).rejects.toThrow(
-				'must be exactly 64 hex characters',
+				/INTEGRATION_ENCRYPTION_KEY.*valid.*encryption key/,
 			)
 		})
 
@@ -527,7 +527,7 @@ describe('IntegrationEncryptionService Edge Cases', () => {
 			const tokenData: TokenData = { accessToken: 'token' }
 
 			await expect(newService.encryptTokenData(tokenData)).rejects.toThrow(
-				'must be exactly 64 hex characters',
+				/INTEGRATION_ENCRYPTION_KEY.*valid.*encryption key/,
 			)
 		})
 
@@ -550,7 +550,7 @@ describe('IntegrationEncryptionService Edge Cases', () => {
 			const tokenData: TokenData = { accessToken: 'token' }
 
 			await expect(newService.encryptTokenData(tokenData)).rejects.toThrow(
-				'INTEGRATION_ENCRYPTION_KEY environment variable cannot be empty or whitespace-only',
+				/INTEGRATION_ENCRYPTION_KEY.*valid.*encryption key/,
 			)
 		})
 	})

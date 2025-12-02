@@ -24,14 +24,18 @@ export interface GetClientIpOptions {
 /**
  * Type guard to check if an object has a get method (Express-style request)
  */
-function hasGetMethod(obj: any): obj is { get: (name: string) => string | undefined } {
+function hasGetMethod(
+	obj: any,
+): obj is { get: (name: string) => string | undefined } {
 	return typeof obj?.get === 'function'
 }
 
 /**
  * Type guard to check if an object has headers.get method (Web API Request)
  */
-function hasHeadersGet(obj: any): obj is { headers: { get: (name: string) => string | null } } {
+function hasHeadersGet(
+	obj: any,
+): obj is { headers: { get: (name: string) => string | null } } {
 	return obj?.headers && typeof obj.headers.get === 'function'
 }
 
@@ -76,17 +80,19 @@ function hasHeadersGet(obj: any): obj is { headers: { get: (name: string) => str
  */
 export function getClientIp(
 	request: any,
-	options: GetClientIpOptions & { returnUndefined: true }
+	options: GetClientIpOptions & { returnUndefined: true },
 ): string | undefined
+export function getClientIp(request: any, options?: GetClientIpOptions): string
 export function getClientIp(
 	request: any,
-	options?: GetClientIpOptions
-): string
-export function getClientIp(
-	request: any,
-	options: GetClientIpOptions = {}
+	options: GetClientIpOptions = {},
 ): string | undefined {
 	const { fallback = '127.0.0.1', returnUndefined = false } = options
+
+	// Handle null/undefined requests early
+	if (request == null) {
+		return returnUndefined ? undefined : fallback
+	}
 
 	// Helper function to get header value regardless of request type
 	const getHeader = (name: string): string | null | undefined => {

@@ -18,10 +18,10 @@ import {
 } from './sso-sanitization.server.ts'
 
 // Mock the encryption functions
-vi.mock('./encryption.server.ts', () => ({
+vi.mock('@repo/security', () => ({
 	encrypt: vi.fn((data: string) => `encrypted_${data}`),
 	decrypt: vi.fn((data: string) => data.replace('encrypted_', '')),
-	getSSOMasterKey: vi.fn(() => 'test-master-key'),
+	getSSOMasterKey: vi.fn(() => 'test-master-key-1234567890123456'),
 }))
 
 describe('SSO Security Tests', () => {

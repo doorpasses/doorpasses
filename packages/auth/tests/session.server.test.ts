@@ -125,7 +125,11 @@ describe('Session Management', () => {
 
 			expect(setCookieHeader).toBeDefined()
 			expect(setCookieHeader).toContain('en_session=')
-			expect(setCookieHeader).toContain('Max-Age=0')
+			// Cookie expiration can use either Max-Age=0 or Expires with past date
+			expect(
+				setCookieHeader.includes('Max-Age=0') ||
+					setCookieHeader.includes('Expires=Thu, 01 Jan 1970'),
+			).toBe(true)
 		})
 
 		it('should handle missing session data gracefully', async () => {
@@ -202,12 +206,29 @@ describe('Session Management', () => {
 		})
 
 		it('should set domain when ROOT_APP is defined', async () => {
-			const session = await authSessionStorage.getSession()
+			const originalRootApp = process.env.ROOT_APP
+			process.env.ROOT_APP = 'example.com'
+			// Reset modules to reload session storage with new env
+			vi.resetModules()
+			const { authSessionStorage: testAuthSessionStorage } = await import(
+				'../src/session.server'
+			)
+
+			const session = await testAuthSessionStorage.getSession()
 			session.set('test', 'value')
 
-			const setCookieHeader = await authSessionStorage.commitSession(session)
+			const setCookieHeader =
+				await testAuthSessionStorage.commitSession(session)
 
 			expect(setCookieHeader).toContain('Domain=.example.com')
+
+			// Restore original env
+			if (originalRootApp) {
+				process.env.ROOT_APP = originalRootApp
+			} else {
+				delete process.env.ROOT_APP
+			}
+			vi.resetModules()
 		})
 	})
 
@@ -227,6 +248,7 @@ describe('Session Management', () => {
 
 		it('should throw error when SESSION_SECRET is missing', async () => {
 			delete process.env.SESSION_SECRET
+			vi.resetModules()
 
 			await expect(async () => {
 				await import('../src/session.server?v=' + Date.now())
@@ -235,6 +257,7 @@ describe('Session Management', () => {
 
 		it('should throw error when SESSION_SECRET is empty', async () => {
 			process.env.SESSION_SECRET = ''
+			vi.resetModules()
 
 			await expect(async () => {
 				await import('../src/session.server?v=' + Date.now())
@@ -262,7 +285,9 @@ describe('Session Management', () => {
 
 			await expect(async () => {
 				await import('../src/session.server?v=' + Date.now())
-			}).rejects.toThrow('SESSION_SECRET must contain at least one non-empty secret')
+			}).rejects.toThrow(
+				'SESSION_SECRET must contain at least one non-empty secret',
+			)
 		})
 	})
 

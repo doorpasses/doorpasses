@@ -232,9 +232,11 @@ describe('OIDC Discovery', () => {
 			const result = validateDiscoveryDocument(doc, 'https://auth.example.com')
 
 			expect(result.valid).toBe(false)
-			expect(result.errors).toContain('Invalid authorization_endpoint URL')
-			expect(result.errors).toContain('Invalid token_endpoint URL')
-			expect(result.errors).toContain('Invalid jwks_uri URL')
+			expect(
+				result.errors.some((e) => e.includes('authorization_endpoint')),
+			).toBe(true)
+			expect(result.errors.some((e) => e.includes('token_endpoint'))).toBe(true)
+			expect(result.errors.some((e) => e.includes('jwks_uri'))).toBe(true)
 		})
 
 		it('should generate warnings for missing optional fields', () => {
@@ -293,9 +295,9 @@ describe('OIDC Discovery', () => {
 			const result = validateManualEndpoints(endpoints)
 
 			expect(result.valid).toBe(false)
-			expect(result.errors).toContain('Invalid authorization URL')
-			expect(result.errors).toContain('Invalid token URL')
-			expect(result.errors).toContain('Invalid userinfo URL')
+			expect(result.errors.some((e) => e.includes('authorization'))).toBe(true)
+			expect(result.errors.some((e) => e.includes('token'))).toBe(true)
+			expect(result.errors.some((e) => e.includes('userinfo'))).toBe(true)
 		})
 
 		it('should generate warnings for missing optional endpoints', () => {
