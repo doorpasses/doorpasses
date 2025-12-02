@@ -1,0 +1,421 @@
+---
+title: 'Usage Guide'
+description: 'How to use the DoorPasses Node.js SDK'
+---
+
+## Client Initialization
+
+Initialize the DoorPasses client with your credentials:
+
+```javascript
+const { DoorPassesClient } = require('@doorpasses/node-sdk');
+
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_ACCOUNT_ID,
+  sharedSecret: process.env.DOORPASSES_SHARED_SECRET
+});
+```
+
+## Access Passes
+
+### Create an Access Pass
+
+Issue a new digital access pass:
+
+```javascript
+const accessPass = await client.accessPasses.create({
+  card_template_id: '0xt3mp14t3',
+  full_name: 'Ahmed Al-Mansouri',
+  email: 'ahmed@company.com',
+  employee_id: 'EMP-001',
+  site_code: '123',
+  card_number: '45678',
+  start_date: '2025-01-01T00:00:00Z',
+  expiration_date: '2025-12-31T23:59:59Z',
+  classification: 'full_time',
+  title: 'Senior Engineer'
+});
+
+console.log('Pass ID:', accessPass.data.id);
+console.log('Install URL:', accessPass.data.install_url);
+```
+
+### List Access Passes
+
+Retrieve a list of access passes with optional filtering:
+
+```javascript
+const passes = await client.accessPasses.list({
+  template_id: '0xt3mp14t3',
+  state: 'ACTIVE',
+  page: 1,
+  limit: 50
+});
+
+console.log(`Found ${passes.data.pagination.total} passes`);
+passes.data.items.forEach(pass => {
+  console.log(`- ${pass.fullName} (${pass.state})`);
+});
+```
+
+### Update an Access Pass
+
+Modify information on an existing access pass:
+
+```javascript
+const updated = await client.accessPasses.update('0xp4551d', {
+  title: 'Lead Engineer',
+  expiration_date: '2026-12-31T23:59:59Z'
+});
+
+console.log('Pass updated:', updated.data.id);
+```
+
+### Suspend an Access Pass
+
+Temporarily disable an access pass:
+
+```javascript
+await client.accessPasses.suspend('0xp4551d');
+console.log('Pass suspended');
+```
+
+### Resume an Access Pass
+
+Re-enable a suspended access pass:
+
+```javascript
+await client.accessPasses.resume('0xp4551d');
+console.log('Pass resumed');
+```
+
+### Unlink an Access Pass
+
+Remove an access pass from a device:
+
+```javascript
+await client.accessPasses.unlink('0xp4551d');
+console.log('Pass unlinked');
+```
+
+### Delete an Access Pass
+
+Permanently delete an access pass:
+
+```javascript
+await client.accessPasses.delete('0xp4551d');
+console.log('Pass deleted');
+```
+
+## Card Templates
+
+### Create a Card Template
+
+<Info>Card Template management requires Enterprise tier access</Info>
+
+```javascript
+const template = await client.cardTemplates.create({
+  name: 'Employee Access Badge',
+  platform: 'BOTH',
+  use_case: 'EMPLOYEE_BADGE',
+  protocol: 'DESFIRE',
+  allow_on_multiple_devices: true,
+  watch_count: 2,
+  iphone_count: 3,
+  design: {
+    background_color: '#1E3A8A',
+    label_color: '#FFFFFF',
+    label_secondary_color: '#CBD5E1',
+    logo_image: 'base64-encoded-logo...'
+  },
+  support_info: {
+    support_url: 'https://help.company.com',
+    support_email: 'support@company.com',
+    support_phone_number: '+971-4-1234567'
+  }
+});
+
+console.log('Template created:', template.data.id);
+```
+
+### Get a Card Template
+
+Retrieve a specific card template:
+
+```javascript
+const template = await client.cardTemplates.get('0xt3mp14t3');
+console.log('Template name:', template.data.name);
+console.log('Active passes:', template.data.access_passes_count);
+```
+
+### Update a Card Template
+
+Update an existing card template:
+
+```javascript
+const updated = await client.cardTemplates.update('0xt3mp14t3', {
+  support_info: {
+    support_email: 'newsupport@company.com'
+  }
+});
+
+console.log('Template updated');
+```
+
+### Get Template Logs
+
+Retrieve event logs for a card template:
+
+```javascript
+const logs = await client.cardTemplates.logs('0xt3mp14t3', {
+  event_type: 'install',
+  start_date: '2025-01-01T00:00:00Z',
+  end_date: '2025-01-31T23:59:59Z'
+});
+
+console.log(`Found ${logs.data.items.length} events`);
+```
+
+## Wallet Passes
+
+### Generate a Pass
+
+Generate a wallet pass file:
+
+```javascript
+const pass = await client.wallet.generatePass('0xp4551d', {
+  platform: 'APPLE' // or 'GOOGLE'
+});
+
+console.log('Pass generated:', pass.data.pass_url);
+```
+
+### Get Apple Wallet URL
+
+Get the Apple Wallet installation URL:
+
+```javascript
+const appleUrl = await client.wallet.appleWallet('0xp4551d');
+console.log('Apple Wallet URL:', appleUrl.data.url);
+```
+
+### Get Google Wallet URL
+
+Get the Google Wallet installation URL:
+
+```javascript
+const googleUrl = await client.wallet.googleWallet('0xp4551d');
+console.log('Google Wallet URL:', googleUrl.data.url);
+```
+
+## Error Handling
+
+The SDK throws specific error types for different scenarios:
+
+```javascript
+const { DoorPassesClient, DoorPassesError, ValidationError, UnauthorizedError } = require('@doorpasses/node-sdk');
+
+try {
+  const pass = await client.accessPasses.create(data);
+} catch (error) {
+  if (error instanceof ValidationError) {
+    console.error('Validation failed:', error.details);
+    // Handle validation errors
+  } else if (error instanceof UnauthorizedError) {
+    console.error('Authentication failed:', error.message);
+    // Check credentials
+  } else if (error instanceof DoorPassesError) {
+    console.error('API error:', error.code, error.message);
+    // Handle other API errors
+  } else {
+    console.error('Unexpected error:', error);
+  }
+}
+```
+
+### Error Types
+
+<AccordionGroup>
+  <Accordion title="ValidationError" icon="triangle-exclamation">
+    Thrown when request data fails validation
+    ```javascript
+    {
+      code: 'VALIDATION_ERROR',
+      message: 'Validation failed',
+      details: {
+        email: 'Invalid email format',
+        start_date: 'Must be a valid ISO 8601 date'
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="UnauthorizedError" icon="lock">
+    Thrown when authentication fails
+    ```javascript
+    {
+      code: 'UNAUTHORIZED',
+      message: 'Invalid authentication credentials'
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="NotFoundError" icon="search">
+    Thrown when a resource is not found
+    ```javascript
+    {
+      code: 'NOT_FOUND',
+      message: 'Access pass not found'
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="RateLimitError" icon="gauge-high">
+    Thrown when rate limit is exceeded
+    ```javascript
+    {
+      code: 'RATE_LIMIT_EXCEEDED',
+      message: 'Too many requests',
+      retryAfter: 900 // seconds
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Advanced Features
+
+### Custom Request Timeout
+
+Set a custom timeout for specific requests:
+
+```javascript
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_ACCOUNT_ID,
+  sharedSecret: process.env.DOORPASSES_SHARED_SECRET,
+  timeout: 60000 // 60 seconds
+});
+```
+
+### Retry Configuration
+
+Configure automatic retries for failed requests:
+
+```javascript
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_ACCOUNT_ID,
+  sharedSecret: process.env.DOORPASSES_SHARED_SECRET,
+  maxRetries: 5,
+  retryDelay: 2000 // Initial delay in ms
+});
+```
+
+### Using Sandbox Environment
+
+Test your integration using the sandbox environment:
+
+```javascript
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_SANDBOX_ACCOUNT_ID,
+  sharedSecret: process.env.DOORPASSES_SANDBOX_SECRET,
+  baseUrl: 'https://sandbox.doorpasses.com'
+});
+```
+
+### Async/Await vs Promises
+
+The SDK supports both async/await and promise chains:
+
+```javascript
+// Using async/await (recommended)
+async function createPass() {
+  try {
+    const pass = await client.accessPasses.create(data);
+    return pass;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Using promises
+client.accessPasses.create(data)
+  .then(pass => {
+    console.log('Pass created:', pass.data.id);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+```
+
+## TypeScript Support
+
+The SDK is written in TypeScript and provides full type definitions:
+
+```typescript
+import { DoorPassesClient, AccessPass, AccessPassState, CreateAccessPassRequest } from '@doorpasses/node-sdk';
+
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_ACCOUNT_ID!,
+  sharedSecret: process.env.DOORPASSES_SHARED_SECRET!
+});
+
+const request: CreateAccessPassRequest = {
+  card_template_id: '0xt3mp14t3',
+  full_name: 'Ahmed Al-Mansouri',
+  email: 'ahmed@company.com',
+  // TypeScript will validate all fields
+};
+
+const response = await client.accessPasses.create(request);
+const pass: AccessPass = response.data;
+const state: AccessPassState = pass.state; // Type-safe enum
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Environment Variables" icon="key">
+    Always store credentials in environment variables, never in code
+  </Card>
+  <Card title="Error Handling" icon="shield-check">
+    Always wrap API calls in try-catch blocks
+  </Card>
+  <Card title="Async Operations" icon="clock">
+    Use async/await for cleaner, more readable code
+  </Card>
+  <Card title="Idempotency" icon="rotate">
+    Store pass IDs to avoid duplicate creations
+  </Card>
+</CardGroup>
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card
+    title="Examples"
+    icon="code"
+    href="/sdks/node/examples"
+  >
+    View complete code examples
+  </Card>
+  <Card
+    title="API Reference"
+    icon="book"
+    href="/api-reference/introduction"
+  >
+    Complete API documentation
+  </Card>
+  <Card
+    title="Authentication"
+    icon="lock"
+    href="/authentication"
+  >
+    Learn about authentication
+  </Card>
+  <Card
+    title="GitHub"
+    icon="github"
+    href="https://github.com/doorpasses/node-sdk"
+  >
+    View source code and report issues
+  </Card>
+</CardGroup>

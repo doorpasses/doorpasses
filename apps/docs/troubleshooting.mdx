@@ -1,0 +1,508 @@
+---
+title: 'Troubleshooting'
+description: 'Common issues and how to solve them'
+---
+
+## Authentication Issues
+
+### 401 Unauthorized Error
+
+**Problem**: API returns 401 Unauthorized
+
+**Possible Causes**:
+- Missing authentication headers
+- Incorrect account ID
+- Invalid shared secret
+
+**Solutions**:
+
+<Steps>
+  <Step title="Verify Headers">
+    Ensure both `X-ACCT-ID` and `X-PAYLOAD-SIG` headers are present:
+    ```bash
+    curl -v https://api.doorpasses.com/v1/access-passes \
+      -H "X-ACCT-ID: your-account-id" \
+      -H "X-PAYLOAD-SIG: generated-signature"
+    ```
+  </Step>
+
+  <Step title="Check Account ID">
+    Verify your account ID is correct:
+    ```javascript
+    console.log('Account ID:', process.env.DOORPASSES_ACCOUNT_ID);
+    // Should match the ID provided by DoorPasses
+    ```
+  </Step>
+
+  <Step title="Validate Signature Generation">
+    Test your signature generation:
+    ```javascript
+    const crypto = require('crypto');
+
+    const payload = JSON.stringify({ test: 'data' });
+    const base64Payload = Buffer.from(payload).toString('base64');
+    const signature = crypto.createHash('sha256')
+      .update(sharedSecret + base64Payload)
+      .digest('hex');
+
+    console.log('Signature:', signature);
+    ```
+  </Step>
+</Steps>
+
+### 401 Invalid Signature
+
+**Problem**: Signature doesn't match
+
+**Common Mistakes**:
+1. JSON serialization inconsistency (extra spaces, different order)
+2. Using wrong payload for signature
+3. Incorrect Base64 encoding
+
+**Solution**:
+```javascript
+// Correct approach
+const payload = { card_template_id: '0xt3mp14t3', full_name: 'Ahmed' };
+const jsonPayload = JSON.stringify(payload); // Consistent serialization
+const base64Payload = Buffer.from(jsonPayload).toString('base64');
+const signature = crypto.createHash('sha256')
+  .update(sharedSecret + base64Payload)
+  .digest('hex');
+```
+
+<Warning>
+  Make sure your JSON serialization is consistent. Different libraries may serialize JSON differently.
+</Warning>
+
+## Access Pass Issues
+
+### Duplicate Card Number
+
+**Problem**: `DUPLICATE_ENTRY` error when creating an access pass
+
+**Cause**: An access pass with the same card number already exists
+
+**Solutions**:
+
+<AccordionGroup>
+  <Accordion title="Check Existing Passes">
+    Search for the card number before creating:
+    ```javascript
+    const passes = await client.accessPasses.list({
+      template_id: '0xt3mp14t3'
+    });
+
+    const exists = passes.data.items.some(p => p.cardNumber === newCardNumber);
+    if (exists) {
+      console.log('Card number already in use');
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Generate Unique Card Numbers">
+    Use a UUID or timestamp-based approach:
+    ```javascript
+    const { v4: uuidv4 } = require('uuid');
+    const cardNumber = uuidv4(); // Guaranteed unique
+
+    // Or timestamp-based
+    const cardNumber = `CARD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    ```
+  </Accordion>
+
+  <Accordion title="Delete Old Pass">
+    If the card number should be reused:
+    ```javascript
+    // Find and delete the old pass
+    await client.accessPasses.delete(oldPassId);
+
+    // Then create new pass with same card number
+    const newPass = await client.accessPasses.create({ /* ... */ });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Pass Not Installing on Device
+
+**Problem**: Users can't install the pass on their device
+
+**Checklist**:
+
+<Check>Card template is published (not in DRAFT state)</Check>
+<Check>Access pass start_date is not in the future</Check>
+<Check>Access pass expiration_date is not in the past</Check>
+<Check>Install URL is accessible (not behind firewall)</Check>
+<Check>Device has internet connection</Check>
+<Check>Device OS version is supported (iOS 12+ or Android 5+)</Check>
+
+**Steps to Debug**:
+
+1. **Check Pass State**:
+   ```javascript
+   const pass = await client.accessPasses.get(passId);
+   console.log('State:', pass.data.state);
+   // Should be PENDING or ACTIVE, not SUSPENDED or DELETED
+   ```
+
+2. **Verify Dates**:
+   ```javascript
+   console.log('Start:', pass.data.startDate);
+   console.log('Expires:', pass.data.expirationDate);
+   console.log('Now:', new Date().toISOString());
+   ```
+
+3. **Test Install URL**:
+   ```bash
+   curl -I https://doorpasses.com/install/0xp4551d
+   # Should return 200 OK
+   ```
+
+## Rate Limiting Issues
+
+### 429 Too Many Requests
+
+**Problem**: API returns 429 status code
+
+**Cause**: Exceeded rate limits (100 requests per 15 minutes)
+
+**Solutions**:
+
+<Tabs>
+  <Tab title="Implement Backoff">
+    ```javascript
+    async function createPassWithRetry(data, maxRetries = 3) {
+      for (let i = 0; i < maxRetries; i++) {
+        try {
+          return await client.accessPasses.create(data);
+        } catch (error) {
+          if (error.code === 'RATE_LIMIT_EXCEEDED') {
+            const delay = Math.pow(2, i) * 1000; // Exponential backoff
+            console.log(`Rate limited. Waiting ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          } else {
+            throw error;
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Batch Operations">
+    ```javascript
+    // Instead of creating passes one by one, batch them
+    const batchSize = 10;
+    for (let i = 0; i < employees.length; i += batchSize) {
+      const batch = employees.slice(i, i + batchSize);
+
+      await Promise.all(batch.map(emp =>
+        client.accessPasses.create(emp)
+      ));
+
+      // Wait between batches
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    ```
+  </Tab>
+
+  <Tab title="Check Rate Limit Headers">
+    ```javascript
+    // Monitor rate limit headers in responses
+    const response = await fetch('https://api.doorpasses.com/v1/access-passes', {
+      headers: {
+        'X-ACCT-ID': accountId,
+        'X-PAYLOAD-SIG': signature
+      }
+    });
+
+    console.log('Limit:', response.headers.get('RateLimit-Limit'));
+    console.log('Remaining:', response.headers.get('RateLimit-Remaining'));
+    console.log('Reset:', response.headers.get('RateLimit-Reset'));
+    ```
+  </Tab>
+</Tabs>
+
+## SDK Issues
+
+### Module Not Found
+
+**Problem**: `Cannot find module '@doorpasses/node-sdk'`
+
+**Solution**:
+```bash
+# Ensure SDK is installed
+npm install @doorpasses/node-sdk
+
+# Clear node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### TypeScript Errors
+
+**Problem**: Type errors when using TypeScript
+
+**Solution**:
+```bash
+# Update TypeScript to latest version
+npm install -D typescript@latest
+
+# Ensure tsconfig.json has correct settings
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "moduleResolution": "node"
+  }
+}
+```
+
+### Import Errors
+
+**Problem**: Import statements not working
+
+**Solutions**:
+
+<CodeGroup>
+```javascript CommonJS
+// Use require for CommonJS
+const { DoorPassesClient } = require('@doorpasses/node-sdk');
+```
+
+```javascript ES Modules
+// Use import for ES modules
+import { DoorPassesClient } from '@doorpasses/node-sdk';
+
+// Ensure package.json has "type": "module"
+```
+
+```typescript TypeScript
+// TypeScript import
+import { DoorPassesClient } from '@doorpasses/node-sdk';
+
+// With types
+import type { AccessPass, CreateAccessPassRequest } from '@doorpasses/node-sdk';
+```
+</CodeGroup>
+
+## Webhook Issues
+
+### Webhooks Not Received
+
+**Problem**: Webhook events not reaching your endpoint
+
+**Checklist**:
+
+<Check>Endpoint is publicly accessible (not localhost)</Check>
+<Check>Endpoint uses HTTPS (not HTTP)</Check>
+<Check>Endpoint returns 200/201 status code</Check>
+<Check>No firewall blocking DoorPasses IPs</Check>
+<Check>Webhook URL is correctly registered</Check>
+
+**Testing**:
+```bash
+# Test your webhook endpoint manually
+curl -X POST https://your-domain.com/webhooks/doorpasses \
+  -H "Authorization: Bearer your-webhook-secret" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "specversion": "1.0",
+    "type": "ag.access_pass.issued",
+    "source": "doorpasses",
+    "id": "test-123",
+    "time": "2025-01-15T10:30:00Z",
+    "data": { "access_pass_id": "test" }
+  }'
+```
+
+### Webhook Authentication Failing
+
+**Problem**: Webhooks receive 401 Unauthorized
+
+**Solution**:
+```javascript
+app.post('/webhooks/doorpasses', (req, res) => {
+  const authHeader = req.headers.authorization;
+  const expectedToken = process.env.DOORPASSES_WEBHOOK_SECRET;
+
+  // Correct format check
+  if (authHeader !== `Bearer ${expectedToken}`) {
+    console.error('Invalid auth header:', authHeader);
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  // Process webhook
+  res.status(200).json({ received: true });
+});
+```
+
+## Performance Issues
+
+### Slow API Responses
+
+**Problem**: API calls taking too long
+
+**Solutions**:
+
+<AccordionGroup>
+  <Accordion title="Use Pagination">
+    Don't fetch all records at once:
+    ```javascript
+    // Bad - fetches all at once
+    const passes = await client.accessPasses.list({ limit: 10000 });
+
+    // Good - use pagination
+    let page = 1;
+    const limit = 100;
+    let hasMore = true;
+
+    while (hasMore) {
+      const response = await client.accessPasses.list({ page, limit });
+      // Process batch
+      hasMore = page < response.data.pagination.totalPages;
+      page++;
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Optimize Filters">
+    Use specific filters to reduce data:
+    ```javascript
+    // Inefficient - gets all passes then filters
+    const allPasses = await client.accessPasses.list({ template_id });
+    const active = allPasses.data.items.filter(p => p.state === 'ACTIVE');
+
+    // Efficient - filter on API side
+    const active = await client.accessPasses.list({
+      template_id,
+      state: 'ACTIVE'
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Use Async Operations">
+    For bulk operations, use async/await:
+    ```javascript
+    // Slow - sequential
+    for (const employee of employees) {
+      await client.accessPasses.create(employee);
+    }
+
+    // Fast - parallel (with rate limiting)
+    const batchSize = 10;
+    for (let i = 0; i < employees.length; i += batchSize) {
+      const batch = employees.slice(i, i + batchSize);
+      await Promise.all(batch.map(emp =>
+        client.accessPasses.create(emp)
+      ));
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Debugging Tips
+
+### Enable Debug Logging
+
+<Tabs>
+  <Tab title="Node.js">
+    ```javascript
+    const client = new DoorPassesClient({
+      accountId: process.env.DOORPASSES_ACCOUNT_ID,
+      sharedSecret: process.env.DOORPASSES_SHARED_SECRET,
+      debug: true // Enable debug mode
+    });
+    ```
+  </Tab>
+
+  <Tab title="Python">
+    ```python
+    import logging
+
+    logging.basicConfig(level=logging.DEBUG)
+
+    client = DoorPassesClient(
+        account_id=os.environ['DOORPASSES_ACCOUNT_ID'],
+        shared_secret=os.environ['DOORPASSES_SHARED_SECRET'],
+        debug=True
+    )
+    ```
+  </Tab>
+</Tabs>
+
+### Inspect API Responses
+
+```javascript
+try {
+  const response = await client.accessPasses.create(data);
+  console.log('Full response:', JSON.stringify(response, null, 2));
+} catch (error) {
+  console.error('Error details:', {
+    code: error.code,
+    message: error.message,
+    details: error.details,
+    stack: error.stack
+  });
+}
+```
+
+### Test in Sandbox
+
+Always test in sandbox first:
+```javascript
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_SANDBOX_ACCOUNT_ID,
+  sharedSecret: process.env.DOORPASSES_SANDBOX_SECRET,
+  baseUrl: 'https://sandbox.doorpasses.com'
+});
+```
+
+## Getting Help
+
+If you're still experiencing issues:
+
+<CardGroup cols={2}>
+  <Card title="Check API Status" icon="signal">
+    Visit https://status.doorpasses.com for system status
+  </Card>
+  <Card title="Search Documentation" icon="magnifying-glass" href="/introduction">
+    Review our comprehensive docs
+  </Card>
+  <Card title="Contact Support" icon="envelope">
+    Email support@doorpasses.com with error details
+  </Card>
+  <Card title="Community Discord" icon="discord">
+    Join our Discord for community help
+  </Card>
+</CardGroup>
+
+### Information to Include
+
+When contacting support, provide:
+- Error message and code
+- Request ID (from error response)
+- Timestamp of the issue
+- Code snippet (remove sensitive data)
+- SDK version and language
+- Expected vs actual behavior
+
+**Example Support Request**:
+```
+Subject: 401 Unauthorized Error on Access Pass Creation
+
+Details:
+- Error: "Invalid authentication credentials"
+- Request ID: req_abc123xyz
+- Timestamp: 2025-01-15T14:30:00Z
+- SDK: @doorpasses/node-sdk v1.2.3
+- Endpoint: POST /v1/access-passes
+
+I'm receiving a 401 error when creating access passes. I've verified:
+- Account ID is correct
+- Signature is being generated properly
+- Headers are being sent
+
+Code snippet:
+[Include sanitized code]
+
+Can you help investigate?
+```

@@ -1,0 +1,69 @@
+{
+  "common": {
+    "success": "Success",
+    "error": "Error",
+    "created": "Created successfully",
+    "updated": "Updated successfully",
+    "deleted": "Deleted successfully",
+    "not_found": "Resource not found",
+    "unauthorized": "Unauthorized access",
+    "forbidden": "Access forbidden",
+    "validation_error": "Validation error",
+    "server_error": "Internal server error"
+  },
+  "auth": {
+    "missing_credentials": "Missing authentication credentials",
+    "invalid_credentials": "Invalid credentials",
+    "invalid_account": "Invalid account ID",
+    "invalid_signature": "Invalid payload signature",
+    "account_inactive": "Account is inactive",
+    "welcome": "Welcome to DoorPasses API"
+  },
+  "access_pass": {
+    "issued": "Access pass issued successfully",
+    "updated": "Access pass updated successfully",
+    "suspended": "Access pass suspended",
+    "resumed": "Access pass resumed",
+    "unlinked": "Access pass unlinked",
+    "deleted": "Access pass deleted",
+    "not_found": "Access pass not found",
+    "already_exists": "Access pass already exists for this user",
+    "expired": "Access pass has expired",
+    "invalid_dates": "Invalid start or expiration date",
+    "list_retrieved": "Access passes retrieved successfully"
+  },
+  "card_template": {
+    "created": "Card template created successfully",
+    "updated": "Card template updated successfully",
+    "published": "Card template published successfully",
+    "not_found": "Card template not found",
+    "already_published": "Card template is already published",
+    "cannot_update_published": "Cannot update published template"
+  },
+  "notification": {
+    "email_sent": "Email notification sent",
+    "sms_sent": "SMS notification sent",
+    "failed_to_send": "Failed to send notification",
+    "invalid_recipient": "Invalid recipient information"
+  },
+  "wallet": {
+    "apple_pass_generated": "Apple Wallet pass generated successfully",
+    "google_pass_generated": "Google Wallet pass generated successfully",
+    "pass_installation_url": "Pass installation URL",
+    "pass_not_available": "Pass not available for this platform",
+    "failed_to_generate": "Failed to generate wallet pass"
+  },
+  "webhook": {
+    "delivered": "Webhook delivered successfully",
+    "failed": "Webhook delivery failed",
+    "retry_scheduled": "Webhook retry scheduled"
+  },
+  "validation": {
+    "required_field": "{{field}} is required",
+    "invalid_email": "Invalid email address",
+    "invalid_phone": "Invalid phone number",
+    "invalid_date_format": "Invalid date format",
+    "date_in_past": "Date cannot be in the past",
+    "end_date_before_start": "End date must be after start date"
+  }
+}

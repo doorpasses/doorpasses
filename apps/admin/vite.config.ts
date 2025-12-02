@@ -80,7 +80,7 @@ export default defineConfig((config) => ({
 		},
 	}),
 	server: {
-		allowedHosts: ['admin.epic-stack.me', 'localhost'],
+		allowedHosts: ['admin.doorpasses.me', 'localhost'],
 		watch: {
 			ignored: ['**/playwright-report/**', '**/node_modules/.vite-temp/**'],
 		},

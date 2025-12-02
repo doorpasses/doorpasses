@@ -286,7 +286,7 @@ function OrganizationSidebar({
 		},
 		{
 			title: _(msg`Get help`),
-			url: 'http://docs.epic-stack.me:2999',
+			url: 'http://docs.doorpasses.me:2999',
 			icon: CircleHelpIcon,
 			target: '_blank',
 		},

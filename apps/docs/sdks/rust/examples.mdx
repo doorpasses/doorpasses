@@ -1,0 +1,383 @@
+---
+title: 'Examples'
+description: 'Code examples for the DoorPasses Rust SDK'
+---
+
+## Complete Employee Onboarding
+
+This example demonstrates issuing access passes for new employees:
+
+```rust
+use doorpasses::{DoorPasses, types::{IssueAccessPassParams, Classification}};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = DoorPasses::new(
+        std::env::var("DOORPASSES_ACCOUNT_ID")?,
+        std::env::var("DOORPASSES_SHARED_SECRET")?
+    )?;
+
+    // New employee data
+    let employees = vec![
+        ("Alice Johnson", "alice@company.com", "EMP001"),
+        ("Bob Smith", "bob@company.com", "EMP002"),
+        ("Carol Williams", "carol@company.com", "EMP003"),
+    ];
+
+    for (name, email, emp_id) in employees {
+        let params = IssueAccessPassParams {
+            card_template_id: "template_123".to_string(),
+            full_name: name.to_string(),
+            email: Some(email.to_string()),
+            employee_id: Some(emp_id.to_string()),
+            classification: Some(Classification::FullTime),
+            start_date: "2024-01-01".to_string(),
+            expiration_date: "2024-12-31".to_string(),
+            ..Default::default()
+        };
+
+        match client.access_passes.issue(params).await {
+            Ok(pass) => println!("✓ Created pass for {}: {}", name, pass.id),
+            Err(e) => eprintln!("✗ Failed to create pass for {}: {}", name, e),
+        }
+    }
+
+    Ok(())
+}
+```
+
+## Batch Pass Management
+
+Process multiple passes with error handling:
+
+```rust
+use doorpasses::{DoorPasses, types::{ListAccessPassesParams, AccessPassState}};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = DoorPasses::new(
+        std::env::var("DOORPASSES_ACCOUNT_ID")?,
+        std::env::var("DOORPASSES_SHARED_SECRET")?
+    )?;
+
+    // Get all active passes
+    let params = ListAccessPassesParams {
+        state: Some(AccessPassState::Active),
+        limit: Some(100),
+        ..Default::default()
+    };
+
+    let passes = client.access_passes.list(Some(params)).await?;
+    println!("Found {} active passes", passes.len());
+
+    // Suspend passes expiring soon
+    for pass in passes {
+        if pass.expiration_date == "2024-12-31" {
+            match client.access_passes.suspend(&pass.id).await {
+                Ok(_) => println!("Suspended pass for {}", pass.full_name),
+                Err(e) => eprintln!("Failed to suspend {}: {}", pass.full_name, e),
+            }
+        }
+    }
+
+    Ok(())
+}
+```
+
+## Create and Publish Template
+
+Enterprise feature for template management:
+
+```rust
+use doorpasses::{
+    DoorPasses,
+    types::{
+        CreateCardTemplateParams, Platform, UseCase, Protocol,
+        CardTemplateDesign, SupportInfo
+    }
+};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = DoorPasses::new(
+        std::env::var("DOORPASSES_ACCOUNT_ID")?,
+        std::env::var("DOORPASSES_SHARED_SECRET")?
+    )?;
+
+    // Create template design
+    let design = CardTemplateDesign {
+        background_color: Some("#1a1a1a".to_string()),
+        foreground_color: Some("#ffffff".to_string()),
+        label_color: Some("#cccccc".to_string()),
+        logo_url: Some("https://company.com/logo.png".to_string()),
+        hero_image_url: Some("https://company.com/hero.jpg".to_string()),
+        strip_image_url: None,
+    };
+
+    let support_info = SupportInfo {
+        email: Some("support@company.com".to_string()),
+        phone: Some("+1-800-123-4567".to_string()),
+        website: Some("https://company.com/support".to_string()),
+    };
+
+    // Create the template
+    let params = CreateCardTemplateParams {
+        name: "Corporate Employee Badge".to_string(),
+        platform: Platform::Apple,
+        use_case: UseCase::EmployeeBadge,
+        protocol: Protocol::Seos,
+        design: Some(design),
+        support_info: Some(support_info),
+        metadata: None,
+    };
+
+    let template = client.console.create_template(params).await?;
+    println!("Created template: {} ({})", template.name, template.id);
+
+    // Publish the template
+    let publish_response = client.console.publish_template(&template.id).await?;
+    if publish_response.success {
+        println!("Template published successfully!");
+    }
+
+    Ok(())
+}
+```
+
+## Event Log Analysis
+
+Analyze access events:
+
+```rust
+use doorpasses::{DoorPasses, types::ReadEventLogParams};
+use std::collections::HashMap;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = DoorPasses::new(
+        std::env::var("DOORPASSES_ACCOUNT_ID")?,
+        std::env::var("DOORPASSES_SHARED_SECRET")?
+    )?;
+
+    // Get last 30 days of events
+    let params = ReadEventLogParams {
+        start_date: Some("2024-01-01".to_string()),
+        end_date: Some("2024-01-31".to_string()),
+        limit: Some(1000),
+        ..Default::default()
+    };
+
+    let events = client.console.event_log(Some(params)).await?;
+
+    // Count events by type
+    let mut event_counts: HashMap<String, usize> = HashMap::new();
+    for event in &events {
+        *event_counts.entry(event.event_type.clone()).or_insert(0) += 1;
+    }
+
+    println!("Event Summary:");
+    for (event_type, count) in event_counts {
+        println!("  {}: {} times", event_type, count);
+    }
+
+    Ok(())
+}
+```
+
+## Error Handling Best Practices
+
+Comprehensive error handling:
+
+```rust
+use doorpasses::{DoorPasses, types::IssueAccessPassParams, error::{DoorPassesError, Result}};
+
+async fn issue_pass_with_retry(
+    client: &DoorPasses,
+    params: IssueAccessPassParams,
+    max_retries: u32,
+) -> Result<String> {
+    let mut attempts = 0;
+
+    loop {
+        attempts += 1;
+
+        match client.access_passes.issue(params.clone()).await {
+            Ok(pass) => return Ok(pass.id),
+            Err(DoorPassesError::RateLimitExceeded) if attempts < max_retries => {
+                eprintln!("Rate limited, waiting before retry...");
+                tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+                continue;
+            }
+            Err(DoorPassesError::Timeout) if attempts < max_retries => {
+                eprintln!("Request timeout, retrying...");
+                continue;
+            }
+            Err(e) => return Err(e),
+        }
+    }
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = DoorPasses::new(
+        std::env::var("DOORPASSES_ACCOUNT_ID")?,
+        std::env::var("DOORPASSES_SHARED_SECRET")?
+    )?;
+
+    let params = IssueAccessPassParams {
+        card_template_id: "template_123".to_string(),
+        full_name: "Test User".to_string(),
+        start_date: "2024-01-01".to_string(),
+        expiration_date: "2024-12-31".to_string(),
+        ..Default::default()
+    };
+
+    match issue_pass_with_retry(&client, params, 3).await {
+        Ok(pass_id) => println!("Successfully created pass: {}", pass_id),
+        Err(e) => eprintln!("Failed after retries: {}", e),
+    }
+
+    Ok(())
+}
+```
+
+## Concurrent Operations
+
+Process multiple operations concurrently:
+
+```rust
+use doorpasses::{DoorPasses, types::IssueAccessPassParams};
+use tokio::task::JoinSet;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = DoorPasses::new(
+        std::env::var("DOORPASSES_ACCOUNT_ID")?,
+        std::env::var("DOORPASSES_SHARED_SECRET")?
+    )?;
+
+    let mut tasks = JoinSet::new();
+
+    // Issue multiple passes concurrently
+    for i in 1..=10 {
+        let client_clone = DoorPasses::new(
+            std::env::var("DOORPASSES_ACCOUNT_ID")?,
+            std::env::var("DOORPASSES_SHARED_SECRET")?
+        )?;
+
+        tasks.spawn(async move {
+            let params = IssueAccessPassParams {
+                card_template_id: "template_123".to_string(),
+                full_name: format!("Employee {}", i),
+                email: Some(format!("emp{}@company.com", i)),
+                employee_id: Some(format!("EMP{:03}", i)),
+                start_date: "2024-01-01".to_string(),
+                expiration_date: "2024-12-31".to_string(),
+                ..Default::default()
+            };
+
+            client_clone.access_passes.issue(params).await
+        });
+    }
+
+    // Wait for all tasks to complete
+    let mut success_count = 0;
+    let mut error_count = 0;
+
+    while let Some(result) = tasks.join_next().await {
+        match result {
+            Ok(Ok(pass)) => {
+                success_count += 1;
+                println!("Created: {}", pass.id);
+            }
+            Ok(Err(e)) => {
+                error_count += 1;
+                eprintln!("Error: {}", e);
+            }
+            Err(e) => {
+                error_count += 1;
+                eprintln!("Task error: {}", e);
+            }
+        }
+    }
+
+    println!("\nSummary: {} successful, {} failed", success_count, error_count);
+
+    Ok(())
+}
+```
+
+## Testing with Mock Data
+
+Example of structuring code for testability:
+
+```rust
+use doorpasses::{DoorPasses, types::{IssueAccessPassParams, AccessPass}, error::Result};
+
+pub struct PassManager {
+    client: DoorPasses,
+}
+
+impl PassManager {
+    pub fn new(client: DoorPasses) -> Self {
+        Self { client }
+    }
+
+    pub async fn create_employee_pass(
+        &self,
+        name: &str,
+        email: &str,
+        employee_id: &str,
+    ) -> Result<AccessPass> {
+        let params = IssueAccessPassParams {
+            card_template_id: "template_123".to_string(),
+            full_name: name.to_string(),
+            email: Some(email.to_string()),
+            employee_id: Some(employee_id.to_string()),
+            start_date: "2024-01-01".to_string(),
+            expiration_date: "2024-12-31".to_string(),
+            ..Default::default()
+        };
+
+        self.client.access_passes.issue(params).await
+    }
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = DoorPasses::new(
+        std::env::var("DOORPASSES_ACCOUNT_ID")?,
+        std::env::var("DOORPASSES_SHARED_SECRET")?
+    )?;
+
+    let manager = PassManager::new(client);
+
+    let pass = manager.create_employee_pass(
+        "John Doe",
+        "john@company.com",
+        "EMP001"
+    ).await?;
+
+    println!("Created pass: {}", pass.id);
+
+    Ok(())
+}
+```
+
+## More Examples
+
+Find more examples in the [GitHub repository](https://github.com/mohammedzamakhan/doorpasses/tree/main/packages/rust-sdk/examples):
+
+- `basic_usage.rs` - Getting started example
+- `access_passes.rs` - Complete access pass management
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="book" href="https://docs.rs/doorpasses">
+    View full API documentation
+  </Card>
+  <Card title="GitHub Repository" icon="github" href="https://github.com/mohammedzamakhan/doorpasses">
+    View source code
+  </Card>
+</CardGroup>

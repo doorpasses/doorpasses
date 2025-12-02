@@ -23,7 +23,7 @@ const baseManifest: ManifestV3Export = {
 		},
 	],
 	externally_connectable: {
-		matches: ['*://*.epic-stack.me/*'],
+		matches: ['*://*.doorpasses.me/*'],
 	},
 }
 

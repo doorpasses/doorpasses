@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "doorpasses"
+version = "1.0.0"
+description = "Official Python SDK for DoorPasses - Digital Access Control Platform"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "DoorPasses Team"}
+]
+keywords = [
+    "doorpasses",
+    "access-control",
+    "nfc",
+    "digital-wallet",
+    "apple-wallet",
+    "google-wallet",
+    "mena",
+    "sdk",
+    "api-client"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.7.0",
+    "mypy>=1.5.0",
+    "ruff>=0.0.285",
+    "types-requests>=2.31.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/mohammedzamakhan/doorpasses"
+Documentation = "https://docs.doorpasses.io"
+Repository = "https://github.com/mohammedzamakhan/doorpasses.git"
+Issues = "https://github.com/mohammedzamakhan/doorpasses/issues"
+
+[tool.setuptools]
+packages = ["doorpasses", "doorpasses.resources"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=doorpasses --cov-report=term-missing --cov-report=html --cov-report=xml"
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+select = ["E", "F", "I", "N", "W", "B", "C4", "SIM"]
+ignore = []
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true

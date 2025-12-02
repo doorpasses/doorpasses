@@ -1,0 +1,38 @@
+{
+  "name": "ruby-sdk",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "packages/ruby-sdk/lib",
+  "targets": {
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cd packages/ruby-sdk && bundle exec rspec",
+        "color": true
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cd packages/ruby-sdk && bundle exec rubocop",
+        "color": true
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cd packages/ruby-sdk && gem build doorpasses.gemspec",
+        "color": true
+      },
+      "outputs": ["{projectRoot}/*.gem"]
+    },
+    "install": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cd packages/ruby-sdk && bundle install",
+        "color": true
+      }
+    }
+  },
+  "tags": ["type:sdk", "language:ruby"]
+}

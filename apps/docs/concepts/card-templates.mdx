@@ -1,0 +1,251 @@
+---
+title: 'Card Templates'
+description: 'Design and manage card templates for your organization'
+---
+
+## What is a Card Template?
+
+A **Card Template** defines the visual design, configuration, and behavior of access passes issued by your organization. Think of it as a blueprint that determines how your digital access passes will look and function across Apple Wallet and Google Wallet.
+
+<Info>
+  Card Template management requires **Enterprise tier** access. Contact sales@doorpasses.com to upgrade.
+</Info>
+
+## Template Properties
+
+### Basic Information
+
+<ParamField path="name" type="string" required>
+  Display name for the template (e.g., "Employee Access Badge")
+</ParamField>
+
+<ParamField path="platform" type="string" required>
+  Platform support: `APPLE`, `GOOGLE`, or `BOTH`
+</ParamField>
+
+<ParamField path="use_case" type="string" required>
+  Use case type: `EMPLOYEE_BADGE`, `VISITOR_PASS`, `EVENT_TICKET`, etc.
+</ParamField>
+
+<ParamField path="protocol" type="string" required>
+  NFC protocol: `DESFIRE` or `SEOS`
+</ParamField>
+
+### Design Configuration
+
+The design object controls the visual appearance of the pass:
+
+<ParamField path="design.background_color" type="string">
+  Hex color code for background (e.g., `#FFFFFF`)
+</ParamField>
+
+<ParamField path="design.label_color" type="string">
+  Hex color code for primary text
+</ParamField>
+
+<ParamField path="design.label_secondary_color" type="string">
+  Hex color code for secondary text
+</ParamField>
+
+<ParamField path="design.background_image" type="string">
+  Base64-encoded background image
+</ParamField>
+
+<ParamField path="design.logo_image" type="string">
+  Base64-encoded logo image
+</ParamField>
+
+<ParamField path="design.icon_image" type="string">
+  Base64-encoded icon image
+</ParamField>
+
+### Support Information
+
+<ParamField path="support_info.support_url" type="string">
+  URL for user support
+</ParamField>
+
+<ParamField path="support_info.support_phone_number" type="string">
+  Phone number for support
+</ParamField>
+
+<ParamField path="support_info.support_email" type="string">
+  Email address for support
+</ParamField>
+
+<ParamField path="support_info.privacy_policy_url" type="string">
+  Link to privacy policy
+</ParamField>
+
+<ParamField path="support_info.terms_and_conditions_url" type="string">
+  Link to terms and conditions
+</ParamField>
+
+### Device Configuration
+
+<ParamField path="allow_on_multiple_devices" type="boolean">
+  Allow pass on multiple devices simultaneously
+</ParamField>
+
+<ParamField path="watch_count" type="number">
+  Maximum number of watches (Apple Watch)
+</ParamField>
+
+<ParamField path="iphone_count" type="number">
+  Maximum number of iPhones
+</ParamField>
+
+## Template States
+
+<Steps>
+  <Step title="DRAFT">
+    Template is being created/edited and not yet available for use
+  </Step>
+  <Step title="PUBLISHED">
+    Template is active and can be used to issue access passes
+  </Step>
+  <Step title="ARCHIVED">
+    Template is no longer active but historical data is retained
+  </Step>
+</Steps>
+
+## Creating a Template
+
+<CodeGroup>
+```javascript Node.js
+const template = await client.cardTemplates.create({
+  name: 'Employee Access Badge',
+  platform: 'BOTH',
+  use_case: 'EMPLOYEE_BADGE',
+  protocol: 'DESFIRE',
+  allow_on_multiple_devices: true,
+  watch_count: 2,
+  iphone_count: 3,
+  design: {
+    background_color: '#1E3A8A',
+    label_color: '#FFFFFF',
+    label_secondary_color: '#CBD5E1',
+    logo_image: 'base64-encoded-logo...'
+  },
+  support_info: {
+    support_url: 'https://help.company.com',
+    support_email: 'support@company.com',
+    support_phone_number: '+971-4-1234567'
+  }
+});
+```
+
+```python Python
+template = client.card_templates.create(
+    name='Employee Access Badge',
+    platform='BOTH',
+    use_case='EMPLOYEE_BADGE',
+    protocol='DESFIRE',
+    allow_on_multiple_devices=True,
+    watch_count=2,
+    iphone_count=3,
+    design={
+        'background_color': '#1E3A8A',
+        'label_color': '#FFFFFF',
+        'label_secondary_color': '#CBD5E1',
+        'logo_image': 'base64-encoded-logo...'
+    },
+    support_info={
+        'support_url': 'https://help.company.com',
+        'support_email': 'support@company.com',
+        'support_phone_number': '+971-4-1234567'
+    }
+)
+```
+</CodeGroup>
+
+## Design Guidelines
+
+### Apple Wallet
+
+<CardGroup cols={2}>
+  <Card title="Logo Size" icon="image">
+    160 x 50 pixels (PNG, 72 DPI)
+  </Card>
+  <Card title="Icon Size" icon="square">
+    58 x 58 pixels (PNG)
+  </Card>
+  <Card title="Background" icon="palette">
+    Use solid colors or subtle patterns
+  </Card>
+  <Card title="Text" icon="text">
+    Ensure sufficient contrast for readability
+  </Card>
+</CardGroup>
+
+### Google Wallet
+
+<CardGroup cols={2}>
+  <Card title="Logo Size" icon="image">
+    660 x 660 pixels (PNG)
+  </Card>
+  <Card title="Hero Image" icon="panorama">
+    1032 x 336 pixels (PNG)
+  </Card>
+  <Card title="Colors" icon="palette">
+    Support for gradient backgrounds
+  </Card>
+  <Card title="Rich Media" icon="photo-film">
+    Support for multiple images and QR codes
+  </Card>
+</CardGroup>
+
+## Template Analytics
+
+Monitor how your templates are being used:
+
+```javascript
+// Get template with usage statistics
+const template = await client.cardTemplates.get('0xt3mp14t3');
+
+console.log(`Active passes: ${template.data.access_passes_count}`);
+console.log(`Created: ${template.data.created_at}`);
+console.log(`Last updated: ${template.data.updated_at}`);
+```
+
+## Event Logs
+
+Track all events related to passes issued from a template:
+
+```javascript
+const logs = await client.cardTemplates.logs('0xt3mp14t3', {
+  event_type: 'install',
+  start_date: '2025-01-01T00:00:00Z',
+  end_date: '2025-01-31T23:59:59Z'
+});
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Brand Consistency" icon="paintbrush">
+    Use your organization's brand colors and logo for a professional appearance
+  </Accordion>
+
+  <Accordion title="Clear Support Info" icon="life-ring">
+    Always provide complete support information so users know how to get help
+  </Accordion>
+
+  <Accordion title="Test Before Publishing" icon="flask">
+    Issue test passes to verify the design looks good on both iOS and Android
+  </Accordion>
+
+  <Accordion title="Version Control" icon="code-branch">
+    Use metadata to track template versions and changes
+  </Accordion>
+
+  <Accordion title="Monitor Usage" icon="chart-line">
+    Regularly review event logs to understand how your templates are being used
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Access Passes](/concepts/access-passes) - Learn about access passes
+- [API Reference](/api-reference/card-templates/create) - Card Template API endpoints
+- [Design Guidelines](https://developer.apple.com/wallet/) - Apple Wallet design guidelines

@@ -1,0 +1,177 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "DoorPasses",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#16A34A",
+    "light": "#07C983",
+    "dark": "#15803D",
+    "anchors": {
+      "from": "#16A34A",
+      "to": "#07C983"
+    }
+  },
+  "topbar": {
+    "style": "default"
+  },
+  "tabs": [
+    {
+      "name": "API Reference",
+      "url": "api-reference"
+    },
+    {
+      "name": "SDKs",
+      "url": "sdks"
+    }
+  ],
+  "anchors": [
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/mohammedzamakhan/doorpasses"
+    },
+    {
+      "name": "Community",
+      "icon": "discord",
+      "url": "https://discord.gg/doorpasses"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "introduction",
+        "quickstart",
+        "authentication",
+        "best-practices",
+        "troubleshooting"
+      ]
+    },
+    {
+      "group": "Core Concepts",
+      "pages": [
+        "concepts/access-passes",
+        "concepts/card-templates",
+        "concepts/webhooks"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api-reference/introduction",
+        {
+          "group": "Access Passes",
+          "pages": [
+            "api-reference/access-passes/create",
+            "api-reference/access-passes/list",
+            "api-reference/access-passes/update",
+            "api-reference/access-passes/suspend",
+            "api-reference/access-passes/resume",
+            "api-reference/access-passes/unlink",
+            "api-reference/access-passes/delete"
+          ]
+        },
+        {
+          "group": "Card Templates",
+          "pages": [
+            "api-reference/card-templates/create",
+            "api-reference/card-templates/get",
+            "api-reference/card-templates/update",
+            "api-reference/card-templates/logs"
+          ]
+        },
+        {
+          "group": "Wallet",
+          "pages": [
+            "api-reference/wallet/generate-pass",
+            "api-reference/wallet/apple-wallet",
+            "api-reference/wallet/google-wallet"
+          ]
+        }
+      ]
+    },
+    {
+      "group": "SDKs",
+      "pages": [
+        "sdks/overview",
+        {
+          "group": "Node.js SDK",
+          "pages": [
+            "sdks/node/installation",
+            "sdks/node/usage",
+            "sdks/node/examples"
+          ]
+        },
+        {
+          "group": "Python SDK",
+          "pages": [
+            "sdks/python/installation",
+            "sdks/python/usage",
+            "sdks/python/examples"
+          ]
+        },
+        {
+          "group": "PHP SDK",
+          "pages": [
+            "sdks/php/installation",
+            "sdks/php/usage",
+            "sdks/php/examples"
+          ]
+        },
+        {
+          "group": "Ruby SDK",
+          "pages": [
+            "sdks/ruby/installation",
+            "sdks/ruby/usage",
+            "sdks/ruby/examples"
+          ]
+        },
+        {
+          "group": "Java SDK",
+          "pages": [
+            "sdks/java/installation",
+            "sdks/java/usage",
+            "sdks/java/examples"
+          ]
+        },
+        {
+          "group": "Go SDK",
+          "pages": [
+            "sdks/go/installation",
+            "sdks/go/usage",
+            "sdks/go/examples"
+          ]
+        },
+        {
+          "group": "C# SDK",
+          "pages": [
+            "sdks/csharp/installation",
+            "sdks/csharp/usage",
+            "sdks/csharp/examples"
+          ]
+        },
+        {
+          "group": "Rust SDK",
+          "pages": [
+            "sdks/rust/installation",
+            "sdks/rust/usage",
+            "sdks/rust/examples"
+          ]
+        }
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/mohammedzamakhan/doorpasses",
+    "twitter": "https://twitter.com/doorpasses"
+  },
+  "analytics": {
+    "ga4": {
+      "measurementId": "G-XXXXXXXXXX"
+    }
+  }
+}

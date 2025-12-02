@@ -1,0 +1,268 @@
+---
+title: 'Installation'
+description: 'Install the DoorPasses Node.js SDK'
+---
+
+## Requirements
+
+- Node.js 18.x or higher
+- npm 9.x or higher (or yarn, pnpm)
+
+## Installation
+
+Install the SDK using your preferred package manager:
+
+<CodeGroup>
+```bash npm
+npm install @doorpasses/node-sdk
+```
+
+```bash yarn
+yarn add @doorpasses/node-sdk
+```
+
+```bash pnpm
+pnpm add @doorpasses/node-sdk
+```
+</CodeGroup>
+
+## TypeScript Support
+
+The SDK is written in TypeScript and includes full type definitions out of the box. No additional `@types` packages are required.
+
+```typescript
+import { DoorPassesClient, AccessPass } from '@doorpasses/node-sdk';
+
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_ACCOUNT_ID!,
+  sharedSecret: process.env.DOORPASSES_SHARED_SECRET!
+});
+
+// Full type safety and autocomplete
+const pass: AccessPass = await client.accessPasses.create({
+  card_template_id: '0xt3mp14t3',
+  full_name: 'Ahmed Al-Mansouri',
+  email: 'ahmed@company.com',
+  // TypeScript will validate all fields
+});
+```
+
+## Quick Start
+
+Create a new file `app.js` (or `app.ts` for TypeScript):
+
+<CodeGroup>
+```javascript JavaScript
+const { DoorPassesClient } = require('@doorpasses/node-sdk');
+
+// Initialize the client
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_ACCOUNT_ID,
+  sharedSecret: process.env.DOORPASSES_SHARED_SECRET
+});
+
+async function main() {
+  try {
+    // Issue an access pass
+    const accessPass = await client.accessPasses.create({
+      card_template_id: '0xt3mp14t3',
+      full_name: 'Ahmed Al-Mansouri',
+      email: 'ahmed@company.com',
+      employee_id: 'EMP-001',
+      site_code: '123',
+      card_number: '45678',
+      start_date: '2025-01-01T00:00:00Z',
+      expiration_date: '2025-12-31T23:59:59Z',
+      classification: 'full_time',
+      title: 'Senior Engineer'
+    });
+
+    console.log('Access pass created:', accessPass.data.id);
+    console.log('Install URL:', accessPass.data.install_url);
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
+}
+
+main();
+```
+
+```typescript TypeScript
+import { DoorPassesClient } from '@doorpasses/node-sdk';
+
+// Initialize the client
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_ACCOUNT_ID!,
+  sharedSecret: process.env.DOORPASSES_SHARED_SECRET!
+});
+
+async function main(): Promise<void> {
+  try {
+    // Issue an access pass
+    const accessPass = await client.accessPasses.create({
+      card_template_id: '0xt3mp14t3',
+      full_name: 'Ahmed Al-Mansouri',
+      email: 'ahmed@company.com',
+      employee_id: 'EMP-001',
+      site_code: '123',
+      card_number: '45678',
+      start_date: '2025-01-01T00:00:00Z',
+      expiration_date: '2025-12-31T23:59:59Z',
+      classification: 'full_time',
+      title: 'Senior Engineer'
+    });
+
+    console.log('Access pass created:', accessPass.data.id);
+    console.log('Install URL:', accessPass.data.install_url);
+  } catch (error) {
+    console.error('Error:', (error as Error).message);
+  }
+}
+
+main();
+```
+</CodeGroup>
+
+## Environment Variables
+
+Create a `.env` file in your project root:
+
+```bash
+DOORPASSES_ACCOUNT_ID=your-account-id
+DOORPASSES_SHARED_SECRET=your-shared-secret
+```
+
+Install `dotenv` to load environment variables:
+
+```bash
+npm install dotenv
+```
+
+Load environment variables at the start of your application:
+
+```javascript
+require('dotenv').config();
+
+const { DoorPassesClient } = require('@doorpasses/node-sdk');
+
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_ACCOUNT_ID,
+  sharedSecret: process.env.DOORPASSES_SHARED_SECRET
+});
+```
+
+## Configuration Options
+
+<ParamField path="accountId" type="string" required>
+  Your DoorPasses account ID
+</ParamField>
+
+<ParamField path="sharedSecret" type="string" required>
+  Your DoorPasses shared secret for authentication
+</ParamField>
+
+<ParamField path="baseUrl" type="string" default="https://api.doorpasses.com">
+  API base URL (use `https://sandbox.doorpasses.com` for testing)
+</ParamField>
+
+<ParamField path="timeout" type="number" default="30000">
+  Request timeout in milliseconds
+</ParamField>
+
+<ParamField path="maxRetries" type="number" default="3">
+  Maximum number of retry attempts for failed requests
+</ParamField>
+
+<ParamField path="retryDelay" type="number" default="1000">
+  Initial delay between retries in milliseconds (exponential backoff)
+</ParamField>
+
+### Advanced Configuration
+
+```typescript
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_ACCOUNT_ID!,
+  sharedSecret: process.env.DOORPASSES_SHARED_SECRET!,
+  baseUrl: 'https://sandbox.doorpasses.com',
+  timeout: 60000,
+  maxRetries: 5,
+  retryDelay: 2000
+});
+```
+
+## Verify Installation
+
+Test that everything is working:
+
+```javascript
+const { DoorPassesClient } = require('@doorpasses/node-sdk');
+
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_ACCOUNT_ID,
+  sharedSecret: process.env.DOORPASSES_SHARED_SECRET
+});
+
+// Test connection
+client.accessPasses.list({ template_id: '0xt3mp14t3' })
+  .then(() => console.log('✅ SDK connected successfully!'))
+  .catch(error => console.error('❌ Connection failed:', error.message));
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Usage Guide"
+    icon="book"
+    href="/sdks/node/usage"
+  >
+    Learn how to use the SDK
+  </Card>
+  <Card
+    title="Examples"
+    icon="code"
+    href="/sdks/node/examples"
+  >
+    View code examples
+  </Card>
+  <Card
+    title="API Reference"
+    icon="file-code"
+    href="/api-reference/introduction"
+  >
+    Complete API documentation
+  </Card>
+  <Card
+    title="GitHub"
+    icon="github"
+    href="https://github.com/doorpasses/node-sdk"
+  >
+    View source code
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Module not found error">
+    Make sure you've installed the package:
+    ```bash
+    npm install @doorpasses/node-sdk
+    ```
+  </Accordion>
+
+  <Accordion title="TypeScript errors">
+    Ensure you're using TypeScript 4.5 or higher:
+    ```bash
+    npm install -D typescript@latest
+    ```
+  </Accordion>
+
+  <Accordion title="Authentication errors">
+    Verify your credentials are correct and loaded from environment variables:
+    ```javascript
+    console.log('Account ID:', process.env.DOORPASSES_ACCOUNT_ID);
+    // Should not be undefined
+    ```
+  </Accordion>
+</AccordionGroup>

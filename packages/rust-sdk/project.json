@@ -1,0 +1,67 @@
+{
+  "name": "rust-sdk",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/rust-sdk/src",
+  "projectType": "library",
+  "tags": ["type:lib", "scope:sdk", "language:rust"],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/target"],
+      "options": {
+        "command": "cargo build --release",
+        "cwd": "packages/rust-sdk"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo test",
+        "cwd": "packages/rust-sdk"
+      }
+    },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo tarpaulin --out Xml --output-dir coverage",
+        "cwd": "packages/rust-sdk"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo clippy -- -D warnings",
+        "cwd": "packages/rust-sdk"
+      }
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo fmt",
+        "cwd": "packages/rust-sdk"
+      }
+    },
+    "format:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo fmt -- --check",
+        "cwd": "packages/rust-sdk"
+      }
+    },
+    "doc": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo doc --no-deps --open",
+        "cwd": "packages/rust-sdk"
+      }
+    },
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo publish",
+        "cwd": "packages/rust-sdk"
+      },
+      "dependsOn": ["build", "test"]
+    }
+  }
+}

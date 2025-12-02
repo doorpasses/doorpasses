@@ -1,0 +1,87 @@
+---
+title: 'List Access Passes'
+api: 'GET /v1/access-passes'
+description: 'Retrieve a list of access passes'
+---
+
+## Endpoint
+
+```
+GET https://api.doorpasses.com/v1/access-passes
+```
+
+## Authentication
+
+This endpoint requires [authentication](/authentication) using `X-ACCT-ID` and `X-PAYLOAD-SIG` headers.
+
+## Query Parameters
+
+<ParamField query="template_id" type="string" required>
+  Card template ID to filter by
+</ParamField>
+
+<ParamField query="state" type="string">
+  Filter by state: `PENDING`, `ACTIVE`, `SUSPENDED`, `UNLINKED`, `DELETED`, `EXPIRED`
+</ParamField>
+
+<ParamField query="page" type="number" default="1">
+  Page number to retrieve
+</ParamField>
+
+<ParamField query="limit" type="number" default="50">
+  Number of items per page (max: 100)
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Whether the request was successful
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="items" type="array">
+      Array of access pass objects
+    </ResponseField>
+    <ResponseField name="pagination" type="object">
+      Pagination information
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Request
+
+```bash
+curl -X GET "https://api.doorpasses.com/v1/access-passes?template_id=0xt3mp14t3&state=ACTIVE" \
+  -H "X-ACCT-ID: your-account-id" \
+  -H "X-PAYLOAD-SIG: generated-signature"
+```
+
+## Example Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "exId": "0xp4551d",
+        "fullName": "Ahmed Al-Mansouri",
+        "email": "ahmed@company.com",
+        "employeeId": "EMP-001",
+        "state": "ACTIVE",
+        "startDate": "2025-01-01T00:00:00Z",
+        "expirationDate": "2025-12-31T23:59:59Z",
+        "createdAt": "2025-01-15T10:30:00Z",
+        "updatedAt": "2025-01-15T10:30:00Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 50,
+      "total": 150,
+      "totalPages": 3
+    }
+  }
+}
+```

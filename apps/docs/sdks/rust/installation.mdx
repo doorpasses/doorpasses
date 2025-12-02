@@ -1,0 +1,111 @@
+---
+title: 'Installation'
+description: 'Get started with the DoorPasses Rust SDK'
+---
+
+## Requirements
+
+- Rust 1.70 or later
+- Cargo (comes with Rust)
+
+## Installation
+
+Add the DoorPasses SDK to your `Cargo.toml`:
+
+```toml
+[dependencies]
+doorpasses = "1.0"
+tokio = { version = "1", features = ["full"] }
+```
+
+## Quick Start
+
+Create a new Rust project and add the SDK:
+
+```bash
+# Create a new project
+cargo new my-doorpasses-app
+cd my-doorpasses-app
+
+# Add doorpasses to dependencies
+cargo add doorpasses
+cargo add tokio --features full
+```
+
+## Basic Usage
+
+Here's a simple example to get you started:
+
+```rust
+use doorpasses::{DoorPasses, types::IssueAccessPassParams};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Initialize the client
+    let client = DoorPasses::new(
+        "your_account_id".to_string(),
+        "your_shared_secret".to_string()
+    )?;
+
+    // Check API health
+    let health = client.health().await?;
+    println!("API Status: {:?}", health);
+
+    // Issue a new access pass
+    let params = IssueAccessPassParams {
+        card_template_id: "template_123".to_string(),
+        full_name: "John Doe".to_string(),
+        start_date: "2024-01-01".to_string(),
+        expiration_date: "2024-12-31".to_string(),
+        email: Some("john@example.com".to_string()),
+        ..Default::default()
+    };
+
+    let access_pass = client.access_passes.issue(params).await?;
+    println!("Created access pass: {}", access_pass.id);
+
+    Ok(())
+}
+```
+
+## Configuration
+
+### Using Environment Variables
+
+```rust
+use doorpasses::DoorPasses;
+
+let account_id = std::env::var("DOORPASSES_ACCOUNT_ID")
+    .expect("DOORPASSES_ACCOUNT_ID not set");
+let shared_secret = std::env::var("DOORPASSES_SHARED_SECRET")
+    .expect("DOORPASSES_SHARED_SECRET not set");
+
+let client = DoorPasses::new(account_id, shared_secret)?;
+```
+
+### Custom Configuration
+
+```rust
+use doorpasses::{DoorPasses, DoorPassesConfig};
+use std::time::Duration;
+
+let config = DoorPassesConfig::new(
+    "account_id".to_string(),
+    "shared_secret".to_string()
+)
+.with_base_url("https://api.staging.doorpasses.io".to_string())
+.with_timeout(Duration::from_secs(60));
+
+let client = DoorPasses::with_config(config)?;
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Usage Guide" icon="book" href="/sdks/rust/usage">
+    Learn how to use the SDK
+  </Card>
+  <Card title="Examples" icon="code" href="/sdks/rust/examples">
+    View code examples
+  </Card>
+</CardGroup>
