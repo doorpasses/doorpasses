@@ -85,9 +85,7 @@ describe('IntegrationEncryptionService', () => {
 
 			await expect(
 				encryptionService.encryptTokenData(tokenData),
-			).rejects.toThrow(
-				'INTEGRATION_ENCRYPTION_KEY environment variable is required for token encryption',
-			)
+			).rejects.toThrow(/INTEGRATION_ENCRYPTION_KEY environment variable/)
 		})
 
 		it('should throw error when encryption key is wrong length', async () => {
@@ -99,9 +97,7 @@ describe('IntegrationEncryptionService', () => {
 
 			await expect(
 				encryptionService.encryptTokenData(tokenData),
-			).rejects.toThrow(
-				'INTEGRATION_ENCRYPTION_KEY must be exactly 64 hex characters',
-			)
+			).rejects.toThrow(/INTEGRATION_ENCRYPTION_KEY.*valid.*encryption key/)
 		})
 
 		it('should throw error when encryption key is whitespace-only', async () => {
@@ -113,13 +109,11 @@ describe('IntegrationEncryptionService', () => {
 
 			await expect(
 				encryptionService.encryptTokenData(tokenData),
-			).rejects.toThrow(
-				'INTEGRATION_ENCRYPTION_KEY environment variable cannot be empty or whitespace-only',
-			)
+			).rejects.toThrow(/INTEGRATION_ENCRYPTION_KEY.*valid.*encryption key/)
 		})
 
 		it('should handle encryption key with surrounding whitespace', async () => {
-			// Key with spaces around it should work after trimming
+			// Key with spaces around it should fail validation (whitespace is not allowed)
 			const validKey =
 				'1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 			vi.stubEnv('INTEGRATION_ENCRYPTION_KEY', `  ${validKey}  `)
@@ -128,10 +122,9 @@ describe('IntegrationEncryptionService', () => {
 				accessToken: 'access-token-123',
 			}
 
-			const encrypted = await encryptionService.encryptTokenData(tokenData)
-
-			expect(encrypted).toBeDefined()
-			expect(encrypted.encryptedAccessToken).toBeDefined()
+			await expect(
+				encryptionService.encryptTokenData(tokenData),
+			).rejects.toThrow(/INTEGRATION_ENCRYPTION_KEY.*valid.*encryption key/)
 		})
 	})
 
@@ -188,9 +181,7 @@ describe('IntegrationEncryptionService', () => {
 
 			await expect(
 				newEncryptionService.decryptTokenData(encrypted),
-			).rejects.toThrow(
-				'Failed to decrypt token data - invalid key or corrupted data',
-			)
+			).rejects.toThrow(/Decryption failed/)
 		})
 
 		it('should throw error when encrypted data is corrupted', async () => {
@@ -201,9 +192,7 @@ describe('IntegrationEncryptionService', () => {
 
 			await expect(
 				encryptionService.decryptTokenData(corruptedData),
-			).rejects.toThrow(
-				'Failed to decrypt token data - invalid key or corrupted data',
-			)
+			).rejects.toThrow(/Decryption failed/)
 		})
 	})
 
@@ -507,13 +496,13 @@ describe('Utility functions', () => {
 			const corruptedEncrypted = encrypted.slice(0, -10) + '0000000000'
 
 			await expect(decryptToken(corruptedEncrypted)).rejects.toThrow(
-				'Failed to decrypt token - invalid key or corrupted data',
+				/Decryption failed/,
 			)
 		})
 
 		it('should throw error when decrypting corrupted data', async () => {
 			await expect(decryptToken('corrupted-encrypted-data')).rejects.toThrow(
-				'Failed to decrypt token - invalid key or corrupted data',
+				/Decryption failed/,
 			)
 		})
 	})

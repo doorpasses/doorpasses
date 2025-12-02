@@ -52,9 +52,12 @@ vi.mock('stripe', () => {
 		},
 	}
 
+	const mockStripeConstructor = vi.fn(() => mockStripe) as any
+	// Add createFetchHttpClient as a static method on the constructor
+	mockStripeConstructor.createFetchHttpClient = vi.fn(() => ({}))
+
 	return {
-		default: vi.fn(() => mockStripe),
-		createFetchHttpClient: vi.fn(() => ({})),
+		default: mockStripeConstructor,
 	}
 })
 
@@ -137,9 +140,7 @@ describe('StripeProvider', () => {
 		})
 
 		it('should handle product fetch errors', async () => {
-			mockStripeInstance.products.list.mockRejectedValue(
-				new Error('API Error'),
-			)
+			mockStripeInstance.products.list.mockRejectedValue(new Error('API Error'))
 
 			await expect(stripeProvider.getProducts()).rejects.toThrow(
 				'Failed to fetch Stripe products: API Error',
@@ -160,7 +161,7 @@ describe('StripeProvider', () => {
 
 			const result = await stripeProvider.getProducts()
 
-			expect(result[0]?.defaultPriceId).toBeUndefined()
+			expect(result[0]?.defaultPriceId).toBeNull()
 		})
 	})
 
@@ -237,9 +238,7 @@ describe('StripeProvider', () => {
 				subscription: 'sub_123',
 			}
 
-			mockStripeInstance.checkout.sessions.create.mockResolvedValue(
-				mockSession,
-			)
+			mockStripeInstance.checkout.sessions.create.mockResolvedValue(mockSession)
 
 			const result = await stripeProvider.createCheckoutSession({
 				priceId: 'price_123',

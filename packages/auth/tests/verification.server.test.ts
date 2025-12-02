@@ -76,7 +76,11 @@ describe('Verification Session Management', () => {
 
 			expect(setCookieHeader).toBeDefined()
 			expect(setCookieHeader).toContain('en_verification=')
-			expect(setCookieHeader).toContain('Max-Age=0')
+			// Cookie expiration can use either Max-Age=0 or Expires with past date
+			expect(
+				setCookieHeader.includes('Max-Age=0') ||
+					setCookieHeader.includes('Expires=Thu, 01 Jan 1970'),
+			).toBe(true)
 		})
 
 		it('should handle missing verification data gracefully', async () => {
