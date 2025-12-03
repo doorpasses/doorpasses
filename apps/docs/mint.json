@@ -26,6 +26,10 @@
     {
       "name": "SDKs",
       "url": "sdks"
+    },
+    {
+      "name": "Integrations",
+      "url": "integrations"
     }
   ],
   "anchors": [
@@ -160,6 +164,66 @@
             "sdks/rust/installation",
             "sdks/rust/usage",
             "sdks/rust/examples"
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Integrations",
+      "pages": [
+        "integrations/overview",
+        {
+          "group": "Slack",
+          "pages": [
+            "integrations/slack"
+          ]
+        },
+        {
+          "group": "Github",
+          "pages": [
+            "integrations/github"
+          ]
+        },
+        {
+          "group": "Notion",
+          "pages": [
+            "integrations/notion"
+          ]
+        },
+        {
+          "group": "Gitlab",
+          "pages": [
+            "integrations/gitlab"
+          ]
+        },
+        {
+          "group": "Jira",
+          "pages": [
+            "integrations/jira"
+          ]
+        },
+        {
+          "group": "Trello",
+          "pages": [
+            "integrations/trello"
+          ]
+        },
+        {
+          "group": "Linear",
+          "pages": [
+            "integrations/linear"
+          ]
+        },
+        {
+          "group": "Asana",
+          "pages": [
+            "integrations/asana"
+          ]
+        },
+        {
+          "group": "ClickUp",
+          "pages": [
+            "integrations/clickup"
           ]
         }
       ]
