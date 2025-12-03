@@ -24,7 +24,7 @@ class CardTemplateController {
 
       const result = await cardTemplateService.createCardTemplate(
         req.account!.id,
-        req.account!.id, // Using organizationId as createdById for now
+        req.account!.userId,
         data
       );
 

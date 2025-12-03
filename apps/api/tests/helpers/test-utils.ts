@@ -1,29 +1,75 @@
 import { generatePayloadSignature, encodePayload } from '../../src/utils/auth';
 import prisma from '../../src/config/database';
-import { Tier, Platform, UseCase, Protocol, PublishStatus, PassState } from '@prisma/client';
+import { Platform, UseCase, Protocol, PublishStatus, PassState } from '@prisma/client';
 
 /**
- * Create a test account for integration testing
+ * Create a test organization and user for integration testing
  */
-export async function createTestAccount(tier: Tier = 'STARTER') {
+export async function createTestAccount(tier: string = 'STARTER') {
+  const orgSlug = `test-org-${Math.random().toString(36).substring(7)}`;
   const accountId = `0xtest${Math.random().toString(36).substring(7)}`;
   const sharedSecret = 'test-shared-secret-12345';
 
-  const account = await prisma.account.create({
+  // Create a test user
+  const user = await prisma.user.create({
     data: {
-      accountId,
-      sharedSecret,
-      tier,
-      name: `Test Account ${accountId}`,
       email: `test-${accountId}@example.com`,
+      username: `testuser-${accountId}`,
+      name: `Test User ${accountId}`,
+    },
+  });
+
+  // Get or create the admin role
+  let adminRole = await prisma.organizationRole.findFirst({
+    where: { name: 'admin' },
+  });
+
+  if (!adminRole) {
+    adminRole = await prisma.organizationRole.create({
+      data: {
+        name: 'admin',
+        description: 'Administrator role',
+        level: 4,
+      },
+    });
+  }
+
+  // Create a test organization
+  const organization = await prisma.organization.create({
+    data: {
+      name: `Test Organization ${accountId}`,
+      slug: orgSlug,
+      description: 'Test organization for integration testing',
+      planName: tier, // Store tier in planName
+      users: {
+        create: {
+          userId: user.id,
+          organizationRoleId: adminRole.id,
+        },
+      },
+    },
+  });
+
+  // Create an API key for the organization
+  await prisma.apiKey.create({
+    data: {
+      key: accountId,
+      name: `Test API Key for ${accountId}`,
+      userId: user.id,
+      organizationId: organization.id,
       isActive: true,
     },
   });
 
   return {
-    account,
+    account: {
+      id: organization.id,
+      accountId,
+    },
     accountId,
     sharedSecret,
+    userId: user.id,
+    organizationId: organization.id,
   };
 }
 
@@ -68,13 +114,15 @@ export function generateAuthHeadersForGet(
 
 /**
  * Create a test card template
- * @param accountInternalId - The internal UUID of the account (account.id), not the external accountId
+ * @param organizationId - The organization ID
+ * @param createdById - The user ID who created the template
  */
-export async function createTestCardTemplate(accountInternalId: string) {
+export async function createTestCardTemplate(organizationId: string, createdById: string) {
   const cardTemplate = await prisma.cardTemplate.create({
     data: {
       exId: `0xtest${Math.random().toString(36).substring(7)}`,
-      accountId: accountInternalId,
+      organizationId,
+      createdById,
       name: 'Test Card Template',
       platform: Platform.APPLE,
       useCase: UseCase.EMPLOYEE_BADGE,
@@ -83,9 +131,9 @@ export async function createTestCardTemplate(accountInternalId: string) {
       publishStatus: PublishStatus.DRAFT,
       backgroundColor: '#000000',
       labelColor: '#FFFFFF',
-      metadata: {
+      metadata: JSON.stringify({
         description: 'Test card template for integration testing',
-      },
+      }),
     },
   });
 
@@ -96,8 +144,8 @@ export async function createTestCardTemplate(accountInternalId: string) {
  * Create a test access pass
  */
 export async function createTestAccessPass(
-  accountId: string,
   cardTemplateId: string,
+  createdById: string,
   data: Partial<{
     employeeId: string;
     fullName: string;
@@ -122,6 +170,7 @@ export async function createTestAccessPass(
     data: {
       exId: `0xtest${Math.random().toString(36).substring(7)}`,
       cardTemplateId,
+      createdById,
       employeeId: data.employeeId || `emp-${Math.random().toString(36).substring(7)}`,
       fullName: data.fullName || 'Test Employee',
       email: data.email || 'test@example.com',
@@ -135,7 +184,7 @@ export async function createTestAccessPass(
       startDate: data.startDate || now,
       expirationDate: data.expirationDate || oneYearLater,
       state: data.state || PassState.ACTIVE,
-      metadata: data.metadata || {},
+      metadata: data.metadata ? JSON.stringify(data.metadata) : undefined,
     },
   });
 
@@ -143,40 +192,43 @@ export async function createTestAccessPass(
 }
 
 /**
- * Clean up test account and related data
+ * Clean up test organization and related data
  */
-export async function cleanupTestAccount(accountId: string) {
-  const account = await prisma.account.findUnique({
-    where: { accountId },
+export async function cleanupTestAccount(organizationId: string) {
+  const organization = await prisma.organization.findUnique({
+    where: { id: organizationId },
     select: { id: true },
   });
 
-  if (!account) {
-    return; // Account doesn't exist, nothing to clean up
+  if (!organization) {
+    return; // Organization doesn't exist, nothing to clean up
   }
 
-  // Delete access passes first (foreign key constraint)
-  await prisma.accessPass.deleteMany({
-    where: {
-      cardTemplate: {
-        accountId: account.id,
-      },
-    },
+  // Delete API keys
+  await prisma.apiKey.deleteMany({
+    where: { organizationId: organization.id },
   });
 
-  // Delete credential profiles
-  await prisma.credentialProfile.deleteMany({
-    where: {
-      cardTemplate: {
-        accountId: account.id,
-      },
-    },
+  // Delete webhook deliveries first
+  const webhooks = await prisma.webhook.findMany({
+    where: { organizationId: organization.id },
+    select: { id: true },
   });
 
-  // Delete event logs (EventLog doesn't have accountId, it relates through cardTemplate)
-  // First get all card template IDs for this account
+  for (const webhook of webhooks) {
+    await prisma.webhookDelivery.deleteMany({
+      where: { webhookId: webhook.id },
+    });
+  }
+
+  // Delete webhooks
+  await prisma.webhook.deleteMany({
+    where: { organizationId: organization.id },
+  });
+
+  // Delete access passes and event logs
   const cardTemplates = await prisma.cardTemplate.findMany({
-    where: { accountId: account.id },
+    where: { organizationId: organization.id },
     select: { id: true },
   });
 
@@ -184,50 +236,67 @@ export async function cleanupTestAccount(accountId: string) {
 
   // Delete event logs related to these card templates
   if (cardTemplateIds.length > 0) {
-    await prisma.eventLog.deleteMany({
+    await prisma.passEventLog.deleteMany({
       where: {
         OR: [
           { cardTemplateId: { in: cardTemplateIds } },
           {
             accessPass: {
-              cardTemplateId: { in: cardTemplateIds }
+              cardTemplate: {
+                id: { in: cardTemplateIds }
+              }
             }
           }
         ]
       },
     });
+
+    // Delete access passes
+    await prisma.accessPass.deleteMany({
+      where: {
+        cardTemplate: {
+          organizationId: organization.id,
+        },
+      },
+    });
+
+    // Delete credential profiles
+    await prisma.credentialProfile.deleteMany({
+      where: {
+        cardTemplate: {
+          organizationId: organization.id,
+        },
+      },
+    });
+
+    // Delete card templates
+    await prisma.cardTemplate.deleteMany({
+      where: { organizationId: organization.id },
+    });
   }
 
-  // Delete card templates
-  await prisma.cardTemplate.deleteMany({
-    where: { accountId: account.id },
+  // Delete user organization relationships
+  await prisma.userOrganization.deleteMany({
+    where: { organizationId: organization.id },
   });
 
-  // Delete webhooks
-  await prisma.webhook.deleteMany({
-    where: { accountId: account.id },
-  });
-
-  // Delete API keys
-  await prisma.apiKey.deleteMany({
-    where: { accountId: account.id },
-  });
-
-  // Delete account
-  await prisma.account.delete({
-    where: { id: account.id },
+  // Delete organization
+  await prisma.organization.delete({
+    where: { id: organization.id },
   });
 }
 
 /**
  * Create a published card template for wallet testing
- * @param accountInternalId - The internal UUID of the account (account.id), not the external accountId
+ * @param organizationId - The organization ID
+ * @param createdById - The user ID who created the template
  */
-export async function createPublishedCardTemplate(accountInternalId: string) {
+export async function createPublishedCardTemplate(organizationId: string, createdById: string) {
   const cardTemplate = await prisma.cardTemplate.create({
     data: {
       exId: `0xtest${Math.random().toString(36).substring(7)}`,
-      accountId: accountInternalId,
+      organizationId,
+      createdById,
       name: 'Test Published Card',
       platform: Platform.APPLE,
       useCase: UseCase.EMPLOYEE_BADGE,
@@ -240,9 +309,9 @@ export async function createPublishedCardTemplate(accountInternalId: string) {
       labelSecondaryColor: '#CCCCCC',
       supportUrl: 'https://test.example.com/support',
       supportEmail: 'support@test.example.com',
-      metadata: {
+      metadata: JSON.stringify({
         description: 'Published card template for wallet testing',
-      },
+      }),
     },
   });
 

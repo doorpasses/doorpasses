@@ -24,8 +24,8 @@ describe('Card Template API Integration Tests', () => {
 
   afterAll(async () => {
     // Cleanup test data
-    await cleanupTestAccount(enterpriseAccount.account.accountId);
-    await cleanupTestAccount(standardAccount.account.accountId);
+    await cleanupTestAccount(enterpriseAccount.organizationId);
+    await cleanupTestAccount(standardAccount.organizationId);
   });
 
   describe('POST /v1/console/card-templates - Create Card Template', () => {
@@ -139,7 +139,7 @@ describe('Card Template API Integration Tests', () => {
 
     beforeAll(async () => {
       // Create a card template for reading tests
-      testTemplate = await createTestCardTemplate(enterpriseAccount.account.id);
+      testTemplate = await createTestCardTemplate(enterpriseAccount.organizationId, enterpriseAccount.userId);
     });
 
     it('should retrieve a card template by ID', async () => {
@@ -194,7 +194,7 @@ describe('Card Template API Integration Tests', () => {
     let templateToUpdate: any;
 
     beforeAll(async () => {
-      templateToUpdate = await createTestCardTemplate(enterpriseAccount.account.id);
+      templateToUpdate = await createTestCardTemplate(enterpriseAccount.organizationId, enterpriseAccount.userId);
     });
 
     it('should update a card template with valid data', async () => {
@@ -276,7 +276,7 @@ describe('Card Template API Integration Tests', () => {
     let templateToPublish: any;
 
     beforeAll(async () => {
-      templateToPublish = await createTestCardTemplate(enterpriseAccount.account.id);
+      templateToPublish = await createTestCardTemplate(enterpriseAccount.organizationId, enterpriseAccount.userId);
     });
 
     it('should publish a draft card template', async () => {
@@ -339,7 +339,7 @@ describe('Card Template API Integration Tests', () => {
     let templateWithLogs: any;
 
     beforeAll(async () => {
-      templateWithLogs = await createTestCardTemplate(enterpriseAccount.account.id);
+      templateWithLogs = await createTestCardTemplate(enterpriseAccount.organizationId, enterpriseAccount.userId);
     });
 
     it('should retrieve event logs for a card template', async () => {

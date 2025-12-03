@@ -7,32 +7,37 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet build DoorPasses.sln --configuration Release",
+        "command": "/opt/homebrew/opt/dotnet@8/bin/dotnet build DoorPasses.sln --configuration Release",
         "cwd": "packages/csharp-sdk"
       }
     },
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet test DoorPasses.sln --logger \"console;verbosity=detailed\"",
+        "command": "/opt/homebrew/opt/dotnet@8/bin/dotnet test DoorPasses.Tests.csproj --logger \"console;verbosity=detailed\"",
         "cwd": "packages/csharp-sdk"
       }
     },
     "pack": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet pack DoorPasses.csproj -c Release -o ./dist",
+        "command": "/opt/homebrew/opt/dotnet@8/bin/dotnet pack DoorPasses.csproj -c Release -o ./dist",
         "cwd": "packages/csharp-sdk"
       },
-      "dependsOn": ["build"]
+      "dependsOn": [
+        "build"
+      ]
     },
     "clean": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet clean DoorPasses.sln",
+        "command": "/opt/homebrew/opt/dotnet@8/bin/dotnet clean DoorPasses.sln",
         "cwd": "packages/csharp-sdk"
       }
     }
   },
-  "tags": ["sdk", "csharp"]
+  "tags": [
+    "sdk",
+    "csharp"
+  ]
 }

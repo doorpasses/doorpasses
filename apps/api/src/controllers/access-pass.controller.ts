@@ -25,7 +25,7 @@ class AccessPassController {
       // Issue access pass
       const result = await accessPassService.issueAccessPass(
         req.account!.id,
-        req.account!.id, // Using organizationId as createdById for now
+        req.account!.userId,
         data
       );
 

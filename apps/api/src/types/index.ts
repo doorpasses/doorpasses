@@ -7,6 +7,7 @@ export interface AuthenticatedRequest extends Omit<Request, 'language' | 't'> {
     id: string;
     accountId: string;
     tier: string;
+    userId: string;
   };
   t?: TFunction;
   language?: string;

@@ -3,7 +3,10 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/python-sdk/doorpasses",
   "projectType": "library",
-  "tags": ["sdk", "python"],
+  "tags": [
+    "sdk",
+    "python"
+  ],
   "targets": {
     "install": {
       "executor": "nx:run-commands",
@@ -22,7 +25,7 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pytest",
+        "command": "source venv/bin/activate && pytest",
         "cwd": "packages/python-sdk"
       }
     },
@@ -65,7 +68,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "python -m build",
+        "command": "python3 -m build",
         "cwd": "packages/python-sdk"
       }
     },

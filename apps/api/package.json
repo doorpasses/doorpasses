@@ -8,12 +8,10 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "jest --coverage",
-    "test:watch": "jest --watch",
-    "test:integration": "vitest run",
-    "test:integration:watch": "vitest",
-    "test:integration:ui": "vitest --ui",
-    "test:integration:coverage": "vitest run --coverage",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down"
   },
@@ -45,6 +43,12 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@types/nodemailer": "^7.0.4"
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.0.0",
+    "@types/nodemailer": "^7.0.4",
+    "@types/supertest": "^6.0.2",
+    "supertest": "^6.3.3",
+    "typescript": "^5.8.3",
+    "vitest": "^4.0.4"
   }
 }

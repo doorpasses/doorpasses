@@ -7,32 +7,41 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cd packages/ruby-sdk && bundle exec rspec",
+        "command": "/opt/homebrew/opt/ruby@3.3/bin/bundle exec rspec",
+        "cwd": "packages/ruby-sdk",
         "color": true
       }
     },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cd packages/ruby-sdk && bundle exec rubocop",
+        "command": "/opt/homebrew/opt/ruby@3.3/bin/bundle exec rubocop",
+        "cwd": "packages/ruby-sdk",
         "color": true
       }
     },
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cd packages/ruby-sdk && gem build doorpasses.gemspec",
+        "command": "/opt/homebrew/opt/ruby@3.3/bin/gem build doorpasses.gemspec",
+        "cwd": "packages/ruby-sdk",
         "color": true
       },
-      "outputs": ["{projectRoot}/*.gem"]
+      "outputs": [
+        "{projectRoot}/*.gem"
+      ]
     },
     "install": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cd packages/ruby-sdk && bundle install",
+        "command": "/opt/homebrew/opt/ruby@3.3/bin/bundle install",
+        "cwd": "packages/ruby-sdk",
         "color": true
       }
     }
   },
-  "tags": ["type:sdk", "language:ruby"]
+  "tags": [
+    "type:sdk",
+    "language:ruby"
+  ]
 }

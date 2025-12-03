@@ -1,10 +1,11 @@
+import { beforeAll, afterEach, afterAll } from 'vitest';
 import prisma from '../src/config/database';
 import redis from '../src/config/redis';
 
-// Setup hooks for Jest
+// Setup hooks for Vitest
 beforeAll(async () => {
   // Database and Redis connections are already established by importing config
-  console.log('Jest test environment setup complete');
+  console.log('Vitest test environment setup complete');
 });
 
 afterEach(async () => {
@@ -19,6 +20,3 @@ afterAll(async () => {
   await prisma.$disconnect();
   redis.disconnect();
 });
-
-// Increase timeout for integration tests
-jest.setTimeout(10000);

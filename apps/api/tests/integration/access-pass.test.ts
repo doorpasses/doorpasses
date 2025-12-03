@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import request from 'supertest';
+import { PassState } from '@prisma/client';
 import createApp from '../../src/app';
 import {
   createTestAccount,
@@ -21,12 +22,12 @@ describe('Access Pass API Integration Tests', () => {
     // Create test account with STARTER tier
     testAccount = await createTestAccount('STARTER');
     // Create a published card template for access pass testing
-    testCardTemplate = await createPublishedCardTemplate(testAccount.account.id);
+    testCardTemplate = await createPublishedCardTemplate(testAccount.organizationId, testAccount.userId);
   });
 
   afterAll(async () => {
     // Cleanup test data
-    await cleanupTestAccount(testAccount.account.accountId);
+    await cleanupTestAccount(testAccount.organizationId);
   });
 
   describe('POST /v1/access-passes - Issue Access Pass', () => {
@@ -154,8 +155,8 @@ describe('Access Pass API Integration Tests', () => {
     beforeAll(async () => {
       // Create an access pass for listing tests
       createdAccessPass = await createTestAccessPass(
-        testAccount.account.id,
-        testCardTemplate.id
+        testCardTemplate.id,
+        testAccount.userId
       );
     });
 
@@ -206,8 +207,8 @@ describe('Access Pass API Integration Tests', () => {
 
     beforeAll(async () => {
       accessPassToUpdate = await createTestAccessPass(
-        testAccount.account.id,
-        testCardTemplate.id
+        testCardTemplate.id,
+        testAccount.userId
       );
     });
 
@@ -263,11 +264,11 @@ describe('Access Pass API Integration Tests', () => {
 
     beforeAll(async () => {
       accessPassToSuspend = await createTestAccessPass(
-        testAccount.account.accountId,
         testCardTemplate.id,
+        testAccount.userId,
         {
-          externalUserId: 'suspend-test-user',
-          status: 'ACTIVE',
+          employeeId: 'suspend-test-user',
+          state: PassState.ACTIVE,
         }
       );
     });
@@ -307,11 +308,11 @@ describe('Access Pass API Integration Tests', () => {
 
     beforeAll(async () => {
       accessPassToResume = await createTestAccessPass(
-        testAccount.account.accountId,
         testCardTemplate.id,
+        testAccount.userId,
         {
-          externalUserId: 'resume-test-user',
-          status: 'SUSPENDED',
+          employeeId: 'resume-test-user',
+          state: PassState.SUSPENDED,
         }
       );
     });
@@ -341,11 +342,11 @@ describe('Access Pass API Integration Tests', () => {
 
     beforeAll(async () => {
       accessPassToUnlink = await createTestAccessPass(
-        testAccount.account.accountId,
         testCardTemplate.id,
+        testAccount.userId,
         {
-          externalUserId: 'unlink-test-user',
-          status: 'ACTIVE',
+          employeeId: 'unlink-test-user',
+          state: PassState.ACTIVE,
         }
       );
     });
@@ -375,11 +376,11 @@ describe('Access Pass API Integration Tests', () => {
 
     beforeAll(async () => {
       accessPassToDelete = await createTestAccessPass(
-        testAccount.account.accountId,
         testCardTemplate.id,
+        testAccount.userId,
         {
-          externalUserId: 'delete-test-user',
-          status: 'ACTIVE',
+          employeeId: 'delete-test-user',
+          state: PassState.ACTIVE,
         }
       );
     });

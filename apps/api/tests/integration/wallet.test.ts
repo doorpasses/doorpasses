@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import request from 'supertest';
+import { PassState } from '@prisma/client';
 import createApp from '../../src/app';
 import {
   createTestAccount,
@@ -22,15 +23,15 @@ describe('Wallet API Integration Tests', () => {
     testAccount = await createTestAccount('STARTER');
 
     // Create a published card template
-    publishedTemplate = await createPublishedCardTemplate(testAccount.account.id);
+    publishedTemplate = await createPublishedCardTemplate(testAccount.organizationId, testAccount.userId);
 
     // Create an active access pass
     activeAccessPass = await createTestAccessPass(
-      testAccount.account.id,
       publishedTemplate.id,
+      testAccount.userId,
       {
-        externalUserId: 'wallet-test-user',
-        status: 'ACTIVE',
+        employeeId: 'wallet-test-user',
+        state: PassState.ACTIVE,
         metadata: {
           name: 'Wallet Test User',
           email: 'wallet@test.com',
@@ -41,7 +42,7 @@ describe('Wallet API Integration Tests', () => {
 
   afterAll(async () => {
     // Cleanup test data
-    await cleanupTestAccount(testAccount.account.accountId);
+    await cleanupTestAccount(testAccount.organizationId);
   });
 
   describe('GET /v1/wallet/passes/:accessPassId - Download Wallet Pass', () => {

@@ -1,20 +1,83 @@
 {
   "format": 1,
   "restore": {
-    "/workspaces/wusul/packages/csharp-sdk/DoorPasses.Tests.csproj": {}
+    "/Users/zama/doorpasses/packages/csharp-sdk/DoorPasses.Tests.csproj": {}
   },
   "projects": {
-    "/workspaces/wusul/packages/csharp-sdk/DoorPasses.Tests.csproj": {
+    "/Users/zama/doorpasses/packages/csharp-sdk/DoorPasses.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/workspaces/wusul/packages/csharp-sdk/DoorPasses.Tests.csproj",
-        "projectName": "DoorPasses.Tests",
-        "projectPath": "/workspaces/wusul/packages/csharp-sdk/DoorPasses.Tests.csproj",
-        "packagesPath": "/home/codespace/.nuget/packages/",
-        "outputPath": "/workspaces/wusul/packages/csharp-sdk/obj-tests/",
+        "projectUniqueName": "/Users/zama/doorpasses/packages/csharp-sdk/DoorPasses.csproj",
+        "projectName": "DoorPasses",
+        "projectPath": "/Users/zama/doorpasses/packages/csharp-sdk/DoorPasses.csproj",
+        "packagesPath": "/Users/zama/.nuget/packages/",
+        "outputPath": "/Users/zama/doorpasses/packages/csharp-sdk/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/codespace/.nuget/NuGet/NuGet.Config"
+          "/Users/zama/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.1": {
+            "targetAlias": "netstandard2.1",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netstandard2.1": {
+          "targetAlias": "netstandard2.1",
+          "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
+            },
+            "System.Net.Http": {
+              "target": "Package",
+              "version": "[4.3.4, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "NETStandard.Library": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet@8/8.0.122/libexec/sdk/8.0.122/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/zama/doorpasses/packages/csharp-sdk/DoorPasses.Tests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/zama/doorpasses/packages/csharp-sdk/DoorPasses.Tests.csproj",
+        "projectName": "DoorPasses.Tests",
+        "projectPath": "/Users/zama/doorpasses/packages/csharp-sdk/DoorPasses.Tests.csproj",
+        "packagesPath": "/Users/zama/.nuget/packages/",
+        "outputPath": "/Users/zama/doorpasses/packages/csharp-sdk/obj-tests/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/zama/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -26,8 +89,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/workspaces/wusul/packages/csharp-sdk/DoorPasses.csproj": {
-                "projectPath": "/workspaces/wusul/packages/csharp-sdk/DoorPasses.csproj"
+              "/Users/zama/doorpasses/packages/csharp-sdk/DoorPasses.csproj": {
+                "projectPath": "/Users/zama/doorpasses/packages/csharp-sdk/DoorPasses.csproj"
               }
             }
           }
@@ -36,11 +99,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -86,75 +144,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.415/PortableRuntimeIdentifierGraph.json"
-        }
-      }
-    },
-    "/workspaces/wusul/packages/csharp-sdk/DoorPasses.csproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "/workspaces/wusul/packages/csharp-sdk/DoorPasses.csproj",
-        "projectName": "DoorPasses",
-        "projectPath": "/workspaces/wusul/packages/csharp-sdk/DoorPasses.csproj",
-        "packagesPath": "/home/codespace/.nuget/packages/",
-        "outputPath": "/workspaces/wusul/packages/csharp-sdk/obj/",
-        "projectStyle": "PackageReference",
-        "configFilePaths": [
-          "/home/codespace/.nuget/NuGet/NuGet.Config"
-        ],
-        "originalTargetFrameworks": [
-          "netstandard2.1"
-        ],
-        "sources": {
-          "https://api.nuget.org/v3/index.json": {}
-        },
-        "frameworks": {
-          "netstandard2.1": {
-            "targetAlias": "netstandard2.1",
-            "projectReferences": {}
-          }
-        },
-        "warningProperties": {
-          "warnAsError": [
-            "NU1605"
-          ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
-        }
-      },
-      "frameworks": {
-        "netstandard2.1": {
-          "targetAlias": "netstandard2.1",
-          "dependencies": {
-            "Newtonsoft.Json": {
-              "target": "Package",
-              "version": "[13.0.3, )"
-            },
-            "System.Net.Http": {
-              "target": "Package",
-              "version": "[4.3.4, )"
-            }
-          },
-          "imports": [
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48",
-            "net481"
-          ],
-          "assetTargetFallback": true,
-          "warn": true,
-          "frameworkReferences": {
-            "NETStandard.Library": {
-              "privateAssets": "all"
-            }
-          },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.415/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet@8/8.0.122/libexec/sdk/8.0.122/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

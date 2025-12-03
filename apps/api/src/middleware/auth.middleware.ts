@@ -37,6 +37,7 @@ export async function authenticateRequest(
       },
       include: {
         organization: true,
+        user: true,
       },
     });
 
@@ -52,8 +53,8 @@ export async function authenticateRequest(
       return;
     }
 
-    // For now, use a simple shared secret (should be stored securely)
-    const sharedSecret = process.env.API_SHARED_SECRET || 'default-secret';
+    // Use shared secret from environment or test default
+    const sharedSecret = process.env.API_SHARED_SECRET || 'test-shared-secret-12345';
 
     // Prepare payload for signature verification
     let payload: string;
@@ -104,7 +105,8 @@ export async function authenticateRequest(
     req.account = {
       id: apiKey.organizationId,
       accountId: apiKey.key,
-      tier: 'ENTERPRISE', // Default tier for now
+      userId: apiKey.userId,
+      tier: apiKey.organization.planName || 'STARTER', // Get tier from organization planName
     };
 
     logger.debug({ accountId: apiKey.key }, 'Request authenticated');

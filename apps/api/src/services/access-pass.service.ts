@@ -48,33 +48,55 @@ class AccessPassService {
       const installUrl = `https://doorpasses.com/install/${exId}`;
 
       // Create access pass
+      const createData: any = {
+        exId,
+        cardTemplateId: cardTemplate.id,
+        createdById,
+        employeeId: data.employee_id,
+        fullName: data.full_name,
+        email: data.email,
+        phoneNumber: data.phone_number,
+        classification: data.classification,
+        title: data.title,
+        siteCode: data.site_code,
+        cardNumber: data.card_number,
+        startDate: new Date(data.start_date),
+        expirationDate: new Date(data.expiration_date),
+        installUrl,
+        state: PassState.PENDING,
+      };
+
+      // Only add optional fields if they're provided
+      if (data.employee_photo !== undefined) {
+        createData.employeePhoto = data.employee_photo;
+      }
+      if (data.tag_id !== undefined) {
+        createData.tagId = data.tag_id;
+      }
+      if (data.file_data !== undefined) {
+        createData.fileData = data.file_data;
+      }
+      if (data.member_id !== undefined) {
+        createData.memberId = data.member_id;
+      }
+      if (data.membership_status !== undefined) {
+        createData.membershipStatus = data.membership_status;
+      }
+      if (data.is_pass_ready_to_transact !== undefined) {
+        createData.isPassReadyToTransact = data.is_pass_ready_to_transact;
+      }
+      if (data.tile_data !== undefined) {
+        createData.tileData = data.tile_data;
+      }
+      if (data.reservations !== undefined) {
+        createData.reservations = data.reservations;
+      }
+      if (data.metadata !== undefined) {
+        createData.metadata = JSON.stringify(data.metadata);
+      }
+
       const accessPass = await prisma.accessPass.create({
-        data: {
-          exId,
-          cardTemplateId: cardTemplate.id,
-          createdById,
-          employeeId: data.employee_id,
-          fullName: data.full_name,
-          email: data.email,
-          phoneNumber: data.phone_number,
-          classification: data.classification,
-          title: data.title,
-          employeePhoto: data.employee_photo,
-          tagId: data.tag_id,
-          siteCode: data.site_code,
-          cardNumber: data.card_number,
-          fileData: data.file_data,
-          startDate: new Date(data.start_date),
-          expirationDate: new Date(data.expiration_date),
-          memberId: data.member_id,
-          membershipStatus: data.membership_status,
-          isPassReadyToTransact: data.is_pass_ready_to_transact,
-          tileData: data.tile_data as any,
-          reservations: data.reservations as any,
-          metadata: data.metadata as any,
-          installUrl,
-          state: PassState.PENDING,
-        },
+        data: createData,
       });
 
       // Log event
@@ -127,13 +149,23 @@ class AccessPassService {
         'Access pass issued'
       );
 
+      // Parse metadata if it's a string
+      let parsedMetadata: any = undefined;
+      if (accessPass.metadata && typeof accessPass.metadata === 'string') {
+        try {
+          parsedMetadata = JSON.parse(accessPass.metadata);
+        } catch (e) {
+          // If parsing fails, keep it as undefined
+        }
+      }
+
       return {
         id: accessPass.exId,
         externalId: accessPass.exId, // Alias for backwards compatibility
         status: accessPass.state, // Alias for tests
         state: accessPass.state,
         install_url: walletInstallUrl,
-        metadata: accessPass.metadata,
+        metadata: parsedMetadata,
         created_at: accessPass.createdAt,
       };
     } catch (error) {
@@ -252,7 +284,7 @@ class AccessPassService {
           }),
           ...(data.tile_data && { tileData: data.tile_data as any }),
           ...(data.reservations && { reservations: data.reservations as any }),
-          ...(data.metadata && { metadata: data.metadata as any }),
+          ...(data.metadata && { metadata: JSON.stringify(data.metadata) }),
         },
       });
 
@@ -276,10 +308,20 @@ class AccessPassService {
 
       logger.info({ accessPassId: updated.exId }, 'Access pass updated');
 
+      // Parse metadata if it's a string
+      let parsedMetadata: any = undefined;
+      if (updated.metadata && typeof updated.metadata === 'string') {
+        try {
+          parsedMetadata = JSON.parse(updated.metadata);
+        } catch (e) {
+          // If parsing fails, keep it as undefined
+        }
+      }
+
       return {
         id: updated.exId,
         state: updated.state,
-        metadata: updated.metadata,
+        metadata: parsedMetadata,
         updated_at: updated.updatedAt,
       };
     } catch (error) {

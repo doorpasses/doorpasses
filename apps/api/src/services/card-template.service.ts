@@ -21,32 +21,70 @@ class CardTemplateService {
       // Generate external ID for the card template
       const exId = generateExternalId(12);
 
+      const createData: any = {
+        exId,
+        organizationId,
+        createdById,
+        name: data.name,
+        platform: data.platform,
+        useCase: data.use_case,
+        protocol: data.protocol,
+        allowOnMultipleDevices: data.allow_on_multiple_devices || false,
+        publishStatus: PublishStatus.DRAFT,
+      };
+
+      // Add optional design fields
+      if (data.design?.background_color !== undefined) {
+        createData.backgroundColor = data.design.background_color;
+      }
+      if (data.design?.label_color !== undefined) {
+        createData.labelColor = data.design.label_color;
+      }
+      if (data.design?.label_secondary_color !== undefined) {
+        createData.labelSecondaryColor = data.design.label_secondary_color;
+      }
+      if (data.design?.background_image !== undefined) {
+        createData.backgroundImage = data.design.background_image;
+      }
+      if (data.design?.logo_image !== undefined) {
+        createData.logoImage = data.design.logo_image;
+      }
+      if (data.design?.icon_image !== undefined) {
+        createData.iconImage = data.design.icon_image;
+      }
+
+      // Add optional support info fields
+      if (data.support_info?.support_url !== undefined) {
+        createData.supportUrl = data.support_info.support_url;
+      }
+      if (data.support_info?.support_phone_number !== undefined) {
+        createData.supportPhoneNumber = data.support_info.support_phone_number;
+      }
+      if (data.support_info?.support_email !== undefined) {
+        createData.supportEmail = data.support_info.support_email;
+      }
+      if (data.support_info?.privacy_policy_url !== undefined) {
+        createData.privacyPolicyUrl = data.support_info.privacy_policy_url;
+      }
+      if (data.support_info?.terms_and_conditions_url !== undefined) {
+        createData.termsAndConditionsUrl = data.support_info.terms_and_conditions_url;
+      }
+
+      // Add optional count fields
+      if (data.watch_count !== undefined) {
+        createData.watchCount = data.watch_count;
+      }
+      if (data.iphone_count !== undefined) {
+        createData.iphoneCount = data.iphone_count;
+      }
+
+      // Stringify metadata if provided
+      if (data.metadata !== undefined) {
+        createData.metadata = JSON.stringify(data.metadata);
+      }
+
       const cardTemplate = await prisma.cardTemplate.create({
-        data: {
-          exId,
-          organizationId,
-          createdById,
-          name: data.name,
-          platform: data.platform,
-          useCase: data.use_case,
-          protocol: data.protocol,
-          allowOnMultipleDevices: data.allow_on_multiple_devices || false,
-          watchCount: data.watch_count,
-          iphoneCount: data.iphone_count,
-          backgroundColor: data.design?.background_color,
-          labelColor: data.design?.label_color,
-          labelSecondaryColor: data.design?.label_secondary_color,
-          backgroundImage: data.design?.background_image,
-          logoImage: data.design?.logo_image,
-          iconImage: data.design?.icon_image,
-          supportUrl: data.support_info?.support_url,
-          supportPhoneNumber: data.support_info?.support_phone_number,
-          supportEmail: data.support_info?.support_email,
-          privacyPolicyUrl: data.support_info?.privacy_policy_url,
-          termsAndConditionsUrl: data.support_info?.terms_and_conditions_url,
-          metadata: data.metadata as any,
-          publishStatus: PublishStatus.DRAFT,
-        },
+        data: createData,
       });
 
       // Log event
@@ -232,7 +270,7 @@ class CardTemplateService {
           ...(data.support_info?.terms_and_conditions_url && {
             termsAndConditionsUrl: data.support_info.terms_and_conditions_url,
           }),
-          ...(data.metadata && { metadata: data.metadata as any }),
+          ...(data.metadata && { metadata: JSON.stringify(data.metadata) }),
         },
         select: {
           id: true,
@@ -262,10 +300,20 @@ class CardTemplateService {
 
       logger.info({ cardTemplateId: updated.exId }, 'Card template updated');
 
+      // Parse metadata if it's a string
+      let parsedMetadata: any = {};
+      if (updated.metadata && typeof updated.metadata === 'string') {
+        try {
+          parsedMetadata = JSON.parse(updated.metadata);
+        } catch (e) {
+          // If parsing fails, keep it as empty object
+        }
+      }
+
       return {
         id: updated.exId,
         name: updated.name,
-        description: (updated.metadata as any)?.description, // Extract description from metadata
+        description: parsedMetadata?.description, // Extract description from metadata
         design: {
           background_color: updated.backgroundColor,
           label_color: updated.labelColor,
