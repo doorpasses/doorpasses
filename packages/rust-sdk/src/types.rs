@@ -121,7 +121,7 @@ pub struct AccessPass {
 }
 
 /// Parameters for issuing a new access pass
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct IssueAccessPassParams {
     pub card_template_id: String,
@@ -163,7 +163,7 @@ pub struct ListAccessPassesParams {
 }
 
 /// Parameters for updating an access pass
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAccessPassParams {
     pub access_pass_id: String,

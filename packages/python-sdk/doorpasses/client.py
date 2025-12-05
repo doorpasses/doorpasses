@@ -1,4 +1,5 @@
 """Main DoorPasses SDK client."""
+
 from typing import Any, Optional
 
 from .http_client import HttpClient

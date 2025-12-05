@@ -1,5 +1,4 @@
 """Tests for authentication module."""
-import pytest
 
 from doorpasses.auth import (
     create_auth_headers,

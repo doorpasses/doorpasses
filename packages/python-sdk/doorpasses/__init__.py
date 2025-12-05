@@ -20,6 +20,8 @@ from .types import (
     CardTemplateDesign,
     Classification,
     CreateCardTemplateParams,
+    DoorPassesConfig,
+    DoorPassesResponse,
     EventLogEntry,
     EventLogFilters,
     IssueAccessPassParams,
@@ -30,8 +32,6 @@ from .types import (
     SupportInfo,
     UpdateAccessPassParams,
     UpdateCardTemplateParams,
-    DoorPassesConfig,
-    DoorPassesResponse,
 )
 
 __all__ = [

@@ -37,13 +37,13 @@ RSpec.describe DoorPasses::Auth do
     end
   end
 
-  describe '.verify_signature' do
+  describe '.verify_signature?' do
     it 'verifies a valid signature' do
       shared_secret = 'test_secret'
       encoded_payload = 'dGVzdF9wYXlsb2Fk'
       signature = described_class.create_signature(shared_secret, encoded_payload)
 
-      result = described_class.verify_signature(shared_secret, encoded_payload, signature)
+      result = described_class.verify_signature?(shared_secret, encoded_payload, signature)
       expect(result).to be true
     end
 
@@ -52,7 +52,7 @@ RSpec.describe DoorPasses::Auth do
       encoded_payload = 'dGVzdF9wYXlsb2Fk'
       invalid_signature = 'invalid_signature'
 
-      result = described_class.verify_signature(shared_secret, encoded_payload, invalid_signature)
+      result = described_class.verify_signature?(shared_secret, encoded_payload, invalid_signature)
       expect(result).to be false
     end
   end

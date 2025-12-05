@@ -1,6 +1,6 @@
 """HTTP client for making authenticated requests to the DoorPasses API."""
+
 from typing import Any, Dict, Optional
-from urllib.parse import urlencode
 
 import requests
 
@@ -52,9 +52,11 @@ class HttpClient:
                 pass
 
             if error_message:
-                raise Exception(f"DoorPasses API Error ({response.status_code}): {error_message}")
+                raise Exception(
+                    f"DoorPasses API Error ({response.status_code}): {error_message}"
+                ) from None
             else:
-                raise Exception(f"DoorPasses API Error ({response.status_code}): {str(e)}")
+                raise Exception(f"DoorPasses API Error ({response.status_code}): {str(e)}") from e
 
         try:
             data = response.json()
@@ -81,12 +83,14 @@ class HttpClient:
         params = {"sig_payload": encoded_payload}
 
         try:
-            response = self.session.get(full_url, headers=headers, params=params, timeout=self.timeout)
+            response = self.session.get(
+                full_url, headers=headers, params=params, timeout=self.timeout
+            )
             return self._handle_response(response)
         except requests.exceptions.Timeout:
-            raise Exception("Request timeout - no response received from DoorPasses API")
+            raise Exception("Request timeout - no response received from DoorPasses API") from None
         except requests.exceptions.RequestException as e:
-            raise Exception(f"Request error: {str(e)}")
+            raise Exception(f"Request error: {str(e)}") from e
 
     def post(self, url: str, data: Optional[Any] = None) -> Any:
         """
@@ -103,14 +107,12 @@ class HttpClient:
         full_url = f"{self.base_url}{url}"
 
         try:
-            response = self.session.post(
-                full_url, json=data, headers=headers, timeout=self.timeout
-            )
+            response = self.session.post(full_url, json=data, headers=headers, timeout=self.timeout)
             return self._handle_response(response)
         except requests.exceptions.Timeout:
-            raise Exception("Request timeout - no response received from DoorPasses API")
+            raise Exception("Request timeout - no response received from DoorPasses API") from None
         except requests.exceptions.RequestException as e:
-            raise Exception(f"Request error: {str(e)}")
+            raise Exception(f"Request error: {str(e)}") from e
 
     def patch(self, url: str, data: Optional[Any] = None) -> Any:
         """
@@ -132,9 +134,9 @@ class HttpClient:
             )
             return self._handle_response(response)
         except requests.exceptions.Timeout:
-            raise Exception("Request timeout - no response received from DoorPasses API")
+            raise Exception("Request timeout - no response received from DoorPasses API") from None
         except requests.exceptions.RequestException as e:
-            raise Exception(f"Request error: {str(e)}")
+            raise Exception(f"Request error: {str(e)}") from e
 
     def delete(self, url: str) -> Any:
         """
@@ -153,6 +155,6 @@ class HttpClient:
             response = self.session.delete(full_url, headers=headers, timeout=self.timeout)
             return self._handle_response(response)
         except requests.exceptions.Timeout:
-            raise Exception("Request timeout - no response received from DoorPasses API")
+            raise Exception("Request timeout - no response received from DoorPasses API") from None
         except requests.exceptions.RequestException as e:
-            raise Exception(f"Request error: {str(e)}")
+            raise Exception(f"Request error: {str(e)}") from e

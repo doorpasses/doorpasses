@@ -1,6 +1,7 @@
 """Type definitions for DoorPasses SDK."""
+
 from enum import Enum
-from typing import Any, Dict, Literal, Optional, TypedDict
+from typing import Any, Dict, Optional, TypedDict
 
 
 class AccessPassState(str, Enum):

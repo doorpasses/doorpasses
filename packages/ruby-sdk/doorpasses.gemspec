@@ -18,26 +18,19 @@ Gem::Specification.new do |spec|
   spec.metadata['changelog_uri'] = 'https://github.com/mohammedzamakhan/doorpasses/blob/main/CHANGELOG.md'
   spec.metadata['bug_tracker_uri'] = 'https://github.com/mohammedzamakhan/doorpasses/issues'
   spec.metadata['documentation_uri'] = 'https://docs.doorpasses.io'
+  spec.metadata['rubygems_mfa_required'] = 'true'
 
   # Specify which files should be added to the gem when it is released.
   spec.files = Dir.glob(%w[
-    lib/**/*.rb
-    *.gemspec
-    *.md
-    LICENSE
-  ])
+                          lib/**/*.rb
+                          *.gemspec
+                          *.md
+                          LICENSE
+                        ])
 
   spec.require_paths = ['lib']
 
   # Runtime dependencies
   spec.add_dependency 'faraday', '~> 2.0'
   spec.add_dependency 'faraday-net_http', '~> 3.0'
-
-  # Development dependencies
-  spec.add_development_dependency 'bundler', '>= 2.0'
-  spec.add_development_dependency 'rake', '~> 13.0'
-  spec.add_development_dependency 'rspec', '~> 3.12'
-  spec.add_development_dependency 'webmock', '~> 3.18'
-  spec.add_development_dependency 'rubocop', '~> 1.50'
-  spec.add_development_dependency 'simplecov', '~> 0.22'
 end
