@@ -1,0 +1,377 @@
+---
+title: 'Authentication'
+description: 'Learn how to authenticate your API requests'
+---
+
+## Overview
+
+DoorPasses uses a **dual authentication mechanism** to ensure secure API access. Every API request must include two headers:
+
+1. **X-ACCT-ID**: Your static account identifier
+2. **X-PAYLOAD-SIG**: A SHA256 signature of the request payload
+
+This approach provides enhanced security similar to HMAC authentication used by major cloud providers.
+
+## Required Headers
+
+```http
+X-ACCT-ID: your-account-id
+X-PAYLOAD-SIG: generated-signature-here
+Content-Type: application/json
+```
+
+## How to Generate the Signature
+
+The signature is generated using the following steps:
+
+<Steps>
+  <Step title="Convert payload to JSON">
+    Serialize your request body to a JSON string
+  </Step>
+  <Step title="Base64 encode the JSON">
+    Encode the JSON string using Base64 encoding
+  </Step>
+  <Step title="Concatenate with shared secret">
+    Combine your shared secret with the Base64-encoded payload
+  </Step>
+  <Step title="Hash with SHA256">
+    Generate a SHA256 hash of the concatenated string
+  </Step>
+  <Step title="Convert to hexadecimal">
+    Return the hash as a hexadecimal string
+  </Step>
+</Steps>
+
+## Code Examples
+
+<Tabs>
+  <Tab title="Node.js">
+    ```javascript
+    const crypto = require('crypto');
+
+    function generatePayloadSignature(sharedSecret, payload) {
+      // Convert payload to JSON string
+      const jsonPayload = JSON.stringify(payload);
+
+      // Base64 encode the payload
+      const base64Payload = Buffer.from(jsonPayload).toString('base64');
+
+      // Create SHA256 hash
+      const hash = crypto.createHash('sha256');
+      hash.update(sharedSecret + base64Payload);
+
+      // Return hex digest
+      return hash.digest('hex');
+    }
+
+    // Example usage
+    const sharedSecret = 'your-shared-secret-here';
+    const payload = {
+      card_template_id: '0xt3mp14t3',
+      full_name: 'Ahmed Al-Mansouri',
+      email: 'ahmed@company.com'
+    };
+
+    const signature = generatePayloadSignature(sharedSecret, payload);
+    console.log('Signature:', signature);
+    ```
+  </Tab>
+
+  <Tab title="Python">
+    ```python
+    import hashlib
+    import base64
+    import json
+
+    def generate_payload_signature(shared_secret, payload):
+        # Convert payload to JSON string
+        json_payload = json.dumps(payload, separators=(',', ':'))
+
+        # Base64 encode the payload
+        base64_payload = base64.b64encode(json_payload.encode()).decode()
+
+        # Create SHA256 hash
+        hash_input = shared_secret + base64_payload
+        signature = hashlib.sha256(hash_input.encode()).hexdigest()
+
+        return signature
+
+    # Example usage
+    shared_secret = 'your-shared-secret-here'
+    payload = {
+        'card_template_id': '0xt3mp14t3',
+        'full_name': 'Ahmed Al-Mansouri',
+        'email': 'ahmed@company.com'
+    }
+
+    signature = generate_payload_signature(shared_secret, payload)
+    print('Signature:', signature)
+    ```
+  </Tab>
+
+  <Tab title="PHP">
+    ```php
+    <?php
+
+    function generatePayloadSignature($sharedSecret, $payload) {
+        // Convert payload to JSON string
+        $jsonPayload = json_encode($payload, JSON_UNESCAPED_SLASHES);
+
+        // Base64 encode the payload
+        $base64Payload = base64_encode($jsonPayload);
+
+        // Create SHA256 hash
+        $hashInput = $sharedSecret . $base64Payload;
+        $signature = hash('sha256', $hashInput);
+
+        return $signature;
+    }
+
+    // Example usage
+    $sharedSecret = 'your-shared-secret-here';
+    $payload = [
+        'card_template_id' => '0xt3mp14t3',
+        'full_name' => 'Ahmed Al-Mansouri',
+        'email' => 'ahmed@company.com'
+    ];
+
+    $signature = generatePayloadSignature($sharedSecret, $payload);
+    echo "Signature: " . $signature . "\n";
+    ?>
+    ```
+  </Tab>
+
+  <Tab title="Ruby">
+    ```ruby
+    require 'digest'
+    require 'base64'
+    require 'json'
+
+    def generate_payload_signature(shared_secret, payload)
+      # Convert payload to JSON string
+      json_payload = JSON.generate(payload)
+
+      # Base64 encode the payload
+      base64_payload = Base64.strict_encode64(json_payload)
+
+      # Create SHA256 hash
+      hash_input = shared_secret + base64_payload
+      signature = Digest::SHA256.hexdigest(hash_input)
+
+      signature
+    end
+
+    # Example usage
+    shared_secret = 'your-shared-secret-here'
+    payload = {
+      card_template_id: '0xt3mp14t3',
+      full_name: 'Ahmed Al-Mansouri',
+      email: 'ahmed@company.com'
+    }
+
+    signature = generate_payload_signature(shared_secret, payload)
+    puts "Signature: #{signature}"
+    ```
+  </Tab>
+
+  <Tab title="Go">
+    ```go
+    package main
+
+    import (
+        "crypto/sha256"
+        "encoding/base64"
+        "encoding/hex"
+        "encoding/json"
+        "fmt"
+    )
+
+    func generatePayloadSignature(sharedSecret string, payload interface{}) (string, error) {
+        // Convert payload to JSON
+        jsonPayload, err := json.Marshal(payload)
+        if err != nil {
+            return "", err
+        }
+
+        // Base64 encode the payload
+        base64Payload := base64.StdEncoding.EncodeToString(jsonPayload)
+
+        // Create SHA256 hash
+        hashInput := sharedSecret + base64Payload
+        hash := sha256.Sum256([]byte(hashInput))
+        signature := hex.EncodeToString(hash[:])
+
+        return signature, nil
+    }
+
+    func main() {
+        sharedSecret := "your-shared-secret-here"
+        payload := map[string]interface{}{
+            "card_template_id": "0xt3mp14t3",
+            "full_name":        "Ahmed Al-Mansouri",
+            "email":            "ahmed@company.com",
+        }
+
+        signature, err := generatePayloadSignature(sharedSecret, payload)
+        if err != nil {
+            panic(err)
+        }
+
+        fmt.Println("Signature:", signature)
+    }
+    ```
+  </Tab>
+
+  <Tab title="Java">
+    ```java
+    import java.nio.charset.StandardCharsets;
+    import java.security.MessageDigest;
+    import java.util.Base64;
+    import com.google.gson.Gson;
+
+    public class DoorPassesAuth {
+        public static String generatePayloadSignature(String sharedSecret, Object payload)
+            throws Exception {
+            // Convert payload to JSON
+            Gson gson = new Gson();
+            String jsonPayload = gson.toJson(payload);
+
+            // Base64 encode the payload
+            String base64Payload = Base64.getEncoder()
+                .encodeToString(jsonPayload.getBytes(StandardCharsets.UTF_8));
+
+            // Create SHA256 hash
+            String hashInput = sharedSecret + base64Payload;
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(hashInput.getBytes(StandardCharsets.UTF_8));
+
+            // Convert to hex string
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+
+            return hexString.toString();
+        }
+    }
+    ```
+  </Tab>
+
+  <Tab title="C#">
+    ```csharp
+    using System;
+    using System.Security.Cryptography;
+    using System.Text;
+    using System.Text.Json;
+
+    public class DoorPassesAuth
+    {
+        public static string GeneratePayloadSignature(string sharedSecret, object payload)
+        {
+            // Convert payload to JSON
+            string jsonPayload = JsonSerializer.Serialize(payload);
+
+            // Base64 encode the payload
+            byte[] payloadBytes = Encoding.UTF8.GetBytes(jsonPayload);
+            string base64Payload = Convert.ToBase64String(payloadBytes);
+
+            // Create SHA256 hash
+            string hashInput = sharedSecret + base64Payload;
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(hashInput));
+                return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+            }
+        }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Authentication for GET Requests
+
+For GET requests, you still need to provide the signature. Include a `sig_payload` query parameter with the data used for signature generation:
+
+```bash
+GET /v1/access-passes?template_id=0xt3mp14t3&sig_payload={"template_id":"0xt3mp14t3"}
+X-ACCT-ID: your-account-id
+X-PAYLOAD-SIG: generated-signature-of-sig-payload
+```
+
+## Testing Your Authentication
+
+Use this simple test to verify your authentication is working:
+
+<CodeGroup>
+```bash cURL
+curl -X GET https://api.doorpasses.com/v1/health \
+  -H "X-ACCT-ID: your-account-id" \
+  -H "X-PAYLOAD-SIG: $(echo -n 'your-shared-secret' | sha256sum | awk '{print $1}')"
+```
+
+```javascript Node.js
+const { DoorPassesClient } = require('@doorpasses/node-sdk');
+
+const client = new DoorPassesClient({
+  accountId: 'your-account-id',
+  sharedSecret: 'your-shared-secret'
+});
+
+// The SDK handles authentication automatically
+await client.health.check();
+```
+</CodeGroup>
+
+## Common Errors
+
+<AccordionGroup>
+  <Accordion title="401 Unauthorized">
+    **Cause**: Missing or invalid authentication headers
+
+    **Solution**: Ensure both `X-ACCT-ID` and `X-PAYLOAD-SIG` headers are present and valid
+  </Accordion>
+
+  <Accordion title="401 Invalid Signature">
+    **Cause**: The payload signature doesn't match
+
+    **Solution**:
+    - Verify your shared secret is correct
+    - Ensure the payload used for signature matches the request body exactly
+    - Check that JSON serialization is consistent (no extra spaces)
+  </Accordion>
+
+  <Accordion title="403 Forbidden">
+    **Cause**: Account doesn't have permission for this resource
+
+    **Solution**: Contact support to verify your account tier and permissions
+  </Accordion>
+</AccordionGroup>
+
+## Security Best Practices
+
+<Warning>
+  Never expose your shared secret in client-side code or commit it to version control
+</Warning>
+
+<CardGroup cols={2}>
+  <Card title="Store Securely" icon="vault">
+    Use environment variables or secure secret management services
+  </Card>
+  <Card title="Rotate Regularly" icon="rotate">
+    Rotate your shared secret periodically for enhanced security
+  </Card>
+  <Card title="Use HTTPS" icon="lock">
+    Always use HTTPS in production to encrypt data in transit
+  </Card>
+  <Card title="Monitor Access" icon="eye">
+    Monitor API logs for unusual authentication patterns
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<Card title="Make Your First Request" icon="rocket" href="/quickstart">
+  Now that you understand authentication, try making your first API call
+</Card>

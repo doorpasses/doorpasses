@@ -1,0 +1,9 @@
+include README.md
+include LICENSE
+include pyproject.toml
+recursive-include doorpasses *.py
+recursive-include tests *.py
+prune tests/__pycache__
+prune doorpasses/__pycache__
+global-exclude *.pyc
+global-exclude __pycache__

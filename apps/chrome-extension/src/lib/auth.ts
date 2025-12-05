@@ -2,8 +2,8 @@ import browser from 'webextension-polyfill'
 import { logger, debugMessage } from './debug'
 
 export const AUTH_STATUS_KEY = 'auth_status'
-export const DOMAIN = '.epic-stack.me'
-export const APP_URL = 'http://app.epic-stack.me:2999'
+export const DOMAIN = '.doorpasses.me'
+export const APP_URL = 'http://app.doorpasses.me:2999'
 
 export interface AuthStatus {
 	isLoggedIn: boolean

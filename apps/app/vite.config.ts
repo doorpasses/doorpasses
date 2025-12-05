@@ -137,7 +137,7 @@ export default defineConfig((config) => ({
 		},
 	}),
 	server: {
-		allowedHosts: ['app.epic-stack.me', 'localhost'],
+		allowedHosts: ['app.doorpasses.me', 'localhost'],
 		watch: {
 			ignored: ['**/playwright-report/**', '**/node_modules/.vite-temp/**'],
 		},

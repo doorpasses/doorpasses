@@ -1,0 +1,49 @@
+{
+  "name": "doorpasses",
+  "version": "1.0.0",
+  "description": "Official Node.js SDK for DoorPasses - Digital Access Control Platform",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "doorpasses",
+    "access-control",
+    "nfc",
+    "digital-wallet",
+    "apple-wallet",
+    "google-wallet",
+    "mena",
+    "sdk",
+    "api-client"
+  ],
+  "author": "DoorPasses Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mohammedzamakhan/doorpasses.git",
+    "directory": "packages/node-sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/mohammedzamakhan/doorpasses/issues"
+  },
+  "homepage": "https://github.com/mohammedzamakhan/doorpasses#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}

@@ -6,12 +6,13 @@ const proxy = httpProxy.createProxyServer({
 })
 
 const targets = {
-	'epic-stack.me:2999': 'http://localhost:3002',
-	'app.epic-stack.me:2999': 'http://localhost:3001',
-	'studio.epic-stack.me:2999': 'http://localhost:3003',
-	'docs.epic-stack.me:2999': 'http://localhost:3004',
-	'admin.epic-stack.me:2999': 'http://localhost:3005',
-	'cms.epic-stack.me:2999': 'http://localhost:3006',
+	'doorpasses.me:2999': 'http://localhost:3002',
+	'app.doorpasses.me:2999': 'http://localhost:3001',
+	'studio.doorpasses.me:2999': 'http://localhost:3003',
+	'docs.doorpasses.me:2999': 'http://localhost:3004',
+	'admin.doorpasses.me:2999': 'http://localhost:3005',
+	'cms.doorpasses.me:2999': 'http://localhost:3006',
+	'api.doorpasses.me:2999': 'http://localhost:3007',
 }
 
 const server = http.createServer((req, res) => {

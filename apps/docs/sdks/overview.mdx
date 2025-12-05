@@ -1,0 +1,272 @@
+---
+title: 'SDK Overview'
+description: 'Official SDKs for integrating with DoorPasses API'
+---
+
+## Available SDKs
+
+DoorPasses provides official SDKs for multiple programming languages, making it easy to integrate digital access control into your applications.
+
+<CardGroup cols={2}>
+  <Card
+    title="Node.js SDK"
+    icon="node-js"
+    href="/sdks/node/installation"
+  >
+    JavaScript and TypeScript support with full type definitions
+  </Card>
+  <Card
+    title="Python SDK"
+    icon="python"
+    href="/sdks/python/installation"
+  >
+    Python 3.8+ with type hints and async support
+  </Card>
+  <Card
+    title="PHP SDK"
+    icon="php"
+    href="/sdks/php/installation"
+  >
+    PHP 8.0+ with Composer package management
+  </Card>
+  <Card
+    title="Ruby SDK"
+    icon="gem"
+    href="/sdks/ruby/installation"
+  >
+    Ruby 3.0+ with idiomatic Ruby patterns
+  </Card>
+  <Card
+    title="Java SDK"
+    icon="java"
+    href="/sdks/java/installation"
+  >
+    Java 11+ with Maven and Gradle support
+  </Card>
+  <Card
+    title="Go SDK"
+    icon="golang"
+    href="/sdks/go/installation"
+  >
+    Go 1.19+ with context support
+  </Card>
+  <Card
+    title="C# SDK"
+    icon="c"
+    href="/sdks/csharp/installation"
+  >
+    .NET 6.0+ with async/await patterns
+  </Card>
+</CardGroup>
+
+## Why Use an SDK?
+
+<AccordionGroup>
+  <Accordion title="Automatic Authentication" icon="lock">
+    SDKs handle all authentication complexity including signature generation automatically
+  </Accordion>
+
+  <Accordion title="Type Safety" icon="shield-check">
+    Get autocomplete and type checking in your IDE with full type definitions
+  </Accordion>
+
+  <Accordion title="Error Handling" icon="triangle-exclamation">
+    Built-in error handling with meaningful exceptions and error messages
+  </Accordion>
+
+  <Accordion title="Retry Logic" icon="rotate">
+    Automatic retry with exponential backoff for transient failures
+  </Accordion>
+
+  <Accordion title="Documentation" icon="book">
+    Inline documentation and code examples for every method
+  </Accordion>
+
+  <Accordion title="Maintenance" icon="wrench">
+    Regular updates to support new API features and improvements
+  </Accordion>
+</AccordionGroup>
+
+## Quick Comparison
+
+| SDK | Package Manager | Async Support | Type Safety | Minimum Version |
+|-----|----------------|---------------|-------------|-----------------|
+| **Node.js** | npm | ✅ Yes | ✅ TypeScript | Node 18+ |
+| **Python** | pip | ✅ Yes | ✅ Type Hints | Python 3.8+ |
+| **PHP** | Composer | ❌ No | ⚠️ Partial | PHP 8.0+ |
+| **Ruby** | gem | ❌ No | ❌ No | Ruby 3.0+ |
+| **Java** | Maven/Gradle | ✅ Yes | ✅ Yes | Java 11+ |
+| **Go** | go get | ✅ Yes | ✅ Yes | Go 1.19+ |
+| **C#** | NuGet | ✅ Yes | ✅ Yes | .NET 6.0+ |
+
+## Common Features
+
+All SDKs share these common features:
+
+### Configuration
+
+Initialize the client with your credentials:
+
+<Tabs>
+  <Tab title="Node.js">
+    ```javascript
+    const { DoorPassesClient } = require('@doorpasses/node-sdk');
+
+    const client = new DoorPassesClient({
+      accountId: 'your-account-id',
+      sharedSecret: 'your-shared-secret',
+      baseUrl: 'https://api.doorpasses.com' // Optional
+    });
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    from doorpasses import DoorPassesClient
+
+    client = DoorPassesClient(
+        account_id='your-account-id',
+        shared_secret='your-shared-secret',
+        base_url='https://api.doorpasses.com'  # Optional
+    )
+    ```
+  </Tab>
+  <Tab title="PHP">
+    ```php
+    use DoorPasses\DoorPassesClient;
+
+    $client = new DoorPassesClient([
+        'accountId' => 'your-account-id',
+        'sharedSecret' => 'your-shared-secret',
+        'baseUrl' => 'https://api.doorpasses.com'  // Optional
+    ]);
+    ```
+  </Tab>
+  <Tab title="Go">
+    ```go
+    import "github.com/doorpasses/go-sdk"
+
+    client := doorpasses.NewClient(
+        "your-account-id",
+        "your-shared-secret",
+        doorpasses.WithBaseURL("https://api.doorpasses.com"),
+    )
+    ```
+  </Tab>
+</Tabs>
+
+### Access Pass Management
+
+Create, update, and manage access passes:
+
+```javascript
+// Issue a new access pass
+const pass = await client.accessPasses.create({
+  card_template_id: '0xt3mp14t3',
+  full_name: 'Ahmed Al-Mansouri',
+  email: 'ahmed@company.com',
+  // ... other fields
+});
+
+// List access passes
+const passes = await client.accessPasses.list({
+  template_id: '0xt3mp14t3',
+  state: 'ACTIVE'
+});
+
+// Update an access pass
+await client.accessPasses.update('0xp4551d', {
+  title: 'Lead Engineer'
+});
+
+// Suspend an access pass
+await client.accessPasses.suspend('0xp4551d');
+
+// Resume an access pass
+await client.accessPasses.resume('0xp4551d');
+
+// Delete an access pass
+await client.accessPasses.delete('0xp4551d');
+```
+
+### Error Handling
+
+All SDKs provide structured error handling:
+
+<Tabs>
+  <Tab title="Node.js">
+    ```javascript
+    try {
+      const pass = await client.accessPasses.create(data);
+    } catch (error) {
+      if (error.code === 'VALIDATION_ERROR') {
+        console.error('Validation failed:', error.details);
+      } else if (error.code === 'UNAUTHORIZED') {
+        console.error('Authentication failed');
+      } else {
+        console.error('Error:', error.message);
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    try:
+        pass = client.access_passes.create(data)
+    except ValidationError as e:
+        print(f"Validation failed: {e.details}")
+    except UnauthorizedError:
+        print("Authentication failed")
+    except DoorPassesError as e:
+        print(f"Error: {e.message}")
+    ```
+  </Tab>
+</Tabs>
+
+## Environment Variables
+
+For security, we recommend storing credentials in environment variables:
+
+```bash
+export DOORPASSES_ACCOUNT_ID="your-account-id"
+export DOORPASSES_SHARED_SECRET="your-shared-secret"
+```
+
+Then use them in your code:
+
+```javascript
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_ACCOUNT_ID,
+  sharedSecret: process.env.DOORPASSES_SHARED_SECRET
+});
+```
+
+## Getting Help
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="book" href="/api-reference/introduction">
+    Complete API documentation
+  </Card>
+  <Card title="GitHub Issues" icon="github">
+    Report bugs and request features
+  </Card>
+  <Card title="Support Email" icon="envelope">
+    Contact support@doorpasses.com
+  </Card>
+  <Card title="Community Discord" icon="discord">
+    Join our developer community
+  </Card>
+</CardGroup>
+
+## Contributing
+
+All our SDKs are open source and welcome contributions:
+
+- **Node.js**: [github.com/doorpasses/node-sdk](https://github.com/doorpasses/node-sdk)
+- **Python**: [github.com/doorpasses/python-sdk](https://github.com/doorpasses/python-sdk)
+- **PHP**: [github.com/doorpasses/php-sdk](https://github.com/doorpasses/php-sdk)
+- **Ruby**: [github.com/doorpasses/ruby-sdk](https://github.com/doorpasses/ruby-sdk)
+- **Java**: [github.com/doorpasses/java-sdk](https://github.com/doorpasses/java-sdk)
+- **Go**: [github.com/doorpasses/go-sdk](https://github.com/doorpasses/go-sdk)
+- **C#**: [github.com/doorpasses/csharp-sdk](https://github.com/doorpasses/csharp-sdk)
+
+See our [Contributing Guide](https://github.com/doorpasses/.github/blob/main/CONTRIBUTING.md) for details.

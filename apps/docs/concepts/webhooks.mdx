@@ -1,0 +1,436 @@
+---
+title: 'Webhooks'
+description: 'Receive real-time notifications for events in your DoorPasses account'
+---
+
+## Overview
+
+Webhooks allow you to receive real-time HTTP notifications when events occur in your DoorPasses account. Instead of polling the API for changes, DoorPasses will push updates to your server automatically.
+
+## CloudEvents Format
+
+All webhook payloads follow the [CloudEvents 1.0](https://cloudevents.io/) specification, an industry-standard format for event data:
+
+```json
+{
+  "specversion": "1.0",
+  "id": "unique-event-id-12345",
+  "source": "doorpasses",
+  "type": "ag.access_pass.issued",
+  "datacontenttype": "application/json",
+  "time": "2025-01-15T10:30:00Z",
+  "data": {
+    "access_pass_id": "0xp4551d",
+    "protocol": "DESFIRE",
+    "metadata": {}
+  }
+}
+```
+
+<ParamField path="specversion" type="string">
+  CloudEvents specification version (always "1.0")
+</ParamField>
+
+<ParamField path="id" type="string">
+  Unique identifier for this event
+</ParamField>
+
+<ParamField path="source" type="string">
+  Source of the event (always "doorpasses")
+</ParamField>
+
+<ParamField path="type" type="string">
+  Event type identifier (e.g., "ag.access_pass.issued")
+</ParamField>
+
+<ParamField path="datacontenttype" type="string">
+  Content type of the data (always "application/json")
+</ParamField>
+
+<ParamField path="time" type="datetime">
+  Timestamp when the event occurred (ISO 8601)
+</ParamField>
+
+<ParamField path="data" type="object">
+  Event-specific data payload
+</ParamField>
+
+## Event Types
+
+### Access Pass Events
+
+<AccordionGroup>
+  <Accordion title="ag.access_pass.issued" icon="plus">
+    Fired when a new access pass is created
+
+    ```json
+    {
+      "data": {
+        "access_pass_id": "0xp4551d",
+        "full_name": "Ahmed Al-Mansouri",
+        "employee_id": "EMP-001",
+        "protocol": "DESFIRE"
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="ag.access_pass.activated" icon="check">
+    Fired when an access pass is installed and activated on a device
+
+    ```json
+    {
+      "data": {
+        "access_pass_id": "0xp4551d",
+        "device_type": "mobile",
+        "platform": "APPLE"
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="ag.access_pass.updated" icon="pen">
+    Fired when access pass information is updated
+
+    ```json
+    {
+      "data": {
+        "access_pass_id": "0xp4551d",
+        "updated_fields": ["title", "expiration_date"]
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="ag.access_pass.suspended" icon="pause">
+    Fired when an access pass is suspended
+
+    ```json
+    {
+      "data": {
+        "access_pass_id": "0xp4551d",
+        "reason": "temporary_suspension"
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="ag.access_pass.resumed" icon="play">
+    Fired when a suspended access pass is resumed
+
+    ```json
+    {
+      "data": {
+        "access_pass_id": "0xp4551d"
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="ag.access_pass.unlinked" icon="link-slash">
+    Fired when an access pass is removed from a device
+
+    ```json
+    {
+      "data": {
+        "access_pass_id": "0xp4551d",
+        "device_type": "mobile"
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="ag.access_pass.deleted" icon="trash">
+    Fired when an access pass is permanently deleted
+
+    ```json
+    {
+      "data": {
+        "access_pass_id": "0xp4551d"
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="ag.access_pass.expired" icon="clock">
+    Fired when an access pass reaches its expiration date
+
+    ```json
+    {
+      "data": {
+        "access_pass_id": "0xp4551d",
+        "expiration_date": "2025-12-31T23:59:59Z"
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Card Template Events
+
+<AccordionGroup>
+  <Accordion title="ag.card_template.created" icon="plus">
+    Fired when a new card template is created
+
+    ```json
+    {
+      "data": {
+        "template_id": "0xt3mp14t3",
+        "name": "Employee Access Badge"
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="ag.card_template.updated" icon="pen">
+    Fired when a card template is updated
+
+    ```json
+    {
+      "data": {
+        "template_id": "0xt3mp14t3",
+        "updated_fields": ["design", "support_info"]
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="ag.card_template.published" icon="rocket">
+    Fired when a card template is published
+
+    ```json
+    {
+      "data": {
+        "template_id": "0xt3mp14t3",
+        "published_at": "2025-01-15T12:00:00Z"
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Setting Up Webhooks
+
+<Steps>
+  <Step title="Create an endpoint">
+    Create a publicly accessible HTTPS endpoint on your server to receive webhooks
+  </Step>
+  <Step title="Register the webhook">
+    Contact DoorPasses support to register your webhook URL and receive a secret token
+  </Step>
+  <Step title="Validate the signature">
+    Verify incoming webhooks using the provided secret token
+  </Step>
+  <Step title="Return 200 OK">
+    Respond with HTTP 200 or 201 to acknowledge receipt
+  </Step>
+</Steps>
+
+## Webhook Authentication
+
+Each webhook request includes an `Authorization` header with a Bearer token that you provide during registration:
+
+```http
+POST /your-webhook-endpoint
+Authorization: Bearer your-webhook-secret
+Content-Type: application/json
+```
+
+Always validate this token before processing the webhook:
+
+<CodeGroup>
+```javascript Node.js
+app.post('/webhook', (req, res) => {
+  const authHeader = req.headers.authorization;
+  const expectedToken = process.env.WEBHOOK_SECRET;
+
+  if (authHeader !== `Bearer ${expectedToken}`) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const event = req.body;
+
+  // Process the event
+  console.log(`Received event: ${event.type}`);
+
+  // Return success
+  res.status(200).json({ received: true });
+});
+```
+
+```python Python
+from flask import Flask, request, jsonify
+import os
+
+app = Flask(__name__)
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    auth_header = request.headers.get('Authorization')
+    expected_token = os.environ.get('WEBHOOK_SECRET')
+
+    if auth_header != f'Bearer {expected_token}':
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    event = request.json
+
+    # Process the event
+    print(f"Received event: {event['type']}")
+
+    # Return success
+    return jsonify({'received': True}), 200
+```
+
+```php PHP
+<?php
+$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+$expectedToken = getenv('WEBHOOK_SECRET');
+
+if ($authHeader !== "Bearer $expectedToken") {
+    http_response_code(401);
+    echo json_encode(['error' => 'Unauthorized']);
+    exit;
+}
+
+$event = json_decode(file_get_contents('php://input'), true);
+
+// Process the event
+error_log("Received event: " . $event['type']);
+
+// Return success
+http_response_code(200);
+echo json_encode(['received' => true]);
+?>
+```
+</CodeGroup>
+
+## Handling Events
+
+Process different event types based on the `type` field:
+
+```javascript
+app.post('/webhook', async (req, res) => {
+  const event = req.body;
+
+  switch (event.type) {
+    case 'ag.access_pass.issued':
+      await handleAccessPassIssued(event.data);
+      break;
+
+    case 'ag.access_pass.activated':
+      await handleAccessPassActivated(event.data);
+      break;
+
+    case 'ag.access_pass.expired':
+      await handleAccessPassExpired(event.data);
+      break;
+
+    default:
+      console.log(`Unhandled event type: ${event.type}`);
+  }
+
+  res.status(200).json({ received: true });
+});
+
+async function handleAccessPassIssued(data) {
+  // Send welcome email
+  // Update internal systems
+  // Log to analytics
+}
+
+async function handleAccessPassActivated(data) {
+  // Update user status
+  // Trigger onboarding flow
+}
+
+async function handleAccessPassExpired(data) {
+  // Send renewal notification
+  // Archive access records
+}
+```
+
+## Retry Behavior
+
+If your endpoint doesn't respond with a 2xx status code, DoorPasses will retry the webhook delivery:
+
+<Steps>
+  <Step title="Immediate retry">
+    First retry happens immediately after initial failure
+  </Step>
+  <Step title="Exponential backoff">
+    Subsequent retries use exponential backoff (2s, 4s, 8s, 16s, etc.)
+  </Step>
+  <Step title="Maximum attempts">
+    Up to 10 retry attempts over 6 hours
+  </Step>
+  <Step title="Final failure">
+    After all retries fail, the webhook is marked as failed
+  </Step>
+</Steps>
+
+## Idempotency
+
+Webhooks may be delivered more than once. Use the `id` field to detect and ignore duplicate events:
+
+```javascript
+const processedEvents = new Set();
+
+app.post('/webhook', (req, res) => {
+  const event = req.body;
+
+  // Check if we've already processed this event
+  if (processedEvents.has(event.id)) {
+    console.log(`Duplicate event ${event.id}, skipping`);
+    return res.status(200).json({ received: true });
+  }
+
+  // Process the event
+  processEvent(event);
+
+  // Mark as processed
+  processedEvents.add(event.id);
+
+  res.status(200).json({ received: true });
+});
+```
+
+## Testing Webhooks
+
+Use a tool like [webhook.site](https://webhook.site) or [ngrok](https://ngrok.com) to test webhooks during development:
+
+```bash
+# Using ngrok to expose local server
+ngrok http 3000
+
+# Your webhook URL would be:
+# https://your-id.ngrok.io/webhook
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Respond Quickly" icon="bolt">
+    Return 200 OK immediately, then process the event asynchronously
+  </Card>
+  <Card title="Handle Duplicates" icon="clone">
+    Use the event ID to detect and ignore duplicate deliveries
+  </Card>
+  <Card title="Validate Tokens" icon="shield-check">
+    Always verify the Authorization header before processing
+  </Card>
+  <Card title="Log Everything" icon="file-lines">
+    Keep detailed logs of received webhooks for debugging
+  </Card>
+  <Card title="Use HTTPS" icon="lock">
+    Webhook endpoints must use HTTPS in production
+  </Card>
+  <Card title="Error Handling" icon="triangle-exclamation">
+    Implement robust error handling and monitoring
+  </Card>
+</CardGroup>
+
+## Related Resources
+
+- [Access Passes](/concepts/access-passes) - Learn about access pass events
+- [Card Templates](/concepts/card-templates) - Learn about template events
+- [CloudEvents Spec](https://cloudevents.io/) - CloudEvents specification

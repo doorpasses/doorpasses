@@ -8,7 +8,7 @@ import { fontless } from 'fontless'
 
 export default defineConfig({
 	output: 'server',
-	site: 'https://epic-stack.me',
+	site: 'https://doorpasses.me',
 	integrations: [
 		react(),
 		sitemap({
@@ -24,7 +24,7 @@ export default defineConfig({
 	vite: {
 		plugins: [tailwindcss(), fontless()],
 		server: {
-			allowedHosts: ['epic-stack.me', 'localhost'],
+			allowedHosts: ['doorpasses.me', 'localhost'],
 		},
 		optimizeDeps: {
 			exclude: ['@sentry/profiling-node', '@sentry-internal/node-cpu-profiler'],

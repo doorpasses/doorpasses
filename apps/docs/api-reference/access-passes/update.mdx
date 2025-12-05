@@ -1,0 +1,216 @@
+---
+title: 'Update Access Pass'
+api: 'PATCH /v1/access-passes/:id'
+description: 'Update access pass information'
+---
+
+## Endpoint
+
+```
+PATCH https://api.doorpasses.com/v1/access-passes/:id
+```
+
+## Authentication
+
+This endpoint requires [authentication](/authentication) using `X-ACCT-ID` and `X-PAYLOAD-SIG` headers.
+
+## Path Parameters
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the access pass to update
+</ParamField>
+
+## Request Body
+
+All fields are optional. Only include fields you want to update:
+
+<ParamField body="full_name" type="string">
+  Updated full name of the pass holder
+</ParamField>
+
+<ParamField body="email" type="string">
+  Updated email address
+</ParamField>
+
+<ParamField body="phone_number" type="string">
+  Updated phone number
+</ParamField>
+
+<ParamField body="employee_id" type="string">
+  Updated employee or member ID
+</ParamField>
+
+<ParamField body="title" type="string">
+  Updated job title or role
+</ParamField>
+
+<ParamField body="classification" type="string">
+  Updated classification: `full_time`, `part_time`, `contractor`, `visitor`, `temporary`
+</ParamField>
+
+<ParamField body="start_date" type="string">
+  Updated start date (ISO 8601 format)
+</ParamField>
+
+<ParamField body="expiration_date" type="string">
+  Updated expiration date (ISO 8601 format)
+</ParamField>
+
+<ParamField body="employee_photo" type="string">
+  Updated Base64-encoded photo
+</ParamField>
+
+<ParamField body="metadata" type="object">
+  Updated custom metadata
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Whether the request was successful
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="id" type="string">
+      Access pass ID
+    </ResponseField>
+    <ResponseField name="updated_at" type="string">
+      Timestamp when the pass was last updated
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Request
+
+<CodeGroup>
+```bash cURL
+curl -X PATCH https://api.doorpasses.com/v1/access-passes/0xp4551d \
+  -H "Content-Type: application/json" \
+  -H "X-ACCT-ID: your-account-id" \
+  -H "X-PAYLOAD-SIG: generated-signature" \
+  -d '{
+    "title": "Lead Engineer",
+    "expiration_date": "2026-12-31T23:59:59Z"
+  }'
+```
+
+```javascript Node.js
+const updated = await client.accessPasses.update('0xp4551d', {
+  title: 'Lead Engineer',
+  expiration_date: '2026-12-31T23:59:59Z'
+});
+
+console.log('Pass updated:', updated.data.id);
+```
+
+```python Python
+updated = client.access_passes.update('0xp4551d', {
+    'title': 'Lead Engineer',
+    'expiration_date': '2026-12-31T23:59:59Z'
+})
+
+print(f"Pass updated: {updated['data']['id']}")
+```
+</CodeGroup>
+
+## Example Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "0xp4551d",
+    "updated_at": "2025-01-16T14:30:00Z"
+  },
+  "metadata": {
+    "timestamp": "2025-01-16T14:30:00Z"
+  }
+}
+```
+
+## Important Notes
+
+<Info>
+  Updates are automatically pushed to the user's device within seconds
+</Info>
+
+<Warning>
+  You cannot update the `card_template_id`, `site_code`, or `card_number` fields. To change these, you must create a new access pass.
+</Warning>
+
+## Error Responses
+
+<AccordionGroup>
+  <Accordion title="404 - Not Found">
+    ```json
+    {
+      "success": false,
+      "error": {
+        "code": "NOT_FOUND",
+        "message": "Access pass not found"
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="400 - Validation Error">
+    ```json
+    {
+      "success": false,
+      "error": {
+        "code": "VALIDATION_ERROR",
+        "message": "Validation failed",
+        "details": {
+          "expiration_date": "Must be a future date"
+        }
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="409 - Invalid State">
+    ```json
+    {
+      "success": false,
+      "error": {
+        "code": "INVALID_STATE_TRANSITION",
+        "message": "Cannot update a deleted access pass"
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Related Endpoints
+
+<CardGroup cols={2}>
+  <Card
+    title="Create Access Pass"
+    icon="plus"
+    href="/api-reference/access-passes/create"
+  >
+    Issue a new access pass
+  </Card>
+  <Card
+    title="Suspend Access Pass"
+    icon="pause"
+    href="/api-reference/access-passes/suspend"
+  >
+    Temporarily disable an access pass
+  </Card>
+  <Card
+    title="Delete Access Pass"
+    icon="trash"
+    href="/api-reference/access-passes/delete"
+  >
+    Permanently delete an access pass
+  </Card>
+  <Card
+    title="List Access Passes"
+    icon="list"
+    href="/api-reference/access-passes/list"
+  >
+    Retrieve access passes
+  </Card>
+</CardGroup>
