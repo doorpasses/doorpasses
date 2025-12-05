@@ -1,4 +1,5 @@
 """AccessPasses resource for managing access passes."""
+
 from typing import Any, Dict, List, Optional, cast
 
 from ..types import (

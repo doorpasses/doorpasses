@@ -58,7 +58,7 @@ class Auth
      */
     public static function createAuthHeaders(string $accountId, string $sharedSecret, ?array $payload = null): array
     {
-        if ($payload && count($payload) > 0) {
+        if (!empty($payload)) {
             $encodedPayload = self::encodePayload($payload);
         } else {
             // Default payload when no body is provided

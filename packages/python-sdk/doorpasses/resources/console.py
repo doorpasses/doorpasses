@@ -1,4 +1,5 @@
 """Console resource for managing card templates (Enterprise only)."""
+
 from typing import Any, Dict, List, cast
 
 from ..types import (
@@ -50,9 +51,12 @@ class Console:
         Note:
             Requires Enterprise tier
         """
-        return cast(CardTemplate, self.http.get(
-            f"/v1/console/card-templates/{card_template_id}", {"id": card_template_id}
-        ))
+        return cast(
+            CardTemplate,
+            self.http.get(
+                f"/v1/console/card-templates/{card_template_id}", {"id": card_template_id}
+            ),
+        )
 
     def update_template(self, params: UpdateCardTemplateParams) -> CardTemplate:
         """
@@ -68,7 +72,10 @@ class Console:
             Requires Enterprise tier
         """
         card_template_id = params.pop("cardTemplateId")
-        return cast(CardTemplate, self.http.patch(f"/v1/console/card-templates/{card_template_id}", params))
+        return cast(
+            CardTemplate,
+            self.http.patch(f"/v1/console/card-templates/{card_template_id}", params),
+        )
 
     def publish_template(self, card_template_id: str) -> Dict[str, Any]:
         """
@@ -83,7 +90,10 @@ class Console:
         Note:
             Requires Enterprise tier
         """
-        return cast(Dict[str, Any], self.http.post(f"/v1/console/card-templates/{card_template_id}/publish"))
+        return cast(
+            Dict[str, Any],
+            self.http.post(f"/v1/console/card-templates/{card_template_id}/publish"),
+        )
 
     def event_log(self, params: ReadEventLogParams) -> List[EventLogEntry]:
         """
@@ -113,4 +123,7 @@ class Console:
             if filters.get("eventType"):
                 sig_payload["event_type"] = filters["eventType"]
 
-        return cast(List[EventLogEntry], self.http.get(f"/v1/console/card-templates/{card_template_id}/logs", sig_payload))
+        return cast(
+            List[EventLogEntry],
+            self.http.get(f"/v1/console/card-templates/{card_template_id}/logs", sig_payload),
+        )

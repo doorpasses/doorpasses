@@ -31,7 +31,7 @@ module DoorPasses
     # @param encoded_payload [String] Base64 encoded payload
     # @param signature [String] The signature to verify
     # @return [Boolean] True if signature is valid, false otherwise
-    def self.verify_signature(shared_secret, encoded_payload, signature)
+    def self.verify_signature?(shared_secret, encoded_payload, signature)
       expected_signature = create_signature(shared_secret, encoded_payload)
       expected_signature == signature
     end

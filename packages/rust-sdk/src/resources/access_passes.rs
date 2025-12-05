@@ -78,8 +78,7 @@ impl AccessPasses {
     /// ```
     pub async fn list(&self, params: Option<ListAccessPassesParams>) -> Result<Vec<AccessPass>> {
         let query = params
-            .map(|p| serde_json::to_value(p).ok())
-            .flatten();
+            .and_then(|p| serde_json::to_value(p).ok());
 
         self.http
             .get("/v1/access-passes", query.as_ref())
@@ -221,40 +220,6 @@ impl AccessPasses {
         self.http
             .delete(&format!("/v1/access-passes/{}", access_pass_id))
             .await
-    }
-}
-
-impl Default for IssueAccessPassParams {
-    fn default() -> Self {
-        Self {
-            card_template_id: String::new(),
-            full_name: String::new(),
-            start_date: String::new(),
-            expiration_date: String::new(),
-            employee_id: None,
-            tag_id: None,
-            site_code: None,
-            card_number: None,
-            email: None,
-            phone_number: None,
-            classification: None,
-            metadata: None,
-        }
-    }
-}
-
-impl Default for UpdateAccessPassParams {
-    fn default() -> Self {
-        Self {
-            access_pass_id: String::new(),
-            full_name: None,
-            email: None,
-            phone_number: None,
-            classification: None,
-            start_date: None,
-            expiration_date: None,
-            metadata: None,
-        }
     }
 }
 

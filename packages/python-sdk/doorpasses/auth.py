@@ -1,4 +1,5 @@
 """Authentication utilities for DoorPasses SDK."""
+
 import base64
 import hashlib
 import json

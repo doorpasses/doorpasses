@@ -1,4 +1,5 @@
 """Tests for main client module."""
+
 import pytest
 
 from doorpasses import DoorPasses

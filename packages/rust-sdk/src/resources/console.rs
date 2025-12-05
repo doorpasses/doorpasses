@@ -189,8 +189,7 @@ impl Console {
         params: Option<ReadEventLogParams>,
     ) -> Result<Vec<EventLogEntry>> {
         let query = params
-            .map(|p| serde_json::to_value(p).ok())
-            .flatten();
+            .and_then(|p| serde_json::to_value(p).ok());
 
         self.http
             .get("/v1/console/event-log", query.as_ref())

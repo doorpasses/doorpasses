@@ -98,24 +98,43 @@ module DoorPasses
     # @return [Hash, Array] Parsed response body
     # @raise [DoorPassesError] If the response indicates an error
     def handle_response(response)
-      case response.status
-      when 200..299
-        parse_response(response)
-      when 400
-        raise BadRequestError, error_message(response)
-      when 401
-        raise UnauthorizedError, error_message(response)
-      when 403
-        raise ForbiddenError, error_message(response)
-      when 404
-        raise NotFoundError, error_message(response)
-      when 429
-        raise RateLimitError, error_message(response)
-      when 500..599
-        raise ServerError, error_message(response)
-      else
-        raise DoorPassesError, "Unexpected status code: #{response.status}"
-      end
+      status = response.status
+      return parse_response(response) if (200..299).include?(status)
+
+      raise_error_for_status(status, response)
+    end
+
+    # Raise appropriate error for HTTP status code
+    #
+    # @param status [Integer] HTTP status code
+    # @param response [Faraday::Response] The HTTP response
+    # @raise [DoorPassesError] Appropriate error for the status code
+    def raise_error_for_status(status, response)
+      error_class = error_class_for_status(status)
+      message = known_status?(status) ? error_message(response) : "Unexpected status code: #{status}"
+      raise error_class, message
+    end
+
+    # Get error class for HTTP status code
+    #
+    # @param status [Integer] HTTP status code
+    # @return [Class] Error class
+    def error_class_for_status(status)
+      {
+        400 => BadRequestError,
+        401 => UnauthorizedError,
+        403 => ForbiddenError,
+        404 => NotFoundError,
+        429 => RateLimitError
+      }[status] || ((500..599).include?(status) ? ServerError : DoorPassesError)
+    end
+
+    # Check if status code is a known error status
+    #
+    # @param status [Integer] HTTP status code
+    # @return [Boolean] True if status is a known error code
+    def known_status?(status)
+      [400, 401, 403, 404, 429].include?(status) || (500..599).include?(status)
     end
 
     # Parse the response body
@@ -137,7 +156,7 @@ module DoorPasses
     def error_message(response)
       body = JSON.parse(response.body)
       body['error'] || body['message'] || "HTTP #{response.status}"
-    rescue JSON::ParserError, StandardError
+    rescue StandardError
       "HTTP #{response.status}"
     end
   end
