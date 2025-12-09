@@ -1,0 +1,612 @@
+---
+title: 'Best Practices'
+description: 'Guidelines for building robust integrations with DoorPasses API'
+---
+
+## Security
+
+### Protect Your Credentials
+
+<Warning>
+  Never expose your shared secret in client-side code, public repositories, or logs
+</Warning>
+
+**Do**:
+- Store credentials in environment variables
+- Use secret management services (AWS Secrets Manager, Azure Key Vault, etc.)
+- Rotate secrets regularly
+- Use different credentials for production and sandbox
+
+**Don't**:
+- Hardcode credentials in source code
+- Commit `.env` files to version control
+- Log authentication headers or signatures
+- Share credentials via email or chat
+
+```javascript
+// Good
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_ACCOUNT_ID,
+  sharedSecret: process.env.DOORPASSES_SHARED_SECRET
+});
+
+// Bad - Never do this!
+const client = new DoorPassesClient({
+  accountId: 'acct_123456',
+  sharedSecret: 'secret_key_here'  // NEVER hardcode!
+});
+```
+
+### Use HTTPS Only
+
+Always use HTTPS in production:
+```javascript
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_ACCOUNT_ID,
+  sharedSecret: process.env.DOORPASSES_SHARED_SECRET,
+  baseUrl: 'https://api.doorpasses.com' // Always HTTPS
+});
+```
+
+### Validate Webhook Signatures
+
+Always verify webhook authenticity:
+
+```javascript
+app.post('/webhooks/doorpasses', (req, res) => {
+  const authHeader = req.headers.authorization;
+  const expectedToken = process.env.DOORPASSES_WEBHOOK_SECRET;
+
+  if (authHeader !== `Bearer ${expectedToken}`) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  // Process webhook
+  res.status(200).json({ received: true });
+});
+```
+
+## Error Handling
+
+### Always Handle Errors
+
+Wrap all API calls in try-catch blocks:
+
+```javascript
+async function createAccessPass(data) {
+  try {
+    const accessPass = await client.accessPasses.create(data);
+    return { success: true, data: accessPass.data };
+  } catch (error) {
+    console.error('Failed to create access pass:', error);
+    return { success: false, error: error.message };
+  }
+}
+```
+
+### Handle Specific Error Types
+
+Different errors require different handling:
+
+```javascript
+try {
+  const pass = await client.accessPasses.create(data);
+} catch (error) {
+  if (error.code === 'VALIDATION_ERROR') {
+    // Show validation errors to user
+    return res.status(400).json({ errors: error.details });
+  } else if (error.code === 'RATE_LIMIT_EXCEEDED') {
+    // Retry with backoff
+    await retryWithBackoff(operation);
+  } else if (error.code === 'UNAUTHORIZED') {
+    // Check credentials
+    await refreshCredentials();
+  } else {
+    // Log unexpected errors
+    logger.error('Unexpected error:', error);
+    return res.status(500).json({ error: 'Internal error' });
+  }
+}
+```
+
+### Implement Retry Logic
+
+For transient failures, implement exponential backoff:
+
+```javascript
+async function retryWithBackoff(operation, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await operation();
+    } catch (error) {
+      if (i === maxRetries - 1) throw error;
+
+      const delay = Math.pow(2, i) * 1000;
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+}
+```
+
+## Performance
+
+### Use Pagination
+
+Don't fetch all records at once:
+
+```javascript
+// Bad - may timeout or consume too much memory
+const allPasses = await client.accessPasses.list({ limit: 100000 });
+
+// Good - use pagination
+async function* fetchAllPasses(templateId) {
+  let page = 1;
+  let hasMore = true;
+
+  while (hasMore) {
+    const response = await client.accessPasses.list({
+      template_id: templateId,
+      page: page,
+      limit: 100
+    });
+
+    yield* response.data.items;
+
+    hasMore = page < response.data.pagination.totalPages;
+    page++;
+  }
+}
+
+// Usage
+for await (const pass of fetchAllPasses('0xt3mp14t3')) {
+  // Process each pass
+}
+```
+
+### Batch Operations
+
+Process records in batches to respect rate limits:
+
+```javascript
+async function bulkCreatePasses(employees) {
+  const batchSize = 10;
+  const results = [];
+
+  for (let i = 0; i < employees.length; i += batchSize) {
+    const batch = employees.slice(i, i + batchSize);
+
+    // Process batch in parallel
+    const batchResults = await Promise.allSettled(
+      batch.map(emp => client.accessPasses.create(emp))
+    );
+
+    results.push(...batchResults);
+
+    // Wait between batches to avoid rate limiting
+    if (i + batchSize < employees.length) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+
+  return results;
+}
+```
+
+### Cache Template Data
+
+Card templates rarely change, so cache them:
+
+```javascript
+const templateCache = new Map();
+
+async function getTemplate(templateId) {
+  if (templateCache.has(templateId)) {
+    return templateCache.get(templateId);
+  }
+
+  const template = await client.cardTemplates.get(templateId);
+  templateCache.set(templateId, template.data);
+
+  // Clear cache after 1 hour
+  setTimeout(() => templateCache.delete(templateId), 3600000);
+
+  return template.data;
+}
+```
+
+## Data Management
+
+### Validate Input Data
+
+Always validate data before sending to API:
+
+```javascript
+function validateAccessPassData(data) {
+  const errors = {};
+
+  if (!data.full_name || data.full_name.length < 2) {
+    errors.full_name = 'Full name must be at least 2 characters';
+  }
+
+  if (!data.email || !isValidEmail(data.email)) {
+    errors.email = 'Invalid email address';
+  }
+
+  if (!data.start_date || new Date(data.start_date) < new Date()) {
+    errors.start_date = 'Start date cannot be in the past';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    throw new ValidationError(errors);
+  }
+
+  return true;
+}
+```
+
+### Store Pass IDs
+
+Always store pass IDs in your database for future reference:
+
+```javascript
+async function issueAndTrackPass(employeeData) {
+  const accessPass = await client.accessPasses.create({
+    card_template_id: employeeData.template_id,
+    full_name: employeeData.full_name,
+    email: employeeData.email,
+    // ... other fields
+  });
+
+  // Store in your database
+  await db.employees.update({
+    where: { id: employeeData.id },
+    data: {
+      doorpasses_pass_id: accessPass.data.id,
+      pass_issued_at: new Date(),
+      pass_install_url: accessPass.data.install_url
+    }
+  });
+
+  return accessPass.data;
+}
+```
+
+### Use Metadata for Custom Data
+
+Store application-specific data in metadata field:
+
+```javascript
+const accessPass = await client.accessPasses.create({
+  card_template_id: '0xt3mp14t3',
+  full_name: 'Ahmed Al-Mansouri',
+  email: 'ahmed@company.com',
+  // ... required fields
+  metadata: {
+    internal_employee_id: 'EMP-001',
+    department: 'Engineering',
+    cost_center: 'CC-1234',
+    manager_email: 'manager@company.com',
+    custom_field: 'value'
+  }
+});
+```
+
+## Webhooks
+
+### Respond Quickly
+
+Return 200 OK immediately, then process asynchronously:
+
+```javascript
+app.post('/webhooks/doorpasses', async (req, res) => {
+  // Verify authentication
+  if (!verifyWebhook(req)) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  // Respond immediately
+  res.status(200).json({ received: true });
+
+  // Process asynchronously
+  processWebhookAsync(req.body).catch(error => {
+    logger.error('Webhook processing failed:', error);
+  });
+});
+```
+
+### Handle Idempotency
+
+Webhooks may be delivered multiple times:
+
+```javascript
+const processedEvents = new Set();
+
+async function processWebhook(event) {
+  // Check if already processed
+  if (processedEvents.has(event.id)) {
+    console.log(`Event ${event.id} already processed, skipping`);
+    return;
+  }
+
+  // Process event
+  await handleEvent(event);
+
+  // Mark as processed
+  processedEvents.add(event.id);
+
+  // Clean up old events (keep only last 24 hours)
+  setTimeout(() => processedEvents.delete(event.id), 86400000);
+}
+```
+
+### Log All Webhooks
+
+Keep audit trail of all webhooks:
+
+```javascript
+app.post('/webhooks/doorpasses', async (req, res) => {
+  const event = req.body;
+
+  // Log webhook
+  await db.webhookLogs.create({
+    event_id: event.id,
+    event_type: event.type,
+    payload: event,
+    received_at: new Date(),
+    processed: false
+  });
+
+  // Process
+  try {
+    await processWebhook(event);
+
+    await db.webhookLogs.update({
+      where: { event_id: event.id },
+      data: { processed: true }
+    });
+  } catch (error) {
+    await db.webhookLogs.update({
+      where: { event_id: event.id },
+      data: { error: error.message }
+    });
+  }
+
+  res.status(200).json({ received: true });
+});
+```
+
+## Testing
+
+### Use Sandbox Environment
+
+Always test in sandbox before production:
+
+```javascript
+const environment = process.env.NODE_ENV || 'development';
+
+const client = new DoorPassesClient({
+  accountId: environment === 'production'
+    ? process.env.DOORPASSES_PROD_ACCOUNT_ID
+    : process.env.DOORPASSES_SANDBOX_ACCOUNT_ID,
+  sharedSecret: environment === 'production'
+    ? process.env.DOORPASSES_PROD_SECRET
+    : process.env.DOORPASSES_SANDBOX_SECRET,
+  baseUrl: environment === 'production'
+    ? 'https://api.doorpasses.com'
+    : 'https://sandbox.doorpasses.com'
+});
+```
+
+### Write Integration Tests
+
+Test your integration thoroughly:
+
+```javascript
+describe('DoorPasses Integration', () => {
+  it('should create an access pass', async () => {
+    const data = {
+      card_template_id: TEST_TEMPLATE_ID,
+      full_name: 'Test User',
+      email: 'test@example.com',
+      // ... other required fields
+    };
+
+    const result = await client.accessPasses.create(data);
+
+    expect(result.success).toBe(true);
+    expect(result.data.id).toBeDefined();
+    expect(result.data.install_url).toBeDefined();
+
+    // Cleanup
+    await client.accessPasses.delete(result.data.id);
+  });
+
+  it('should handle validation errors', async () => {
+    const invalidData = {
+      card_template_id: TEST_TEMPLATE_ID,
+      // Missing required fields
+    };
+
+    await expect(
+      client.accessPasses.create(invalidData)
+    ).rejects.toThrow(ValidationError);
+  });
+});
+```
+
+### Mock API Calls in Unit Tests
+
+Don't hit the actual API in unit tests:
+
+```javascript
+// __mocks__/@doorpasses/node-sdk.js
+export const DoorPassesClient = jest.fn().mockImplementation(() => ({
+  accessPasses: {
+    create: jest.fn().mockResolvedValue({
+      success: true,
+      data: {
+        id: 'mock-pass-id',
+        install_url: 'https://mock-url.com'
+      }
+    }),
+    list: jest.fn().mockResolvedValue({
+      success: true,
+      data: { items: [], pagination: {} }
+    })
+  }
+}));
+```
+
+## Monitoring
+
+### Log All API Operations
+
+Maintain comprehensive logs:
+
+```javascript
+const winston = require('winston');
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({ filename: 'doorpasses.log' })
+  ]
+});
+
+async function createAccessPassWithLogging(data) {
+  logger.info('Creating access pass', { employee_id: data.employee_id });
+
+  try {
+    const result = await client.accessPasses.create(data);
+
+    logger.info('Access pass created successfully', {
+      pass_id: result.data.id,
+      employee_id: data.employee_id
+    });
+
+    return result;
+  } catch (error) {
+    logger.error('Failed to create access pass', {
+      employee_id: data.employee_id,
+      error: error.message,
+      code: error.code
+    });
+
+    throw error;
+  }
+}
+```
+
+### Monitor Rate Limits
+
+Track API usage to avoid rate limiting:
+
+```javascript
+let requestCount = 0;
+let windowStart = Date.now();
+
+async function trackAPICall(operation) {
+  // Reset counter every 15 minutes
+  if (Date.now() - windowStart > 900000) {
+    requestCount = 0;
+    windowStart = Date.now();
+  }
+
+  requestCount++;
+
+  if (requestCount > 90) {
+    logger.warn('Approaching rate limit', { count: requestCount });
+  }
+
+  return await operation();
+}
+```
+
+### Set Up Alerts
+
+Monitor for common issues:
+
+```javascript
+async function monitorPassCreation() {
+  const stats = {
+    successful: 0,
+    failed: 0,
+    errors: {}
+  };
+
+  // Track statistics
+  // ...
+
+  if (stats.failed / (stats.successful + stats.failed) > 0.1) {
+    await sendAlert({
+      message: 'High failure rate for pass creation',
+      rate: (stats.failed / (stats.successful + stats.failed)) * 100,
+      errors: stats.errors
+    });
+  }
+}
+```
+
+## Documentation
+
+### Document Your Integration
+
+Maintain internal documentation:
+
+```javascript
+/**
+ * Issues a new access pass for an employee
+ *
+ * @param {Object} employee - Employee data
+ * @param {string} employee.full_name - Full name
+ * @param {string} employee.email - Email address
+ * @param {string} employee.employee_id - Internal employee ID
+ * @returns {Promise<Object>} Created access pass data
+ * @throws {ValidationError} If employee data is invalid
+ * @throws {DoorPassesError} If API request fails
+ *
+ * @example
+ * const pass = await issueAccessPass({
+ *   full_name: 'Ahmed Al-Mansouri',
+ *   email: 'ahmed@company.com',
+ *   employee_id: 'EMP-001'
+ * });
+ */
+async function issueAccessPass(employee) {
+  // Implementation
+}
+```
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card
+    title="Troubleshooting"
+    icon="wrench"
+    href="/troubleshooting"
+  >
+    Common issues and solutions
+  </Card>
+  <Card
+    title="API Reference"
+    icon="code"
+    href="/api-reference/introduction"
+  >
+    Complete API documentation
+  </Card>
+  <Card
+    title="SDK Overview"
+    icon="puzzle-piece"
+    href="/sdks/overview"
+  >
+    Official SDK documentation
+  </Card>
+  <Card
+    title="Webhooks"
+    icon="bell"
+    href="/concepts/webhooks"
+  >
+    Real-time event notifications
+  </Card>
+</CardGroup>

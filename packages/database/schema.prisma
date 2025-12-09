@@ -53,6 +53,8 @@ model User {
   waitlistEntry          WaitlistEntry?
   grantedWaitlistAccess  WaitlistEntry[]            @relation("AccessGranter")
   mcpAuthorizations      MCPAuthorization[]
+  createdCardTemplates   CardTemplate[]             @relation("CardTemplateCreatedBy")
+  createdAccessPasses    AccessPass[]               @relation("AccessPassCreatedBy")
 }
 
 model Note {
@@ -235,6 +237,8 @@ model Organization {
   apiKeys                ApiKey[]
   configFlags            ConfigFlag[]
   mcpAuthorizations      MCPAuthorization[]
+  cardTemplates          CardTemplate[]
+  webhooks               Webhook[]
 }
 
 model OrganizationRole {
@@ -665,6 +669,7 @@ model ApiKey {
   name           String
   userId         String
   organizationId String
+  isActive       Boolean      @default(true)
   createdAt      DateTime     @default(now())
   lastUsedAt     DateTime?
   expiresAt      DateTime?
@@ -945,4 +950,267 @@ model RateLimitEntry {
   @@index([keyId])
   @@index([keyId, createdAt])
   @@index([createdAt]) // For cleanup queries
+}
+
+// ============================================================================
+// Digital Pass / Access Control System Models
+// ============================================================================
+
+// Card Template (Pass Template)
+model CardTemplate {
+  id                      String   @id @default(cuid())
+  exId                    String   @unique // External ID shown to customers
+  organizationId          String
+  createdById             String
+  name                    String
+  platform                Platform
+  useCase                 UseCase
+  protocol                Protocol
+  allowOnMultipleDevices  Boolean  @default(false)
+  watchCount              Int?
+  iphoneCount             Int?
+
+  // Design
+  backgroundColor         String?
+  labelColor              String?
+  labelSecondaryColor     String?
+  backgroundImage         String? // Base64 or URL
+  logoImage               String?
+  iconImage               String?
+
+  // Support Info
+  supportUrl              String?
+  supportPhoneNumber      String?
+  supportEmail            String?
+  privacyPolicyUrl        String?
+  termsAndConditionsUrl   String?
+
+  // Status
+  publishStatus           PublishStatus @default(DRAFT)
+  publishedAt             DateTime?
+
+  // Metadata
+  metadata                String? // JSON stored as string
+
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  organization            Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy               User          @relation("CardTemplateCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  accessPasses            AccessPass[]
+  eventLogs               PassEventLog[]
+  credentialProfiles      CredentialProfile[]
+
+  @@index([organizationId])
+  @@index([createdById])
+  @@index([publishStatus])
+}
+
+// Access Pass (Digital Key)
+model AccessPass {
+  id                      String   @id @default(cuid())
+  exId                    String   @unique // External ID shown to customers
+  cardTemplateId          String
+  createdById             String
+
+  // Employee/User Info
+  employeeId              String?
+  fullName                String
+  email                   String?
+  phoneNumber             String?
+  classification          String? // full_time, contractor, etc.
+  title                   String?
+  employeePhoto           String? // Base64
+
+  // Access Control Data
+  tagId                   String? // 14 hex chars for key diversification
+  siteCode                String?
+  cardNumber              String?
+  fileData                String? // Proprietary hex data
+
+  // Validity
+  startDate               DateTime
+  expirationDate          DateTime
+
+  // Hotel-specific fields
+  memberId                String?
+  membershipStatus        String?
+  isPassReadyToTransact   Boolean?
+  tileData                String? // JSON stored as string
+  reservations            String? // JSON stored as string
+
+  // State
+  state                   PassState @default(PENDING)
+
+  // Device Info
+  devices                 String? // JSON array stored as string
+
+  // Metadata
+  metadata                String? // JSON stored as string
+
+  // Installation tracking
+  installUrl              String?
+  installedAt             DateTime?
+  lastUsedAt              DateTime?
+
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  cardTemplate            CardTemplate @relation(fields: [cardTemplateId], references: [id], onDelete: Cascade)
+  createdBy               User         @relation("AccessPassCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  eventLogs               PassEventLog[]
+
+  @@index([cardTemplateId])
+  @@index([createdById])
+  @@index([employeeId])
+  @@index([state])
+}
+
+// Credential Profile for NFC
+model CredentialProfile {
+  id                String   @id @default(cuid())
+  exId              String   @unique
+  cardTemplateId    String
+  protocol          Protocol
+
+  // DESFire specific
+  desfireAppId      String?
+  desfireFileId     String?
+  desfireKey        String?
+
+  // Seos specific
+  seosEndpoint      String?
+  seosCredentialId  String?
+
+  // Smart Tap specific (Google)
+  smartTapIssuer    String?
+  smartTapClass     String?
+
+  metadata          String? // JSON stored as string
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  cardTemplate      CardTemplate @relation(fields: [cardTemplateId], references: [id], onDelete: Cascade)
+
+  @@index([cardTemplateId])
+}
+
+// Webhook Configuration
+model Webhook {
+  id          String   @id @default(cuid())
+  organizationId String
+  url         String
+  events      String   // JSON array stored as string
+  isActive    Boolean  @default(true)
+  secret      String   // Bearer token for authentication
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deliveries   WebhookDelivery[]
+
+  @@index([organizationId])
+}
+
+// Webhook Delivery Tracking
+model WebhookDelivery {
+  id              String   @id @default(cuid())
+  webhookId       String
+  eventType       String
+  payload         String   // JSON stored as string
+  responseStatus  Int?
+  responseBody    String?
+  attempts        Int      @default(0)
+  lastAttemptAt   DateTime?
+  deliveredAt     DateTime?
+  failedAt        DateTime?
+  createdAt       DateTime @default(now())
+
+  webhook         Webhook  @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@index([webhookId])
+  @@index([eventType])
+}
+
+// Event Log for pass system audit trail
+model PassEventLog {
+  id              String   @id @default(cuid())
+  cardTemplateId  String?
+  accessPassId    String?
+  eventType       PassEventType
+  device          String? // mobile or watch
+  metadata        String? // JSON stored as string
+  createdAt       DateTime @default(now())
+
+  cardTemplate    CardTemplate? @relation(fields: [cardTemplateId], references: [id], onDelete: SetNull)
+  accessPass      AccessPass?   @relation(fields: [accessPassId], references: [id], onDelete: SetNull)
+
+  @@index([cardTemplateId])
+  @@index([accessPassId])
+  @@index([eventType])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// Enums for Digital Pass System
+// ============================================================================
+
+enum Platform {
+  APPLE
+  GOOGLE
+}
+
+enum UseCase {
+  EMPLOYEE_BADGE
+  HOTEL
+  RESIDENTIAL
+  VEHICLE
+}
+
+enum Protocol {
+  DESFIRE
+  SEOS
+  SMART_TAP
+}
+
+enum PublishStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+}
+
+enum PassState {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  UNLINKED
+  DELETED
+  EXPIRED
+}
+
+enum PassEventType {
+  // Access Pass Events
+  ACCESS_PASS_ISSUED
+  ACCESS_PASS_ACTIVATED
+  ACCESS_PASS_UPDATED
+  ACCESS_PASS_SUSPENDED
+  ACCESS_PASS_RESUMED
+  ACCESS_PASS_UNLINKED
+  ACCESS_PASS_DELETED
+  ACCESS_PASS_EXPIRED
+
+  // Card Template Events
+  CARD_TEMPLATE_CREATED
+  CARD_TEMPLATE_UPDATED
+  CARD_TEMPLATE_REQUESTED_PUBLISHING
+  CARD_TEMPLATE_PUBLISHED
+
+  // Landing Page Events (future)
+  LANDING_PAGE_CREATED
+  LANDING_PAGE_UPDATED
+  LANDING_PAGE_ATTACHED_TO_TEMPLATE
+
+  // Credential Profile Events
+  CREDENTIAL_PROFILE_CREATED
+  CREDENTIAL_PROFILE_ATTACHED_TO_TEMPLATE
 }

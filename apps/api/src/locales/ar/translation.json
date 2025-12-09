@@ -1,0 +1,69 @@
+{
+  "common": {
+    "success": "نجح",
+    "error": "خطأ",
+    "created": "تم الإنشاء بنجاح",
+    "updated": "تم التحديث بنجاح",
+    "deleted": "تم الحذف بنجاح",
+    "not_found": "المورد غير موجود",
+    "unauthorized": "وصول غير مصرح به",
+    "forbidden": "الوصول محظور",
+    "validation_error": "خطأ في التحقق",
+    "server_error": "خطأ في الخادم الداخلي"
+  },
+  "auth": {
+    "missing_credentials": "بيانات المصادقة مفقودة",
+    "invalid_credentials": "بيانات اعتماد غير صالحة",
+    "invalid_account": "معرف الحساب غير صالح",
+    "invalid_signature": "توقيع الحمولة غير صالح",
+    "account_inactive": "الحساب غير نشط",
+    "welcome": "مرحباً بك في واجهة برمجة التطبيقات وصول"
+  },
+  "access_pass": {
+    "issued": "تم إصدار تصريح الوصول بنجاح",
+    "updated": "تم تحديث تصريح الوصول بنجاح",
+    "suspended": "تم تعليق تصريح الوصول",
+    "resumed": "تم استئناف تصريح الوصول",
+    "unlinked": "تم إلغاء ربط تصريح الوصول",
+    "deleted": "تم حذف تصريح الوصول",
+    "not_found": "تصريح الوصول غير موجود",
+    "already_exists": "تصريح الوصول موجود بالفعل لهذا المستخدم",
+    "expired": "انتهت صلاحية تصريح الوصول",
+    "invalid_dates": "تاريخ بدء أو انتهاء غير صالح",
+    "list_retrieved": "تم استرجاع تصاريح الوصول بنجاح"
+  },
+  "card_template": {
+    "created": "تم إنشاء نموذج البطاقة بنجاح",
+    "updated": "تم تحديث نموذج البطاقة بنجاح",
+    "published": "تم نشر نموذج البطاقة بنجاح",
+    "not_found": "نموذج البطاقة غير موجود",
+    "already_published": "نموذج البطاقة منشور بالفعل",
+    "cannot_update_published": "لا يمكن تحديث النموذج المنشور"
+  },
+  "notification": {
+    "email_sent": "تم إرسال إشعار البريد الإلكتروني",
+    "sms_sent": "تم إرسال إشعار الرسائل القصيرة",
+    "failed_to_send": "فشل إرسال الإشعار",
+    "invalid_recipient": "معلومات المستلم غير صالحة"
+  },
+  "wallet": {
+    "apple_pass_generated": "تم إنشاء بطاقة Apple Wallet بنجاح",
+    "google_pass_generated": "تم إنشاء بطاقة Google Wallet بنجاح",
+    "pass_installation_url": "رابط تثبيت البطاقة",
+    "pass_not_available": "البطاقة غير متاحة لهذه المنصة",
+    "failed_to_generate": "فشل في إنشاء بطاقة المحفظة"
+  },
+  "webhook": {
+    "delivered": "تم تسليم Webhook بنجاح",
+    "failed": "فشل تسليم Webhook",
+    "retry_scheduled": "تم جدولة إعادة محاولة Webhook"
+  },
+  "validation": {
+    "required_field": "{{field}} مطلوب",
+    "invalid_email": "عنوان البريد الإلكتروني غير صالح",
+    "invalid_phone": "رقم الهاتف غير صالح",
+    "invalid_date_format": "تنسيق التاريخ غير صالح",
+    "date_in_past": "لا يمكن أن يكون التاريخ في الماضي",
+    "end_date_before_start": "يجب أن يكون تاريخ الانتهاء بعد تاريخ البدء"
+  }
+}

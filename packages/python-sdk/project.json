@@ -1,0 +1,85 @@
+{
+	"name": "python-sdk",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "packages/python-sdk/doorpasses",
+	"projectType": "library",
+	"tags": ["sdk", "python"],
+	"targets": {
+		"install": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "pip install -e .",
+				"cwd": "packages/python-sdk"
+			}
+		},
+		"install:dev": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "pip install -e \".[dev]\"",
+				"cwd": "packages/python-sdk"
+			}
+		},
+		"test": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "source venv/bin/activate && pytest",
+				"cwd": "packages/python-sdk"
+			}
+		},
+		"test:coverage": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "pytest --cov=doorpasses --cov-report=term-missing --cov-report=html --cov-report=xml",
+				"cwd": "packages/python-sdk"
+			}
+		},
+		"lint": {
+			"executor": "nx:run-commands",
+			"options": {
+				"commands": [
+					"source venv/bin/activate && ruff check doorpasses tests",
+					"source venv/bin/activate && black --check doorpasses tests"
+				],
+				"cwd": "packages/python-sdk",
+				"parallel": false
+			}
+		},
+		"lint:fix": {
+			"executor": "nx:run-commands",
+			"options": {
+				"commands": [
+					"source venv/bin/activate && ruff check --fix doorpasses tests",
+					"source venv/bin/activate && black doorpasses tests"
+				],
+				"cwd": "packages/python-sdk",
+				"parallel": false
+			}
+		},
+		"typecheck": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "source venv/bin/activate && mypy doorpasses",
+				"cwd": "packages/python-sdk"
+			}
+		},
+		"build": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "python3 -m build",
+				"cwd": "packages/python-sdk"
+			}
+		},
+		"clean": {
+			"executor": "nx:run-commands",
+			"options": {
+				"commands": [
+					"rm -rf dist build *.egg-info",
+					"find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true",
+					"find . -type f -name '*.pyc' -delete 2>/dev/null || true"
+				],
+				"cwd": "packages/python-sdk",
+				"parallel": false
+			}
+		}
+	}
+}

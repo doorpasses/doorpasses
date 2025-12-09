@@ -1,11 +1,20 @@
 {
-  "name": "docs",
-  "version": "0.0.0",
+  "name": "@doorpasses/docs",
+  "version": "1.0.0",
+  "description": "DoorPasses API Documentation with Mintlify",
   "private": true,
   "scripts": {
     "dev": "mint dev --port 3004",
     "lint": "npx mintlify broken-links"
   },
+  "keywords": [
+    "doorpasses",
+    "documentation",
+    "api",
+    "mintlify"
+  ],
+  "author": "DoorPasses Team",
+  "license": "UNLICENSED",
   "dependencies": {
     "mint": "^4.2.105"
   }

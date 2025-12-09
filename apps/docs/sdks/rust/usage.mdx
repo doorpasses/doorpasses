@@ -1,0 +1,288 @@
+---
+title: 'Usage'
+description: 'How to use the DoorPasses Rust SDK'
+---
+
+## Client Initialization
+
+The DoorPasses client is the main entry point for interacting with the API.
+
+### Basic Initialization
+
+```rust
+use doorpasses::DoorPasses;
+
+let client = DoorPasses::new(
+    "your_account_id".to_string(),
+    "your_shared_secret".to_string()
+)?;
+```
+
+### With Custom Configuration
+
+```rust
+use doorpasses::{DoorPasses, DoorPassesConfig};
+use std::time::Duration;
+
+let config = DoorPassesConfig::new(
+    "account_id".to_string(),
+    "shared_secret".to_string()
+)
+.with_base_url("https://api.doorpasses.io".to_string())
+.with_timeout(Duration::from_secs(30));
+
+let client = DoorPasses::with_config(config)?;
+```
+
+## Managing Access Passes
+
+### Issue a New Access Pass
+
+```rust
+use doorpasses::types::{IssueAccessPassParams, Classification};
+
+let params = IssueAccessPassParams {
+    card_template_id: "template_123".to_string(),
+    full_name: "Jane Smith".to_string(),
+    start_date: "2024-01-01".to_string(),
+    expiration_date: "2024-12-31".to_string(),
+    employee_id: Some("EMP001".to_string()),
+    email: Some("jane@example.com".to_string()),
+    phone_number: Some("+1234567890".to_string()),
+    classification: Some(Classification::FullTime),
+    ..Default::default()
+};
+
+let access_pass = client.access_passes.issue(params).await?;
+println!("Created pass: {}", access_pass.id);
+```
+
+### List Access Passes
+
+```rust
+use doorpasses::types::{ListAccessPassesParams, AccessPassState};
+
+// List all passes
+let all_passes = client.access_passes.list(None).await?;
+
+// List with filters
+let params = ListAccessPassesParams {
+    state: Some(AccessPassState::Active),
+    card_template_id: Some("template_123".to_string()),
+    limit: Some(10),
+    offset: Some(0),
+    ..Default::default()
+};
+
+let filtered_passes = client.access_passes.list(Some(params)).await?;
+```
+
+### Update an Access Pass
+
+```rust
+use doorpasses::types::UpdateAccessPassParams;
+
+let params = UpdateAccessPassParams {
+    access_pass_id: "pass_123".to_string(),
+    full_name: Some("Jane Doe-Smith".to_string()),
+    email: Some("jane.new@example.com".to_string()),
+    expiration_date: Some("2025-12-31".to_string()),
+    ..Default::default()
+};
+
+let updated_pass = client.access_passes.update(params).await?;
+```
+
+### Suspend and Resume
+
+```rust
+// Suspend a pass
+let suspend_response = client.access_passes.suspend("pass_123").await?;
+println!("Suspended: {:?}", suspend_response.message);
+
+// Resume a pass
+let resume_response = client.access_passes.resume("pass_123").await?;
+println!("Resumed: {:?}", resume_response.message);
+```
+
+### Unlink and Delete
+
+```rust
+// Unlink from device
+let unlink_response = client.access_passes.unlink("pass_123").await?;
+
+// Permanently delete
+let delete_response = client.access_passes.delete("pass_123").await?;
+```
+
+## Managing Card Templates (Enterprise)
+
+<Info>
+  Card template management is only available for Enterprise tier accounts.
+</Info>
+
+### Create a Template
+
+```rust
+use doorpasses::types::{
+    CreateCardTemplateParams, Platform, UseCase, Protocol,
+    CardTemplateDesign, SupportInfo
+};
+
+let design = CardTemplateDesign {
+    background_color: Some("#1a1a1a".to_string()),
+    foreground_color: Some("#ffffff".to_string()),
+    label_color: Some("#999999".to_string()),
+    logo_url: Some("https://example.com/logo.png".to_string()),
+    hero_image_url: Some("https://example.com/hero.jpg".to_string()),
+    strip_image_url: Some("https://example.com/strip.png".to_string()),
+};
+
+let support_info = SupportInfo {
+    email: Some("support@example.com".to_string()),
+    phone: Some("+1234567890".to_string()),
+    website: Some("https://example.com/support".to_string()),
+};
+
+let params = CreateCardTemplateParams {
+    name: "Employee Badge - Engineering".to_string(),
+    platform: Platform::Apple,
+    use_case: UseCase::EmployeeBadge,
+    protocol: Protocol::Seos,
+    design: Some(design),
+    support_info: Some(support_info),
+    metadata: None,
+};
+
+let template = client.console.create_template(params).await?;
+```
+
+### Read a Template
+
+```rust
+let template = client.console.read_template("template_123").await?;
+println!("Template: {} ({})", template.name, template.id);
+```
+
+### Update a Template
+
+```rust
+use doorpasses::types::UpdateCardTemplateParams;
+
+let params = UpdateCardTemplateParams {
+    card_template_id: "template_123".to_string(),
+    name: Some("Updated Employee Badge".to_string()),
+    design: Some(CardTemplateDesign {
+        background_color: Some("#000000".to_string()),
+        ..Default::default()
+    }),
+    ..Default::default()
+};
+
+let updated = client.console.update_template(params).await?;
+```
+
+### Publish a Template
+
+```rust
+let response = client.console.publish_template("template_123").await?;
+println!("Published: {:?}", response.success);
+```
+
+## Event Logging
+
+### Read Event Logs
+
+```rust
+use doorpasses::types::ReadEventLogParams;
+
+let params = ReadEventLogParams {
+    access_pass_id: Some("pass_123".to_string()),
+    event_type: Some("access_granted".to_string()),
+    start_date: Some("2024-01-01".to_string()),
+    end_date: Some("2024-12-31".to_string()),
+    limit: Some(100),
+    offset: Some(0),
+};
+
+let events = client.console.event_log(Some(params)).await?;
+
+for event in events {
+    println!("Event: {} at {}", event.event_type, event.timestamp);
+}
+```
+
+## Error Handling
+
+The SDK provides comprehensive error types:
+
+```rust
+use doorpasses::error::{DoorPassesError, Result};
+
+match client.access_passes.issue(params).await {
+    Ok(pass) => {
+        println!("Success! Created pass: {}", pass.id);
+    }
+    Err(DoorPassesError::ApiError { status, message }) => {
+        eprintln!("API Error {}: {}", status, message);
+    }
+    Err(DoorPassesError::AuthError(msg)) => {
+        eprintln!("Authentication failed: {}", msg);
+    }
+    Err(DoorPassesError::NotFound(msg)) => {
+        eprintln!("Resource not found: {}", msg);
+    }
+    Err(DoorPassesError::RateLimitExceeded) => {
+        eprintln!("Rate limit exceeded, please retry later");
+    }
+    Err(DoorPassesError::Timeout) => {
+        eprintln!("Request timeout");
+    }
+    Err(e) => {
+        eprintln!("Unexpected error: {}", e);
+    }
+}
+```
+
+## Type Safety
+
+The SDK leverages Rust's type system for safety:
+
+```rust
+use doorpasses::types::{Platform, Protocol, UseCase, Classification, AccessPassState};
+
+// Enums ensure type safety
+let platform = Platform::Apple;  // Can only be Apple or Google
+let protocol = Protocol::Seos;   // Can only be Desfire, Seos, or SmartTap
+let classification = Classification::FullTime;  // Predefined classifications
+let state = AccessPassState::Active;  // Predefined states
+```
+
+## Async/Await
+
+All API methods are async and should be awaited:
+
+```rust
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = DoorPasses::new(account_id, shared_secret)?;
+
+    // All methods return futures that must be awaited
+    let pass = client.access_passes.issue(params).await?;
+    let passes = client.access_passes.list(None).await?;
+    let template = client.console.read_template("id").await?;
+
+    Ok(())
+}
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Examples" icon="code" href="/sdks/rust/examples">
+    View complete examples
+  </Card>
+  <Card title="API Reference" icon="book" href="https://docs.rs/doorpasses">
+    View API documentation
+  </Card>
+</CardGroup>

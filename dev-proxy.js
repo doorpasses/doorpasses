@@ -12,7 +12,7 @@ const proxy = httpProxy.createProxyServer({
 	xfwd: true,
 })
 
-const domain = 'epic-stack.me'
+const domain = 'doorpasses.me'
 
 const targets = {
 	[`${domain}:2999`]: 'http://localhost:3002',

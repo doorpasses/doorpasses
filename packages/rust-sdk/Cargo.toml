@@ -1,0 +1,55 @@
+[package]
+name = "doorpasses"
+version = "1.0.0"
+edition = "2021"
+authors = ["DoorPasses Team"]
+description = "Official Rust SDK for DoorPasses digital access control platform"
+license = "MIT"
+repository = "https://github.com/mohammedzamakhan/doorpasses"
+homepage = "https://doorpasses.io"
+documentation = "https://docs.doorpasses.io"
+keywords = ["doorpasses", "access-control", "digital-wallet", "sdk"]
+categories = ["api-bindings", "authentication"]
+rust-version = "1.70"
+
+[dependencies]
+# HTTP client
+reqwest = { version = "0.11", features = ["json", "rustls-tls"], default-features = false }
+tokio = { version = "1.35", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Crypto for authentication
+sha2 = "0.10"
+hex = "0.4"
+base64 = "0.21"
+
+# Error handling
+thiserror = "1.0"
+
+# Date/Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+[dev-dependencies]
+tokio-test = "0.4"
+mockito = "1.2"
+wiremock = "0.6"
+
+[lib]
+name = "doorpasses"
+path = "src/lib.rs"
+
+[[example]]
+name = "basic_usage"
+path = "examples/basic_usage.rs"
+
+[[example]]
+name = "access_passes"
+path = "examples/access_passes.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

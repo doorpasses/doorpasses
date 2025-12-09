@@ -1,0 +1,289 @@
+---
+title: 'Issue Access Pass'
+api: 'POST /v1/access-passes'
+description: 'Create a new digital access pass'
+---
+
+## Endpoint
+
+```
+POST https://api.doorpasses.com/v1/access-passes
+```
+
+## Authentication
+
+This endpoint requires [authentication](/authentication) using `X-ACCT-ID` and `X-PAYLOAD-SIG` headers.
+
+## Request Body
+
+<ParamField body="card_template_id" type="string" required>
+  The ID of the card template to use for this access pass
+</ParamField>
+
+<ParamField body="full_name" type="string" required>
+  Full name of the access pass holder
+</ParamField>
+
+<ParamField body="email" type="string" required>
+  Email address for notifications and pass delivery
+</ParamField>
+
+<ParamField body="employee_id" type="string">
+  Internal employee or member ID
+</ParamField>
+
+<ParamField body="phone_number" type="string">
+  Phone number for SMS notifications (E.164 format recommended)
+</ParamField>
+
+<ParamField body="site_code" type="string" required>
+  Site code for the access control system
+</ParamField>
+
+<ParamField body="card_number" type="string" required>
+  Unique card number for the access control system
+</ParamField>
+
+<ParamField body="start_date" type="string" required>
+  When the access pass becomes active (ISO 8601 format)
+</ParamField>
+
+<ParamField body="expiration_date" type="string" required>
+  When the access pass expires (ISO 8601 format)
+</ParamField>
+
+<ParamField body="classification" type="string">
+  Classification type: `full_time`, `part_time`, `contractor`, `visitor`, `temporary`
+</ParamField>
+
+<ParamField body="title" type="string">
+  Job title or role
+</ParamField>
+
+<ParamField body="employee_photo" type="string">
+  Base64-encoded photo of the pass holder (JPEG or PNG)
+</ParamField>
+
+<ParamField body="metadata" type="object">
+  Custom metadata for your internal use (key-value pairs)
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Whether the request was successful
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="id" type="string">
+      Unique identifier for the access pass
+    </ResponseField>
+    <ResponseField name="install_url" type="string">
+      URL that users can visit to install the pass on their device
+    </ResponseField>
+    <ResponseField name="state" type="string">
+      Current state of the access pass (PENDING)
+    </ResponseField>
+    <ResponseField name="created_at" type="string">
+      Timestamp when the access pass was created
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Request
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.doorpasses.com/v1/access-passes \
+  -H "Content-Type: application/json" \
+  -H "X-ACCT-ID: 0xYourAccountId" \
+  -H "X-PAYLOAD-SIG: generated-signature-here" \
+  -d '{
+    "card_template_id": "0xt3mp14t3",
+    "full_name": "Ahmed Al-Mansouri",
+    "email": "ahmed@company.com",
+    "employee_id": "EMP-001",
+    "phone_number": "+971501234567",
+    "site_code": "123",
+    "card_number": "45678",
+    "start_date": "2025-01-01T00:00:00Z",
+    "expiration_date": "2025-12-31T23:59:59Z",
+    "classification": "full_time",
+    "title": "Senior Engineer",
+    "metadata": {
+      "department": "Engineering",
+      "location": "Dubai Office"
+    }
+  }'
+```
+
+```javascript Node.js
+const { DoorPassesClient } = require('@doorpasses/node-sdk');
+
+const client = new DoorPassesClient({
+  accountId: process.env.DOORPASSES_ACCOUNT_ID,
+  sharedSecret: process.env.DOORPASSES_SHARED_SECRET
+});
+
+const accessPass = await client.accessPasses.create({
+  card_template_id: '0xt3mp14t3',
+  full_name: 'Ahmed Al-Mansouri',
+  email: 'ahmed@company.com',
+  employee_id: 'EMP-001',
+  phone_number: '+971501234567',
+  site_code: '123',
+  card_number: '45678',
+  start_date: '2025-01-01T00:00:00Z',
+  expiration_date: '2025-12-31T23:59:59Z',
+  classification: 'full_time',
+  title: 'Senior Engineer',
+  metadata: {
+    department: 'Engineering',
+    location: 'Dubai Office'
+  }
+});
+
+console.log(accessPass.data.id);
+```
+
+```python Python
+from doorpasses import DoorPassesClient
+
+client = DoorPassesClient(
+    account_id=os.environ['DOORPASSES_ACCOUNT_ID'],
+    shared_secret=os.environ['DOORPASSES_SHARED_SECRET']
+)
+
+access_pass = client.access_passes.create(
+    card_template_id='0xt3mp14t3',
+    full_name='Ahmed Al-Mansouri',
+    email='ahmed@company.com',
+    employee_id='EMP-001',
+    phone_number='+971501234567',
+    site_code='123',
+    card_number='45678',
+    start_date='2025-01-01T00:00:00Z',
+    expiration_date='2025-12-31T23:59:59Z',
+    classification='full_time',
+    title='Senior Engineer',
+    metadata={
+        'department': 'Engineering',
+        'location': 'Dubai Office'
+    }
+)
+
+print(access_pass['data']['id'])
+```
+</CodeGroup>
+
+## Example Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "0xp4551d",
+    "install_url": "https://doorpasses.com/install/0xp4551d",
+    "state": "PENDING",
+    "created_at": "2025-01-15T10:30:00Z"
+  },
+  "metadata": {
+    "timestamp": "2025-01-15T10:30:00Z"
+  }
+}
+```
+
+## Error Responses
+
+<AccordionGroup>
+  <Accordion title="400 - Validation Error">
+    ```json
+    {
+      "success": false,
+      "error": {
+        "code": "VALIDATION_ERROR",
+        "message": "Validation failed",
+        "details": {
+          "email": "Invalid email format"
+        }
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="401 - Unauthorized">
+    ```json
+    {
+      "success": false,
+      "error": {
+        "code": "UNAUTHORIZED",
+        "message": "Invalid authentication credentials"
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="404 - Template Not Found">
+    ```json
+    {
+      "success": false,
+      "error": {
+        "code": "NOT_FOUND",
+        "message": "Card template not found"
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="409 - Duplicate Entry">
+    ```json
+    {
+      "success": false,
+      "error": {
+        "code": "DUPLICATE_ENTRY",
+        "message": "Access pass with this card number already exists"
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Webhooks
+
+After successfully issuing an access pass, a webhook event `ag.access_pass.issued` will be sent to your registered webhook endpoint.
+
+See [Webhooks](/concepts/webhooks) for more information.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="List Access Passes"
+    icon="list"
+    href="/api-reference/access-passes/list"
+  >
+    Retrieve a list of access passes
+  </Card>
+  <Card
+    title="Update Access Pass"
+    icon="pen"
+    href="/api-reference/access-passes/update"
+  >
+    Modify access pass information
+  </Card>
+  <Card
+    title="Suspend Access Pass"
+    icon="pause"
+    href="/api-reference/access-passes/suspend"
+  >
+    Temporarily disable an access pass
+  </Card>
+  <Card
+    title="Delete Access Pass"
+    icon="trash"
+    href="/api-reference/access-passes/delete"
+  >
+    Permanently delete an access pass
+  </Card>
+</CardGroup>

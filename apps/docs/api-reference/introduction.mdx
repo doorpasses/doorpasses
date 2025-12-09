@@ -1,33 +1,290 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'API Reference'
+description: 'Complete API reference for DoorPasses platform'
 ---
 
-<Note>
-	If you're not looking to build API reference documentation, you can delete
-	this section by removing the api-reference folder.
-</Note>
+## Base URL
 
-## Welcome
+All API requests should be made to:
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+```
+https://api.doorpasses.com
+```
 
-<Card
-	title="Plant Store Endpoints"
-	icon="leaf"
-	href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-	View the OpenAPI specification file
-</Card>
+For testing, you can use our sandbox environment:
+
+```
+https://sandbox.doorpasses.com
+```
+
+## API Version
+
+The current API version is `v1`. All endpoints are prefixed with `/v1/`:
+
+```
+https://api.doorpasses.com/v1/access-passes
+```
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All API requests require authentication using two headers:
+
+```http
+X-ACCT-ID: your-account-id
+X-PAYLOAD-SIG: generated-signature
+Content-Type: application/json
+```
+
+See the [Authentication Guide](/authentication) for detailed information on generating signatures.
+
+## Request Format
+
+### JSON Payload
+
+All POST, PUT, and PATCH requests must include a JSON payload:
 
 ```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+{
+  "card_template_id": "0xt3mp14t3",
+  "full_name": "Ahmed Al-Mansouri",
+  "email": "ahmed@company.com"
+}
 ```
+
+### Query Parameters
+
+GET requests use query parameters:
+
+```
+GET /v1/access-passes?template_id=0xt3mp14t3&state=ACTIVE
+```
+
+## Response Format
+
+### Success Response
+
+All successful responses follow this structure:
+
+```json
+{
+  "success": true,
+  "data": {
+    // Response data here
+  },
+  "metadata": {
+    "timestamp": "2025-01-15T10:30:00Z"
+  }
+}
+```
+
+### Error Response
+
+All error responses follow this structure:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable error message",
+    "details": {}
+  },
+  "metadata": {
+    "timestamp": "2025-01-15T10:30:00Z"
+  }
+}
+```
+
+## HTTP Status Codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 201 | Created |
+| 400 | Bad Request - Validation error |
+| 401 | Unauthorized - Invalid authentication |
+| 403 | Forbidden - Insufficient permissions |
+| 404 | Not Found - Resource doesn't exist |
+| 409 | Conflict - Duplicate entry |
+| 429 | Too Many Requests - Rate limit exceeded |
+| 500 | Internal Server Error |
+
+## Rate Limiting
+
+API requests are rate-limited to ensure fair usage:
+
+- **General endpoints**: 100 requests per 15 minutes
+- **Sensitive operations**: 20 requests per 15 minutes
+
+Rate limit information is included in response headers:
+
+```http
+RateLimit-Limit: 100
+RateLimit-Remaining: 95
+RateLimit-Reset: 1642252800
+```
+
+When rate limited, you'll receive a 429 status code:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Too many requests from this IP, please try again later"
+  }
+}
+```
+
+## Pagination
+
+List endpoints support pagination using query parameters:
+
+```
+GET /v1/access-passes?page=1&limit=50
+```
+
+<ParamField query="page" type="number" default="1">
+  Page number to retrieve
+</ParamField>
+
+<ParamField query="limit" type="number" default="50">
+  Number of items per page (max: 100)
+</ParamField>
+
+Pagination information is included in the response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [...],
+    "pagination": {
+      "page": 1,
+      "limit": 50,
+      "total": 500,
+      "totalPages": 10
+    }
+  }
+}
+```
+
+## Filtering
+
+Many list endpoints support filtering:
+
+```
+GET /v1/access-passes?template_id=0xt3mp14t3&state=ACTIVE
+```
+
+Check individual endpoint documentation for available filters.
+
+## Timestamps
+
+All timestamps are in ISO 8601 format with UTC timezone:
+
+```
+2025-01-15T10:30:00Z
+```
+
+## Language Support
+
+The API supports multiple languages for error messages and content:
+
+```http
+Accept-Language: ar
+```
+
+Supported languages:
+- `en` - English (default)
+- `ar` - Arabic
+
+You can also use a query parameter:
+
+```
+GET /v1/access-passes?lng=ar
+```
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| `VALIDATION_ERROR` | Request validation failed |
+| `UNAUTHORIZED` | Missing or invalid authentication |
+| `FORBIDDEN` | Insufficient permissions |
+| `NOT_FOUND` | Resource not found |
+| `DUPLICATE_ENTRY` | Resource already exists |
+| `RATE_LIMIT_EXCEEDED` | Too many requests |
+| `INTERNAL_ERROR` | Internal server error |
+| `INVALID_STATE_TRANSITION` | Invalid state change |
+| `TEMPLATE_NOT_PUBLISHED` | Card template not published |
+
+## Endpoint Categories
+
+<CardGroup cols={2}>
+  <Card
+    title="Access Passes"
+    icon="id-card"
+    href="/api-reference/access-passes/create"
+  >
+    Issue and manage digital access passes
+  </Card>
+  <Card
+    title="Card Templates"
+    icon="palette"
+    href="/api-reference/card-templates/create"
+  >
+    Create and customize card templates (Enterprise)
+  </Card>
+  <Card
+    title="Wallet Passes"
+    icon="wallet"
+    href="/api-reference/wallet/generate-pass"
+  >
+    Generate Apple Wallet and Google Wallet passes
+  </Card>
+  <Card
+    title="Webhooks"
+    icon="webhook"
+    href="/concepts/webhooks"
+  >
+    Receive real-time event notifications
+  </Card>
+</CardGroup>
+
+## SDKs
+
+Official SDKs are available for multiple languages:
+
+<CardGroup cols={3}>
+  <Card title="Node.js" icon="node-js" href="/sdks/node/installation">
+    JavaScript/TypeScript SDK
+  </Card>
+  <Card title="Python" icon="python" href="/sdks/python/installation">
+    Python SDK
+  </Card>
+  <Card title="PHP" icon="php" href="/sdks/php/installation">
+    PHP SDK
+  </Card>
+  <Card title="Ruby" icon="gem" href="/sdks/ruby/installation">
+    Ruby SDK
+  </Card>
+  <Card title="Java" icon="java" href="/sdks/java/installation">
+    Java SDK
+  </Card>
+  <Card title="Go" icon="golang" href="/sdks/go/installation">
+    Go SDK
+  </Card>
+  <Card title="C#" icon="c" href="/sdks/csharp/installation">
+    C# SDK
+  </Card>
+</CardGroup>
+
+## Support
+
+For API support and questions:
+
+- **Email**: api-support@doorpasses.com
+- **Documentation**: https://docs.doorpasses.com
+- **Status Page**: https://status.doorpasses.com
+- **Community**: Join our Discord server

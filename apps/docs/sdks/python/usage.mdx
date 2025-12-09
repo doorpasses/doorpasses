@@ -1,0 +1,412 @@
+---
+title: 'Usage Guide'
+description: 'How to use the DoorPasses Python SDK'
+---
+
+## Client Initialization
+
+Initialize the DoorPasses client with your credentials:
+
+```python
+from doorpasses import DoorPassesClient
+
+client = DoorPassesClient(
+    account_id=os.environ['DOORPASSES_ACCOUNT_ID'],
+    shared_secret=os.environ['DOORPASSES_SHARED_SECRET']
+)
+```
+
+## Access Passes
+
+### Create an Access Pass
+
+Issue a new digital access pass:
+
+```python
+access_pass = client.access_passes.create(
+    card_template_id='0xt3mp14t3',
+    full_name='Ahmed Al-Mansouri',
+    email='ahmed@company.com',
+    employee_id='EMP-001',
+    site_code='123',
+    card_number='45678',
+    start_date='2025-01-01T00:00:00Z',
+    expiration_date='2025-12-31T23:59:59Z',
+    classification='full_time',
+    title='Senior Engineer'
+)
+
+print(f"Pass ID: {access_pass['data']['id']}")
+print(f"Install URL: {access_pass['data']['install_url']}")
+```
+
+### List Access Passes
+
+Retrieve a list of access passes with optional filtering:
+
+```python
+passes = client.access_passes.list(
+    template_id='0xt3mp14t3',
+    state='ACTIVE',
+    page=1,
+    limit=50
+)
+
+print(f"Found {passes['data']['pagination']['total']} passes")
+for pass_item in passes['data']['items']:
+    print(f"- {pass_item['fullName']} ({pass_item['state']})")
+```
+
+### Update an Access Pass
+
+Modify information on an existing access pass:
+
+```python
+updated = client.access_passes.update('0xp4551d', {
+    'title': 'Lead Engineer',
+    'expiration_date': '2026-12-31T23:59:59Z'
+})
+
+print(f"Pass updated: {updated['data']['id']}")
+```
+
+### Suspend an Access Pass
+
+Temporarily disable an access pass:
+
+```python
+client.access_passes.suspend('0xp4551d')
+print('Pass suspended')
+```
+
+### Resume an Access Pass
+
+Re-enable a suspended access pass:
+
+```python
+client.access_passes.resume('0xp4551d')
+print('Pass resumed')
+```
+
+### Unlink an Access Pass
+
+Remove an access pass from a device:
+
+```python
+client.access_passes.unlink('0xp4551d')
+print('Pass unlinked')
+```
+
+### Delete an Access Pass
+
+Permanently delete an access pass:
+
+```python
+client.access_passes.delete('0xp4551d')
+print('Pass deleted')
+```
+
+## Card Templates
+
+### Create a Card Template
+
+<Info>Card Template management requires Enterprise tier access</Info>
+
+```python
+template = client.card_templates.create(
+    name='Employee Access Badge',
+    platform='BOTH',
+    use_case='EMPLOYEE_BADGE',
+    protocol='DESFIRE',
+    allow_on_multiple_devices=True,
+    watch_count=2,
+    iphone_count=3,
+    design={
+        'background_color': '#1E3A8A',
+        'label_color': '#FFFFFF',
+        'label_secondary_color': '#CBD5E1',
+        'logo_image': 'base64-encoded-logo...'
+    },
+    support_info={
+        'support_url': 'https://help.company.com',
+        'support_email': 'support@company.com',
+        'support_phone_number': '+971-4-1234567'
+    }
+)
+
+print(f"Template created: {template['data']['id']}")
+```
+
+### Get a Card Template
+
+Retrieve a specific card template:
+
+```python
+template = client.card_templates.get('0xt3mp14t3')
+print(f"Template name: {template['data']['name']}")
+print(f"Active passes: {template['data']['access_passes_count']}")
+```
+
+### Update a Card Template
+
+Update an existing card template:
+
+```python
+updated = client.card_templates.update('0xt3mp14t3', {
+    'support_info': {
+        'support_email': 'newsupport@company.com'
+    }
+})
+
+print('Template updated')
+```
+
+### Get Template Logs
+
+Retrieve event logs for a card template:
+
+```python
+logs = client.card_templates.logs('0xt3mp14t3',
+    event_type='install',
+    start_date='2025-01-01T00:00:00Z',
+    end_date='2025-01-31T23:59:59Z'
+)
+
+print(f"Found {len(logs['data']['items'])} events")
+```
+
+## Wallet Passes
+
+### Generate a Pass
+
+Generate a wallet pass file:
+
+```python
+pass_data = client.wallet.generate_pass('0xp4551d', platform='APPLE')
+print(f"Pass generated: {pass_data['data']['pass_url']}")
+```
+
+### Get Apple Wallet URL
+
+Get the Apple Wallet installation URL:
+
+```python
+apple_url = client.wallet.apple_wallet('0xp4551d')
+print(f"Apple Wallet URL: {apple_url['data']['url']}")
+```
+
+### Get Google Wallet URL
+
+Get the Google Wallet installation URL:
+
+```python
+google_url = client.wallet.google_wallet('0xp4551d')
+print(f"Google Wallet URL: {google_url['data']['url']}")
+```
+
+## Error Handling
+
+The SDK raises specific exception types for different scenarios:
+
+```python
+from doorpasses import DoorPassesClient, ValidationError, UnauthorizedError, DoorPassesError
+
+try:
+    pass_data = client.access_passes.create(data)
+except ValidationError as e:
+    print(f'Validation failed: {e.details}')
+    # Handle validation errors
+except UnauthorizedError as e:
+    print(f'Authentication failed: {e.message}')
+    # Check credentials
+except DoorPassesError as e:
+    print(f'API error: {e.code} - {e.message}')
+    # Handle other API errors
+except Exception as e:
+    print(f'Unexpected error: {e}')
+```
+
+### Exception Types
+
+<AccordionGroup>
+  <Accordion title="ValidationError" icon="triangle-exclamation">
+    Raised when request data fails validation
+    ```python
+    {
+        'code': 'VALIDATION_ERROR',
+        'message': 'Validation failed',
+        'details': {
+            'email': 'Invalid email format',
+            'start_date': 'Must be a valid ISO 8601 date'
+        }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="UnauthorizedError" icon="lock">
+    Raised when authentication fails
+    ```python
+    {
+        'code': 'UNAUTHORIZED',
+        'message': 'Invalid authentication credentials'
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="NotFoundError" icon="search">
+    Raised when a resource is not found
+    ```python
+    {
+        'code': 'NOT_FOUND',
+        'message': 'Access pass not found'
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="RateLimitError" icon="gauge-high">
+    Raised when rate limit is exceeded
+    ```python
+    {
+        'code': 'RATE_LIMIT_EXCEEDED',
+        'message': 'Too many requests',
+        'retry_after': 900  # seconds
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Advanced Features
+
+### Custom Request Timeout
+
+Set a custom timeout for requests:
+
+```python
+client = DoorPassesClient(
+    account_id=os.environ['DOORPASSES_ACCOUNT_ID'],
+    shared_secret=os.environ['DOORPASSES_SHARED_SECRET'],
+    timeout=60  # 60 seconds
+)
+```
+
+### Retry Configuration
+
+Configure automatic retries for failed requests:
+
+```python
+client = DoorPassesClient(
+    account_id=os.environ['DOORPASSES_ACCOUNT_ID'],
+    shared_secret=os.environ['DOORPASSES_SHARED_SECRET'],
+    max_retries=5,
+    retry_delay=2  # Initial delay in seconds
+)
+```
+
+### Using Sandbox Environment
+
+Test your integration using the sandbox environment:
+
+```python
+client = DoorPassesClient(
+    account_id=os.environ['DOORPASSES_SANDBOX_ACCOUNT_ID'],
+    shared_secret=os.environ['DOORPASSES_SANDBOX_SECRET'],
+    base_url='https://sandbox.doorpasses.com'
+)
+```
+
+### Async Support
+
+The SDK supports async/await for non-blocking operations:
+
+```python
+import asyncio
+from doorpasses import AsyncDoorPassesClient
+
+async def main():
+    client = AsyncDoorPassesClient(
+        account_id=os.environ['DOORPASSES_ACCOUNT_ID'],
+        shared_secret=os.environ['DOORPASSES_SHARED_SECRET']
+    )
+
+    # All methods are async
+    access_pass = await client.access_passes.create(data)
+    passes = await client.access_passes.list(template_id='0xt3mp14t3')
+
+    await client.close()
+
+asyncio.run(main())
+```
+
+## Type Hints
+
+The SDK provides full type hints for better IDE support:
+
+```python
+from doorpasses import DoorPassesClient
+from doorpasses.types import CreateAccessPassRequest, AccessPass
+
+client = DoorPassesClient(
+    account_id=os.environ['DOORPASSES_ACCOUNT_ID'],
+    shared_secret=os.environ['DOORPASSES_SHARED_SECRET']
+)
+
+request: CreateAccessPassRequest = {
+    'card_template_id': '0xt3mp14t3',
+    'full_name': 'Ahmed Al-Mansouri',
+    'email': 'ahmed@company.com',
+    # Type hints will validate all fields
+}
+
+response = client.access_passes.create(**request)
+access_pass: AccessPass = response['data']
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Environment Variables" icon="key">
+    Always store credentials in environment variables, never in code
+  </Card>
+  <Card title="Error Handling" icon="shield-check">
+    Always wrap API calls in try-except blocks
+  </Card>
+  <Card title="Async Operations" icon="clock">
+    Use AsyncDoorPassesClient for high-throughput applications
+  </Card>
+  <Card title="Idempotency" icon="rotate">
+    Store pass IDs to avoid duplicate creations
+  </Card>
+</CardGroup>
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card
+    title="Examples"
+    icon="code"
+    href="/sdks/python/examples"
+  >
+    View complete code examples
+  </Card>
+  <Card
+    title="API Reference"
+    icon="book"
+    href="/api-reference/introduction"
+  >
+    Complete API documentation
+  </Card>
+  <Card
+    title="Authentication"
+    icon="lock"
+    href="/authentication"
+  >
+    Learn about authentication
+  </Card>
+  <Card
+    title="GitHub"
+    icon="github"
+    href="https://github.com/doorpasses/python-sdk"
+  >
+    View source code and report issues
+  </Card>
+</CardGroup>

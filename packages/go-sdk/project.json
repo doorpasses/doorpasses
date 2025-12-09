@@ -1,0 +1,51 @@
+{
+  "name": "go-sdk",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/go-sdk",
+  "projectType": "library",
+  "tags": ["type:lib", "scope:sdk"],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go build ./...",
+        "cwd": "packages/go-sdk"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go test -v ./...",
+        "cwd": "packages/go-sdk"
+      }
+    },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go test -v -coverprofile=coverage.out -covermode=atomic ./... && go tool cover -html=coverage.out -o coverage.html",
+        "cwd": "packages/go-sdk"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go vet ./...",
+        "cwd": "packages/go-sdk"
+      }
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go fmt ./...",
+        "cwd": "packages/go-sdk"
+      }
+    },
+    "mod-tidy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go mod tidy",
+        "cwd": "packages/go-sdk"
+      }
+    }
+  }
+}

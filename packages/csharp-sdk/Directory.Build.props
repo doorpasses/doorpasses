@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <!-- Set different intermediate output paths based on project name to avoid conflicts -->
+    <BaseIntermediateOutputPath Condition="'$(MSBuildProjectName)' == 'DoorPasses'">obj\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath Condition="'$(MSBuildProjectName)' == 'DoorPasses.Tests'">obj-tests\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+</Project>
