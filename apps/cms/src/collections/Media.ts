@@ -39,8 +39,9 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
-    // Upload to Tigris Object Storage (S3-compatible)
-    // staticDir is removed when using S3 storage adapter
+    // In development: files stored in public/media (served by Next.js)
+    // In production: files stored in S3 (configured via storage adapter plugin)
+    staticDir: path.resolve(_dirname, '../../public/media'),
     adminThumbnail: 'thumbnail',
     focalPoint: true,
     imageSizes: [

@@ -294,12 +294,6 @@ function NotificationBellComponent() {
 		}
 	}, [novu, refetch])
 
-	useEffect(() => {
-		if (refetch) {
-			setTimeout(() => void refetch(), 200)
-		}
-	}, [location.pathname, refetch])
-
 	const handleLoadMore = () => {
 		if (hasMore && fetchMore) {
 			void fetchMore()

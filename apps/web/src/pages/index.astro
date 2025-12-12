@@ -1,6 +1,5 @@
 ---
 import MarketingLayout from '../layouts/MarketingLayout.astro'
-import { logos } from '../data/logos'
 import { cmsClient } from '../lib/cms'
 import RenderHero from '../components/RenderHero.astro'
 import RenderBlocks from '../components/RenderBlocks.astro'
@@ -22,7 +21,7 @@ const homePage = await cmsClient.getHomePage()
 			<article>
 				<Fragment slot="head">
 					<SEO
-						title={homePage.meta?.title || homePage.title || 'The Epic Stack'}
+						title={homePage.meta?.title || homePage.title || 'The Epic Startup'}
 						description={homePage.meta?.description}
 						image={homePage.meta?.image}
 					/>
@@ -65,7 +64,7 @@ const homePage = await cmsClient.getHomePage()
 							data-heading
 							class="animate-slide-top text-foreground xl:animate-slide-left mt-8 text-4xl font-medium [animation-delay:0.3s] [animation-fill-mode:backwards] md:text-5xl xl:mt-4 xl:text-6xl xl:[animation-delay:0.8s] xl:[animation-fill-mode:backwards]"
 						>
-							<a href="https://www.epicweb.dev/stack">The Epic Stack</a>
+							The Epic Startup
 						</h1>
 						<p
 							data-paragraph
@@ -74,28 +73,13 @@ const homePage = await cmsClient.getHomePage()
 							Check the{' '}
 							<a
 								class="underline hover:no-underline"
-								href="https://github.com/epicweb-dev/epic-stack/blob/main/docs/getting-started.md"
+								href="https://github.com/mohammedzamakhan/epic-startup/blob/main/docs/getting-started.md"
 							>
 								Getting Started guide
 							</a>{' '}
 							file for how to get your project off the ground!
 						</p>
 					</div>
-					<ul class="mt-16 flex max-w-3xl flex-wrap justify-center gap-2 sm:gap-4 xl:mt-0 xl:grid xl:grid-flow-col xl:grid-cols-5 xl:grid-rows-6">
-						{logos.map((logo, i) => (
-							<li
-								class={`animate-roll-reveal [animation-fill-mode:backwards]`}
-								style={{ animationDelay: `${i * 0.07}s` }}
-							>
-								<a
-									href={logo.href}
-									class="grid size-20 place-items-center rounded-2xl bg-violet-600/10 p-4 transition hover:-rotate-6 hover:bg-violet-600/15 sm:size-24 dark:bg-violet-200 dark:hover:bg-violet-100"
-								>
-									<img src={logo.src} alt={logo.alt} />
-								</a>
-							</li>
-						))}
-					</ul>
 				</div>
 			</main>
 		)

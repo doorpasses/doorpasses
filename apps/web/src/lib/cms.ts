@@ -55,7 +55,18 @@ class CMSClient {
 	}
 
 	private async fetch<T>(endpoint: string): Promise<T> {
-		const response = await fetch(`${this.baseUrl}/api${endpoint}`)
+		const url = `${this.baseUrl}/api${endpoint}`
+
+		// In development with HTTPS, bypass SSL verification for self-signed certificates
+		const fetchOptions: RequestInit = {}
+		if (import.meta.env.DEV && url.startsWith('https://')) {
+			// @ts-ignore - Node.js specific option for self-signed certs
+			fetchOptions.agent = new (await import('https')).Agent({
+				rejectUnauthorized: false,
+			})
+		}
+
+		const response = await fetch(url, fetchOptions)
 		if (!response.ok) {
 			throw new Error(`Failed to fetch from CMS: ${response.statusText}`)
 		}

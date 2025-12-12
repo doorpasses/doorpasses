@@ -23,6 +23,34 @@ Core features:
 - [Jobs and Scheduled Publishing](#jobs-and-scheduled-publish)
 - [Website](#website)
 
+## Storage Configuration
+
+This CMS uses **different storage strategies** for development and production:
+
+### Development (Default)
+
+- **Local file storage** in `public/media/` directory
+- No S3 or cloud storage required
+- Works completely offline
+- Files served directly by Next.js
+
+### Production
+
+- **S3-compatible storage** (Tigris, AWS S3, etc.)
+- Scalable and distributed
+- CDN-ready
+
+### Switching Modes
+
+Force S3 in development:
+
+```bash
+# .env
+USE_S3_STORAGE=true
+```
+
+See [CMS Storage Documentation](../../docs/cms-storage.md) for complete details.
+
 ## Quick Start
 
 To spin up this example locally, follow these steps:

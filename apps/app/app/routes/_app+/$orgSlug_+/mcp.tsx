@@ -24,8 +24,24 @@ import {
 import { FieldLabel, FieldGroup, FieldDescription } from '@repo/ui/field'
 import { Icon } from '@repo/ui/icon'
 import { Input } from '@repo/ui/input'
+import { Badge } from '@repo/ui/badge'
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '@repo/ui/table'
 import { Label } from '@repo/ui/label'
 import { PageTitle } from '@repo/ui/page-title'
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from '@repo/ui/collapsible'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/tabs'
+import { ChevronDown, Check, Copy } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
 	Form,
@@ -57,7 +73,7 @@ type MCPAuthorizationData = {
 	clientName: string
 	createdAt: Date
 	lastUsedAt: Date | null
-	organizationName: string
+	isActive: boolean
 }
 
 /**
@@ -111,29 +127,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 			clientName: true,
 			createdAt: true,
 			lastUsedAt: true,
-			organization: {
-				select: {
-					name: true,
-				},
-			},
+			isActive: true,
 		},
 		orderBy: { createdAt: 'desc' },
 	})
-
-	// Map to include organization name at top level
-	const mcpAuthorizationsWithOrgName = mcpAuthorizations.map((auth) => ({
-		id: auth.id,
-		clientName: auth.clientName,
-		createdAt: auth.createdAt,
-		lastUsedAt: auth.lastUsedAt,
-		organizationName: auth.organization.name,
-	}))
 
 	return {
 		user,
 		organization,
 		apiKeys,
-		mcpAuthorizations: mcpAuthorizationsWithOrgName,
+		mcpAuthorizations,
 		orgSlug,
 	}
 }
@@ -243,17 +246,26 @@ function CodeBlock({ code }: { code: string }) {
 
 	return (
 		<div className="relative">
-			<div className="bg-muted overflow-x-auto rounded p-4 font-mono text-sm">
-				<pre>{code}</pre>
-			</div>
+			<pre className="bg-muted overflow-x-auto rounded-lg p-4 text-sm">
+				<code>{code}</code>
+			</pre>
 			<Button
-				variant="outline"
+				variant="ghost"
 				size="sm"
-				className="absolute top-2 right-2 h-8 p-0"
+				className="absolute top-2 right-2"
 				onClick={handleCopy}
 			>
-				<Icon name={copied ? 'check' : 'copy'} className="h-4 w-4" />
-				{copied ? 'Copied!' : 'Copy'}
+				{copied ? (
+					<>
+						<Check className="size-4" />
+						<Trans>Copied!</Trans>
+					</>
+				) : (
+					<>
+						<Copy className="size-4" />
+						<Trans>Copy</Trans>
+					</>
+				)}
 			</Button>
 		</div>
 	)
@@ -624,16 +636,15 @@ function SetupInstructionsCard({
 	organization,
 	serverUrl,
 }: {
-	organization: { name: string }
+	organization: { name: string; slug: string }
 	serverUrl: string
 }) {
 	const claudeConfig = JSON.stringify(
 		{
 			mcpServers: {
-				[`epic-notes-${organization.name.toLowerCase().replace(/\s+/g, '-')}`]:
-					{
-						url: `${serverUrl}/sse`,
-					},
+				[`epic-notes-${organization.slug}`]: {
+					url: `${serverUrl}/sse`,
+				},
 			},
 		},
 		null,
@@ -643,12 +654,26 @@ function SetupInstructionsCard({
 	const kiroConfig = JSON.stringify(
 		{
 			mcpServers: {
-				[`epic-notes-${organization.name.toLowerCase().replace(/\s+/g, '-')}`]:
-					{
-						url: `${serverUrl}/sse`,
-						disabled: false,
-						autoApprove: ['find_user', 'get_user_notes'],
+				[`epic-notes-${organization.slug}`]: {
+					url: `${serverUrl}/sse`,
+					disabled: false,
+					autoApprove: ['find_user', 'get_user_notes'],
+				},
+			},
+		},
+		null,
+		2,
+	)
+
+	const cursorConfig = JSON.stringify(
+		{
+			mcpServers: {
+				[`epic-notes-${organization.slug}`]: {
+					url: `${serverUrl}/sse`,
+					transport: {
+						type: 'sse',
 					},
+				},
 			},
 		},
 		null,
@@ -656,92 +681,176 @@ function SetupInstructionsCard({
 	)
 
 	return (
-		<Card>
+		<Card className="w-full">
 			<CardHeader>
-				<CardTitle className="flex items-center gap-2">
-					<Icon name="settings" className="h-5 w-5" />
-					<Trans>OAuth Setup Instructions</Trans>
+				<CardTitle>
+					<Trans>MCP OAuth Setup Instructions</Trans>
 				</CardTitle>
 				<CardDescription>
-					<Trans>Configure your MCP client to use OAuth authentication</Trans>
+					<Trans>
+						Connect your favorite AI client to access your organization's data
+						securely. Follow the instructions for your preferred client below.
+					</Trans>
 				</CardDescription>
 			</CardHeader>
-			<CardContent className="space-y-6">
-				{/* Setup Steps */}
-				<div className="rounded-lg border border-blue-500/30 bg-blue-500/10 p-4">
-					<div className="text-sm text-blue-800 dark:text-blue-200">
-						<div className="mb-2 font-semibold">
-							<Trans>OAuth Setup Flow:</Trans>
-						</div>
-						<ol className="list-inside list-decimal space-y-1">
-							<li>
-								<Trans>Configure your MCP client with the URLs below</Trans>
-							</li>
-							<li>
-								<Trans>
-									When you connect, you'll be redirected to authorize
-								</Trans>
-							</li>
-							<li>
-								<Trans>Select this organization and approve access</Trans>
-							</li>
-							<li>
-								<Trans>
-									Your client will receive OAuth tokens automatically
-								</Trans>
-							</li>
-						</ol>
+			<CardContent>
+				<div className="space-y-6">
+					{/* Server URL */}
+					<div className="space-y-2">
+						<h3 className="text-sm font-medium">
+							<Trans>Your MCP Server URL</Trans>
+						</h3>
+						<CodeBlock code={serverUrl} />
+						<p className="text-muted-foreground text-xs">
+							<Trans>
+								This is your organization's unique MCP server endpoint. Use this
+								URL when configuring your AI client.
+							</Trans>
+						</p>
 					</div>
-				</div>
 
-				{/* Claude Desktop */}
-				<div>
-					<h3 className="mb-2 flex items-center gap-2 font-semibold">
-						<Icon name="bot" className="h-4 w-4" />
-						<Trans>Claude Desktop</Trans>
-					</h3>
-					<p className="text-muted-foreground mb-3 text-sm">
-						<Trans>
-							Add this configuration to your Claude Desktop settings file:
-						</Trans>
-					</p>
-					<CodeBlock code={claudeConfig} />
-					<p className="text-muted-foreground mt-2 text-xs">
-						<Trans>
-							Location: ~/.claude_desktop_config.json (macOS/Linux) or
-							%APPDATA%\Claude\claude_desktop_config.json (Windows)
-						</Trans>
-					</p>
-				</div>
+					{/* Setup Tabs */}
+					<Tabs defaultValue="claude" className="w-full">
+						<TabsList className="grid w-full grid-cols-3">
+							<TabsTrigger value="claude">Claude Desktop</TabsTrigger>
+							<TabsTrigger value="kiro">Kiro IDE</TabsTrigger>
+							<TabsTrigger value="cursor">Cursor</TabsTrigger>
+						</TabsList>
 
-				{/* Kiro IDE */}
-				<div>
-					<h3 className="mb-2 flex items-center gap-2 font-semibold">
-						<Icon name="bot" className="h-4 w-4" />
-						<Trans>Kiro IDE</Trans>
-					</h3>
-					<p className="text-muted-foreground mb-3 text-sm">
-						<Trans>Add this to your .kiro/settings/mcp.json file:</Trans>
-					</p>
-					<CodeBlock code={kiroConfig} />
-					<p className="text-muted-foreground mt-2 text-xs">
-						<Trans>
-							The autoApprove setting allows automatic approval of these tools
-							without prompting
-						</Trans>
-					</p>
-				</div>
+						<TabsContent value="claude" className="mt-4 space-y-4">
+							<div className="space-y-3">
+								<h4 className="font-medium">
+									<Trans>Claude Desktop Setup</Trans>
+								</h4>
+								<ol className="text-muted-foreground list-inside list-decimal space-y-2 text-sm">
+									<li>
+										<Trans>
+											Open Claude Desktop and go to Settings → Developer
+										</Trans>
+									</li>
+									<li>
+										<Trans>
+											Click "Edit Config" to open claude_desktop_config.json
+										</Trans>
+									</li>
+									<li>
+										<Trans>Add the following configuration to the file:</Trans>
+									</li>
+								</ol>
+								<CodeBlock code={claudeConfig} />
+								<ol
+									className="text-muted-foreground list-inside list-decimal space-y-2 text-sm"
+									start={4}
+								>
+									<li>
+										<Trans>Save the file and restart Claude Desktop</Trans>
+									</li>
+									<li>
+										<Trans>
+											When prompted, authorize the connection in your browser
+										</Trans>
+									</li>
+								</ol>
+							</div>
+						</TabsContent>
 
-				{/* Info Box */}
-				<div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
-					<div className="text-sm text-amber-800 dark:text-amber-200">
-						<div className="mb-1 font-semibold">
-							<Trans>Note:</Trans>
-						</div>
-						<Trans>
-							OAuth tokens are short-lived (1 hour) and automatically refreshed.
-							No API keys needed!
-						</Trans>
+						<TabsContent value="kiro" className="mt-4 space-y-4">
+							<div className="space-y-3">
+								<h4 className="font-medium">
+									<Trans>Kiro IDE Setup</Trans>
+								</h4>
+								<ol className="text-muted-foreground list-inside list-decimal space-y-2 text-sm">
+									<li>
+										<Trans>Open Kiro IDE Settings</Trans>
+									</li>
+									<li>
+										<Trans>Navigate to MCP Servers configuration</Trans>
+									</li>
+									<li>
+										<Trans>
+											Add this configuration to your .kiro/settings/mcp.json:
+										</Trans>
+									</li>
+								</ol>
+								<CodeBlock code={kiroConfig} />
+								<ol
+									className="text-muted-foreground list-inside list-decimal space-y-2 text-sm"
+									start={4}
+								>
+									<li>
+										<Trans>Save the file and restart Kiro IDE</Trans>
+									</li>
+									<li>
+										<Trans>Complete the OAuth flow when prompted</Trans>
+									</li>
+								</ol>
+								<p className="text-muted-foreground mt-2 text-xs">
+									<Trans>
+										The autoApprove setting allows automatic approval of these
+										tools without prompting
+									</Trans>
+								</p>
+							</div>
+						</TabsContent>
+
+						<TabsContent value="cursor" className="mt-4 space-y-4">
+							<div className="space-y-3">
+								<h4 className="font-medium">
+									<Trans>Cursor Setup</Trans>
+								</h4>
+								<ol className="text-muted-foreground list-inside list-decimal space-y-2 text-sm">
+									<li>
+										<Trans>Open Cursor Settings (Cmd/Ctrl + ,)</Trans>
+									</li>
+									<li>
+										<Trans>Navigate to Features → MCP Servers</Trans>
+									</li>
+									<li>
+										<Trans>
+											Click "Add Server" and paste this configuration:
+										</Trans>
+									</li>
+								</ol>
+								<CodeBlock code={cursorConfig} />
+								<ol
+									className="text-muted-foreground list-inside list-decimal space-y-2 text-sm"
+									start={4}
+								>
+									<li>
+										<Trans>Click Save and restart Cursor</Trans>
+									</li>
+									<li>
+										<Trans>Complete the OAuth flow when prompted</Trans>
+									</li>
+								</ol>
+							</div>
+						</TabsContent>
+					</Tabs>
+
+					{/* Additional Notes */}
+					<div className="bg-muted/50 rounded-lg p-4">
+						<h4 className="mb-2 text-sm font-medium">
+							<Trans>Important Notes</Trans>
+						</h4>
+						<ul className="text-muted-foreground list-inside list-disc space-y-1 text-xs">
+							<li>
+								<Trans>
+									OAuth tokens are scoped to your organization (
+									{organization.slug})
+								</Trans>
+							</li>
+							<li>
+								<Trans>
+									You can revoke access at any time from the Authorized Clients
+									section above
+								</Trans>
+							</li>
+							<li>
+								<Trans>
+									Tokens automatically expire after 30 days of inactivity
+								</Trans>
+							</li>
+						</ul>
 					</div>
 				</div>
 			</CardContent>
@@ -768,65 +877,92 @@ function AuthorizedClientsCard({
 					<Trans>MCP clients authorized to access your organization data</Trans>
 				</CardDescription>
 			</CardHeader>
-			<CardContent
-				className={cn(
-					authorizations.length === 0 && 'border-0 p-0 shadow-none ring-0',
-					'space-y-4',
-				)}
-			>
-				<div className="space-y-3">
-					{authorizations.map((auth) => (
-						<div
-							key={auth.id}
-							className="flex items-center justify-between rounded-lg border p-4"
-						>
-							<div className="flex-1">
-								<div className="font-medium">{auth.clientName}</div>
-								<div className="text-muted-foreground text-sm">
-									<div>
-										<Trans>Organization: {auth.organizationName}</Trans>
-									</div>
-									<div className="mt-1">
-										<Trans>
-											Authorized {new Date(auth.createdAt).toLocaleDateString()}
-										</Trans>
-										{auth.lastUsedAt && (
-											<span className="ml-2">
-												•{' '}
+			<CardContent className="p-0">
+				{authorizations.length === 0 ? (
+					<div className="text-muted-foreground space-y-2 px-6 py-8 text-center">
+						<p className="text-sm">
+							<Trans>No clients have been authorized yet.</Trans>
+						</p>
+						<p className="text-xs">
+							<Trans>
+								Once you connect an AI client using the setup instructions
+								below, it will appear here.
+							</Trans>
+						</p>
+					</div>
+				) : (
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead>
+									<Trans>Client</Trans>
+								</TableHead>
+								<TableHead>
+									<Trans>Last Used</Trans>
+								</TableHead>
+								<TableHead>
+									<Trans>Status</Trans>
+								</TableHead>
+								<TableHead className="text-right">
+									<Trans>Actions</Trans>
+								</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							{authorizations.map((auth) => (
+								<TableRow key={auth.id}>
+									<TableCell>
+										<div className="flex flex-col">
+											<span className="font-medium">{auth.clientName}</span>
+											<span className="text-muted-foreground text-xs">
 												<Trans>
-													Last used{' '}
-													{new Date(auth.lastUsedAt).toLocaleDateString()}
+													Authorized{' '}
+													{new Date(auth.createdAt).toLocaleDateString()}
 												</Trans>
 											</span>
+										</div>
+									</TableCell>
+									<TableCell className="text-muted-foreground text-sm">
+										{auth.lastUsedAt ? (
+											new Date(auth.lastUsedAt).toLocaleString()
+										) : (
+											<Trans>Never used</Trans>
 										)}
-										{!auth.lastUsedAt && (
-											<span className="ml-2">
-												• <Trans>Never used</Trans>
-											</span>
+									</TableCell>
+									<TableCell>
+										<Badge
+											variant={auth.isActive ? 'default' : 'destructive'}
+											className="text-xs"
+										>
+											{auth.isActive ? (
+												<Trans>Active</Trans>
+											) : (
+												<Trans>Revoked</Trans>
+											)}
+										</Badge>
+									</TableCell>
+									<TableCell className="text-right">
+										{auth.isActive ? (
+											<Button
+												variant="destructive"
+												size="xs"
+												onClick={() => onRevokeClick(auth.id, auth.clientName)}
+												className="gap-2"
+											>
+												<Icon name="trash-2" className="h-4 w-4" />
+												<Trans>Revoke</Trans>
+											</Button>
+										) : (
+											<Badge variant="outline" className="text-xs">
+												<Trans>Revoked</Trans>
+											</Badge>
 										)}
-									</div>
-								</div>
-							</div>
-							<Button
-								variant="destructive"
-								size="sm"
-								onClick={() => onRevokeClick(auth.id, auth.clientName)}
-								className="gap-2"
-							>
-								<Icon name="trash-2" className="h-4 w-4" />
-								<Trans>Revoke</Trans>
-							</Button>
-						</div>
-					))}
-					{authorizations.length === 0 && (
-						<EmptyState
-							title={t`No authorized clients`}
-							description={t`Authorize an MCP client to get started`}
-							icons={['shield-check']}
-							className="-m-1 w-[calc(100%+12px)]"
-						/>
-					)}
-				</div>
+									</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				)}
 			</CardContent>
 		</Card>
 	)
@@ -915,62 +1051,183 @@ function RevokeConfirmationDialog({
 	)
 }
 
-// Available Tools Card Component
+interface MCPTool {
+	name: string
+	description: string
+	inputSchema: {
+		type: string
+		properties: Record<
+			string,
+			{
+				type: string
+				description: string
+			}
+		>
+		required?: string[]
+	}
+}
+
+function ToolItem({ tool }: { tool: MCPTool }) {
+	const [isOpen, setIsOpen] = useState(false)
+
+	const requiredParams = tool.inputSchema.required || []
+	const params = Object.entries(tool.inputSchema.properties || {})
+
+	return (
+		<Collapsible open={isOpen} onOpenChange={setIsOpen}>
+			<CollapsibleTrigger className="hover:bg-muted/50 flex w-full items-center justify-between rounded-lg p-4 text-left transition-colors">
+				<div className="flex flex-col gap-1">
+					<div className="flex items-center gap-2">
+						<code className="bg-primary/10 text-primary rounded px-2 py-0.5 text-sm font-medium">
+							{tool.name}
+						</code>
+						<Badge variant="outline" className="text-xs">
+							{params.length} {params.length === 1 ? 'param' : 'params'}
+						</Badge>
+					</div>
+					<p className="text-muted-foreground text-sm">{tool.description}</p>
+				</div>
+				<ChevronDown
+					className={`text-muted-foreground size-5 transition-transform ${
+						isOpen ? 'rotate-180' : ''
+					}`}
+				/>
+			</CollapsibleTrigger>
+			<CollapsibleContent>
+				<div className="border-border bg-muted/30 mx-4 mb-4 rounded-lg border p-4">
+					<h4 className="mb-3 text-sm font-medium">
+						<Trans>Parameters</Trans>
+					</h4>
+					{params.length === 0 ? (
+						<p className="text-muted-foreground text-sm">
+							<Trans>No parameters required</Trans>
+						</p>
+					) : (
+						<div className="space-y-3">
+							{params.map(([paramName, paramInfo]) => (
+								<div
+									key={paramName}
+									className="border-border/50 border-l-2 pl-3"
+								>
+									<div className="flex items-center gap-2">
+										<code className="text-sm font-medium">{paramName}</code>
+										<Badge variant="secondary" className="text-xs">
+											{paramInfo.type}
+										</Badge>
+										{requiredParams.includes(paramName) && (
+											<Badge variant="destructive" className="text-xs">
+												<Trans>required</Trans>
+											</Badge>
+										)}
+									</div>
+									<p className="text-muted-foreground mt-1 text-xs">
+										{paramInfo.description}
+									</p>
+								</div>
+							))}
+						</div>
+					)}
+
+					<div className="mt-4">
+						<h5 className="text-muted-foreground mb-2 text-xs font-medium">
+							<Trans>Example Request</Trans>
+						</h5>
+						<pre className="bg-muted overflow-x-auto rounded p-3 text-xs">
+							<code>
+								{JSON.stringify(
+									{
+										method: 'tools/call',
+										params: {
+											name: tool.name,
+											arguments: Object.fromEntries(
+												params.map(([name, info]) => [
+													name,
+													info.type === 'string'
+														? `<${name}>`
+														: info.type === 'number'
+															? 0
+															: info.type === 'boolean'
+																? false
+																: null,
+												]),
+											),
+										},
+									},
+									null,
+									2,
+								)}
+							</code>
+						</pre>
+					</div>
+				</div>
+			</CollapsibleContent>
+		</Collapsible>
+	)
+}
+
 function AvailableToolsCard({
 	organization,
 }: {
 	organization: { name: string }
 }) {
-	const tools = [
+	const tools: MCPTool[] = [
 		{
 			name: 'find_user',
-			icon: 'search',
 			description: `Search for users in ${organization.name} by name or username`,
-			example: 'find_user("john")',
+			inputSchema: {
+				type: 'object',
+				properties: {
+					query: {
+						type: 'string',
+						description: 'Search query for user name or username',
+					},
+				},
+				required: ['query'],
+			},
 		},
 		{
 			name: 'get_user_notes',
-			icon: 'file-text',
 			description: 'Get notes for a specific user (up to 10 most recent)',
-			example: 'get_user_notes("username")',
+			inputSchema: {
+				type: 'object',
+				properties: {
+					username: {
+						type: 'string',
+						description: 'Username of the user whose notes to retrieve',
+					},
+				},
+				required: ['username'],
+			},
 		},
 	]
 
 	return (
-		<Card>
+		<Card className="w-full">
 			<CardHeader>
-				<CardTitle className="flex items-center gap-2">
-					<Icon name="pocket-knife" className="h-5 w-5" />
+				<CardTitle>
 					<Trans>Available Tools</Trans>
 				</CardTitle>
 				<CardDescription>
-					<Trans>Tools available through your MCP server connection</Trans>
+					<Trans>
+						These are the MCP tools available in your organization. AI clients
+						can use these tools to interact with your data.
+					</Trans>
 				</CardDescription>
 			</CardHeader>
-			<CardContent>
-				<div className="space-y-4">
-					{tools.map((tool) => (
-						<div key={tool.name} className="rounded-lg border p-4">
-							<div className="flex items-start gap-3">
-								<Icon
-									name={tool.icon as any}
-									className="text-primary h-5 w-5 self-auto"
-								/>
-								<div className="flex-1">
-									<div className="font-mono text-sm font-medium">
-										{tool.name}
-									</div>
-									<div className="text-muted-foreground mt-1 text-sm">
-										{tool.description}
-									</div>
-									<div className="bg-muted mt-2 rounded p-2 font-mono text-xs">
-										{tool.example}
-									</div>
-								</div>
-							</div>
-						</div>
-					))}
-				</div>
+			<CardContent className="p-0">
+				{tools.length === 0 ? (
+					<div className="text-muted-foreground py-8 text-center">
+						<p className="text-sm">
+							<Trans>No tools available.</Trans>
+						</p>
+					</div>
+				) : (
+					<div className="divide-border divide-y">
+						{tools.map((tool) => (
+							<ToolItem key={tool.name} tool={tool} />
+						))}
+					</div>
+				)}
 			</CardContent>
 		</Card>
 	)

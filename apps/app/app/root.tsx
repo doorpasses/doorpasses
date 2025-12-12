@@ -79,61 +79,60 @@ export const links: Route.LinksFunction = () => {
 	].filter(Boolean)
 }
 
-// export const meta: Route.MetaFunction = ({ data, location }) => {
-// 	// If there's an error, return minimal meta tags
-// 	if (!data) {
-// 		return [
-// 			{ title: getErrorTitle() },
-// 			{ name: 'robots', content: 'noindex, nofollow' },
-// 		]
-// 	}
+export const meta: Route.MetaFunction = ({ data, location }) => {
+	// If there's an error, return minimal meta tags
+	if (!data) {
+		return [
+			{ title: getErrorTitle() },
+			{ name: 'robots', content: 'noindex, nofollow' },
+		]
+	}
 
-// 	// Get domain URL from request info
-// 	const url = data.requestInfo
-// 		? `${data.requestInfo.origin}${location.pathname}`
-// 		: seoConfig.getSiteUrl()
+	// Get domain URL from request info
+	const url = data.requestInfo
+		? `${data.requestInfo.origin}${location.pathname}`
+		: seoConfig.getSiteUrl()
 
-// 	// Generate comprehensive SEO meta tags with Open Graph and Twitter Cards
-// 	const seoMeta = generateSeoMeta({
-// 		title: brand.name,
-// 		description: brand.description,
-// 		url,
-// 		siteName: brand.name,
-// 		image: seoConfig.getDefaults().image,
-// 		twitter: {
-// 			card: 'summary_large_image',
-// 			site: brand.twitterHandle,
-// 		},
-// 		keywords: [
-// 			'saas',
-// 			'full-stack',
-// 			'react',
-// 			'typescript',
-// 			'notes',
-// 			'organization',
-// 			'productivity',
-// 		],
-// 		robots: {
-// 			index: data.ENV?.ALLOW_INDEXING !== 'false',
-// 			follow: data.ENV?.ALLOW_INDEXING !== 'false',
-// 			maxImagePreview: 'large',
-// 		},
-// 	})
+	// Generate comprehensive SEO meta tags with Open Graph and Twitter Cards
+	const seoMeta = generateSeoMeta({
+		title: brand.name,
+		description: brand.description,
+		url,
+		siteName: brand.name,
+		image: seoConfig.getDefaults().image,
+		twitter: {
+			card: 'summary_large_image',
+			site: brand.twitterHandle,
+		},
+		keywords: [
+			'saas',
+			'full-stack',
+			'react',
+			'typescript',
+			'notes',
+			'organization',
+			'productivity',
+		],
+		robots: {
+			index: data.ENV?.ALLOW_INDEXING !== 'false',
+			follow: data.ENV?.ALLOW_INDEXING !== 'false',
+			maxImagePreview: 'large',
+		},
+	})
 
-// 	// Generate Organization structured data for better SEO
-// 	const organizationSchema = generateOrganizationSchema({
-// 		name: brand.companyName,
-// 		url: brand.url,
-// 		description: brand.description,
-// 		email: brand.supportEmail,
-// 		sameAs: brand.twitterHandle ? [`https://twitter.com/${brand.twitterHandle.replace('@', '')}`] : [],
-// 	})
+	// Generate Organization structured data for better SEO
+	const organizationSchema = generateOrganizationSchema({
+		name: brand.companyName,
+		url: brand.url,
+		description: brand.description,
+		email: brand.supportEmail,
+		sameAs: brand.twitterHandle
+			? [`https://twitter.com/${brand.twitterHandle.replace('@', '')}`]
+			: [],
+	})
 
-// 	return [
-// 		...seoMeta,
-// 		structuredDataScriptTag(organizationSchema),
-// 	]
-// }
+	return [...seoMeta, structuredDataScriptTag(organizationSchema)]
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
 	const timings = makeTimings('root loader')
@@ -218,9 +217,16 @@ export async function loader({ request }: Route.LoaderArgs) {
 			})
 		: undefined
 
-	// Defer favorite notes loading - not critical for initial render
-	// These are typically only needed in the sidebar/navigation
-	const favoriteNotes = undefined
+	const favoriteNotes = user
+		? await prisma.organizationNoteFavorite.findMany({
+				where: {
+					userId: user.id,
+				},
+				include: {
+					note: true,
+				},
+			})
+		: undefined
 
 	const requestInfo = {
 		hints: getHints(request),

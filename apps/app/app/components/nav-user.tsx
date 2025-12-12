@@ -1,6 +1,6 @@
 import { Trans, msg } from '@lingui/macro'
 import { useLingui } from '@lingui/react'
-import { Avatar, AvatarFallback, AvatarImage } from '@repo/ui/avatar'
+import { UserAvatar } from './user-avatar'
 
 import {
 	DropdownMenu,
@@ -97,10 +97,16 @@ export function NavUser({
 							size="lg"
 							className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 						>
-							<Avatar className="h-8 w-8">
-								<AvatarImage src={user.avatar} alt={user.name} />
-								<AvatarFallback className="rounded-lg">CN</AvatarFallback>
-							</Avatar>
+							<UserAvatar
+								user={{
+									name: user.name,
+									email: user.email,
+									image: user.avatar,
+								}}
+								className="h-8 w-8"
+								fallbackClassName="rounded-lg"
+								alt={user.name}
+							/>
 							<div className="grid flex-1 text-sm leading-tight ltr:text-left rtl:text-right">
 								<span className="truncate font-medium">{user.name}</span>
 								<span className="text-muted-foreground truncate text-xs">

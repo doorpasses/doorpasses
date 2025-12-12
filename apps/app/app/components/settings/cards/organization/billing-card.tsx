@@ -3,8 +3,21 @@ import { type Organization } from '@prisma/client'
 
 import { Badge } from '@repo/ui/badge'
 import { Button } from '@repo/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/ui/card'
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from '@repo/ui/card'
 import { Icon } from '@repo/ui/icon'
+import {
+	Item,
+	ItemActions,
+	ItemContent,
+	ItemDescription,
+	ItemTitle,
+} from '@repo/ui/item'
 import { useState, useEffect } from 'react'
 import { Form, Link } from 'react-router'
 import { type getPlansAndPrices } from '#app/utils/payments.server.ts'
@@ -101,8 +114,8 @@ export function BillingCard({
 						</div>
 						<p className="text-muted-foreground">
 							<Trans>
-								You are covered during our beta phase. No billing required at this
-								time.
+								You are covered during our beta phase. No billing required at
+								this time.
 							</Trans>
 						</p>
 					</div>
@@ -123,13 +136,11 @@ export function BillingCard({
 						<Trans>Your organization's current plan and billing status</Trans>
 					</CardDescription>
 				</CardHeader>
-				<CardContent>
-					<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-						<div>
-							<div className="mb-2 flex items-center gap-2">
-								<h3 className="text-lg font-medium">
-									{organization.planName || 'Free Plan'}
-								</h3>
+				<CardContent className="p-0">
+					<Item>
+						<ItemContent>
+							<ItemTitle className="flex flex-wrap items-center gap-2 text-lg font-medium">
+								{organization.planName || 'Free Plan'}
 								{organization.subscriptionStatus && (
 									<Badge
 										variant={
@@ -147,27 +158,29 @@ export function BillingCard({
 												: organization.subscriptionStatus}
 									</Badge>
 								)}
-							</div>
-							<p className="text-muted-foreground text-sm">
-								{organization.subscriptionStatus === 'active'
-									? <Trans>Billed monthly</Trans>
-									: organization.subscriptionStatus === 'trialing'
-										? <Trans>Trial period active</Trans>
-										: organization.stripeCustomerId
-											? <Trans>Subscription inactive</Trans>
-											: <Trans>No active subscription</Trans>}
-							</p>
+							</ItemTitle>
+							<ItemDescription>
+								{organization.subscriptionStatus === 'active' ? (
+									<Trans>Billed monthly</Trans>
+								) : organization.subscriptionStatus === 'trialing' ? (
+									<Trans>Trial period active</Trans>
+								) : organization.stripeCustomerId ? (
+									<Trans>Subscription inactive</Trans>
+								) : (
+									<Trans>No active subscription</Trans>
+								)}
+							</ItemDescription>
 							{organization._count?.users && (
-								<p className="text-muted-foreground mt-1 text-sm">
+								<ItemDescription className="text-sm">
 									<Plural
 										value={organization._count.users}
 										one="# active member"
 										other="# active members"
 									/>
-								</p>
+								</ItemDescription>
 							)}
-						</div>
-						<div className="flex gap-2">
+						</ItemContent>
+						<ItemActions className="flex flex-wrap justify-end gap-2">
 							{organization.stripeCustomerId ? (
 								<Form method="post">
 									<input type="hidden" name="intent" value="customer-portal" />
@@ -182,8 +195,8 @@ export function BillingCard({
 									</Link>
 								</Button>
 							)}
-						</div>
-					</div>
+						</ItemActions>
+					</Item>
 				</CardContent>
 			</Card>
 
@@ -263,43 +276,49 @@ export function BillingCard({
 
 			{/* Enterprise Plan */}
 			<Card>
-				<CardContent>
-					<div className="flex items-center justify-between">
-						<div>
-							<h3 className="mb-2 font-semibold">
+				<CardContent className="p-0">
+					<Item>
+						<ItemContent>
+							<ItemTitle className="text-base font-semibold">
 								<Trans>Enterprise Plan</Trans>
-							</h3>
-							<p className="text-muted-foreground text-sm">
+							</ItemTitle>
+							<ItemDescription>
 								<Trans>
 									Single sign-on, custom SLA, private support channel, and more.{' '}
 									<Link to="/contact" className="text-primary hover:underline">
 										Learn more
 									</Link>
 								</Trans>
-							</p>
-						</div>
-						<Button variant="outline" asChild>
-							<Link to="/contact?subject=Enterprise">
-								<Trans>Schedule a call</Trans>
-							</Link>
-						</Button>
-					</div>
+							</ItemDescription>
+						</ItemContent>
+						<ItemActions>
+							<Button variant="outline" asChild>
+								<Link to="/contact?subject=Enterprise">
+									<Trans>Schedule a call</Trans>
+								</Link>
+							</Button>
+						</ItemActions>
+					</Item>
 				</CardContent>
 			</Card>
 
 			{/* Help Section */}
 			<Card>
-				<CardContent>
-					<div className="flex items-center justify-between">
-						<div className="text-muted-foreground text-sm">
-							<Trans>Questions about billing?</Trans>
-						</div>
-						<Button variant="link" className="text-sm" asChild>
-							<Link to="/support">
-								<Trans>Get in touch</Trans>
-							</Link>
-						</Button>
-					</div>
+				<CardContent className="p-0">
+					<Item>
+						<ItemContent>
+							<ItemTitle className="text-muted-foreground text-sm font-medium">
+								<Trans>Questions about billing?</Trans>
+							</ItemTitle>
+						</ItemContent>
+						<ItemActions>
+							<Button variant="link" className="text-sm" asChild>
+								<Link to="/support">
+									<Trans>Get in touch</Trans>
+								</Link>
+							</Button>
+						</ItemActions>
+					</Item>
 				</CardContent>
 			</Card>
 		</div>
@@ -449,7 +468,8 @@ function PricingPlan({
 					>
 						{currentPlan ? (
 							<>
-								<Icon name="check" className="h-4 w-4" /> <Trans>Current Plan</Trans>
+								<Icon name="check" className="h-4 w-4" />{' '}
+								<Trans>Current Plan</Trans>
 							</>
 						) : (
 							<Trans>Upgrade</Trans>

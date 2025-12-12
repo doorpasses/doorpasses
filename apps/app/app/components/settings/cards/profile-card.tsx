@@ -3,11 +3,29 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { Trans } from '@lingui/macro'
 import { useLingui } from '@lingui/react'
 
-import { Button } from '@repo/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@repo/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@repo/ui/dialog'
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from '@repo/ui/card'
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@repo/ui/dialog'
 import { Field, FieldLabel, FieldError, FieldGroup } from '@repo/ui/field'
 import { Input } from '@repo/ui/input'
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupButton,
+	InputGroupInput,
+} from '@repo/ui/input-group'
 import { StatusButton } from '@repo/ui/status-button'
 import { NameSchema, UsernameSchema } from '@repo/validation'
 import { useState } from 'react'
@@ -57,7 +75,9 @@ export function ProfileCard({ user }: ProfileCardProps) {
 	return (
 		<Card className="w-full">
 			<CardHeader>
-				<CardTitle><Trans>Profile Settings</Trans></CardTitle>
+				<CardTitle>
+					<Trans>Profile Settings</Trans>
+				</CardTitle>
 				<CardDescription>
 					<Trans>Update your photo and personal details here.</Trans>
 				</CardDescription>
@@ -73,7 +93,9 @@ export function ProfileCard({ user }: ProfileCardProps) {
 								<Field
 									data-invalid={fields.name.errors?.length ? true : undefined}
 								>
-									<FieldLabel htmlFor={fields.name.id}><Trans>Name</Trans></FieldLabel>
+									<FieldLabel htmlFor={fields.name.id}>
+										<Trans>Name</Trans>
+									</FieldLabel>
 									<Input
 										{...getInputProps(fields.name, { type: 'text' })}
 										aria-invalid={fields.name.errors?.length ? true : undefined}
@@ -88,7 +110,9 @@ export function ProfileCard({ user }: ProfileCardProps) {
 										fields.username.errors?.length ? true : undefined
 									}
 								>
-									<FieldLabel htmlFor={fields.username.id}><Trans>Username</Trans></FieldLabel>
+									<FieldLabel htmlFor={fields.username.id}>
+										<Trans>Username</Trans>
+									</FieldLabel>
 									<Input
 										{...getInputProps(fields.username, { type: 'text' })}
 										aria-invalid={
@@ -107,35 +131,34 @@ export function ProfileCard({ user }: ProfileCardProps) {
 									>
 										<Trans>Email</Trans>
 									</label>
-									<div className="relative">
-										<Input
-											id="email"
-											type="text"
-											disabled
-											value={user.email}
-											className="pr-[100px]"
-										/>
-										<Dialog
-											open={isEmailModalOpen}
-											onOpenChange={setIsEmailModalOpen}
-										>
-											<DialogTrigger asChild>
-												<Button
-													variant="outline"
-													size="sm"
-													className="absolute top-1/2 right-1 -translate-y-1/2"
-												>
-													<Trans>Change</Trans>
-												</Button>
-											</DialogTrigger>
-											<DialogContent>
-												<DialogHeader>
-													<DialogTitle><Trans>Change Email</Trans></DialogTitle>
-												</DialogHeader>
-												<EmailChangeForm setIsOpen={setIsEmailModalOpen} />
-											</DialogContent>
-										</Dialog>
-									</div>
+									<Dialog
+										open={isEmailModalOpen}
+										onOpenChange={setIsEmailModalOpen}
+									>
+										<InputGroup>
+											<InputGroupInput
+												id="email"
+												type="text"
+												disabled
+												value={user.email}
+											/>
+											<InputGroupAddon align="inline-end">
+												<DialogTrigger asChild>
+													<InputGroupButton variant="outline">
+														<Trans>Change</Trans>
+													</InputGroupButton>
+												</DialogTrigger>
+											</InputGroupAddon>
+										</InputGroup>
+										<DialogContent>
+											<DialogHeader>
+												<DialogTitle>
+													<Trans>Change Email</Trans>
+												</DialogTitle>
+											</DialogHeader>
+											<EmailChangeForm setIsOpen={setIsEmailModalOpen} />
+										</DialogContent>
+									</Dialog>
 									<p className="text-muted-foreground mt-1 text-sm">
 										<Trans>
 											If you change your email, you'll need to verify the new

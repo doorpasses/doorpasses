@@ -32,6 +32,7 @@ import VerifiedDomainCard, {
 } from '#app/components/settings/cards/organization/verified-domain-card.tsx'
 
 import { requireUserId } from '#app/utils/auth.server.ts'
+import { invalidateUserOrganizationsCache } from '#app/utils/cache.server.ts'
 import { requireUserOrganization } from '#app/utils/organization-loader.server.ts'
 import {
 	updateSeatQuantity,
@@ -144,6 +145,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					})
 				})
 
+				await invalidateUserOrganizationsCache(userId)
+
 				return Response.json({ status: 'success' })
 			} catch {
 				return Response.json(
@@ -158,7 +161,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				await prisma.organizationImage.delete({
 					where: { organizationId: organization.id },
 				})
-
+				await invalidateUserOrganizationsCache(userId)
 				return Response.json({ status: 'success' })
 			} catch {
 				return Response.json(
@@ -201,6 +204,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				// Don't fail the settings update if onboarding tracking fails
 			}
 
+			await invalidateUserOrganizationsCache(userId)
+
 			return redirectWithToast(`/${slug}/settings`, {
 				title: 'Organization updated',
 				description: "Your organization's settings have been updated.",
@@ -233,6 +238,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				where: { id: organization.id },
 				data: { size },
 			})
+
+			await invalidateUserOrganizationsCache(userId)
 
 			return redirectWithToast(`/${organization.slug}/settings`, {
 				title: 'Team size updated',
@@ -347,6 +354,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				}
 			})
 
+			await invalidateUserOrganizationsCache(userId)
+
 			return redirectWithToast(`/${organization.slug}/settings`, {
 				title: 'Verified domain updated',
 				description:
@@ -368,7 +377,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				where: { id: organization.id },
 				data: { verifiedDomain: null },
 			})
-
+			await invalidateUserOrganizationsCache(userId)
 			return Response.json({ status: 'success' })
 		} catch {
 			return Response.json(
@@ -393,6 +402,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			await prisma.organization.delete({
 				where: { id: organization.id },
 			})
+
+			await invalidateUserOrganizationsCache(userId)
 
 			return redirectWithToast('/app', {
 				title: 'Organization deleted',
@@ -475,6 +486,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					},
 				})
 			}
+
+			await invalidateUserOrganizationsCache(userId)
 
 			return redirectWithToast(`/${organization.slug}/settings`, {
 				title: 'S3 Storage updated',

@@ -1,6 +1,13 @@
 import { Trans } from '@lingui/macro'
 import { Avatar, AvatarFallback, AvatarImage } from '@repo/ui/avatar'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/ui/card'
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from '@repo/ui/card'
+import { Icon } from '@repo/ui/icon'
 import { cn, getUserImgSrc } from '#app/utils/misc.tsx'
 
 interface LeadershipUser {
@@ -20,11 +27,11 @@ interface LeadershipCardProps {
 const getRankIcon = (rank: number) => {
 	switch (rank) {
 		case 1:
-			return '👑'
+			return 'crown'
 		case 2:
-			return '🥈'
+			return 'trophy'
 		case 3:
-			return '🥉'
+			return 'medal'
 		default:
 			return null
 	}
@@ -76,7 +83,10 @@ export function LeadershipCard({ leaders, className }: LeadershipCardProps) {
 								<div className="flex items-center gap-2">
 									<span className="text-md font-semibold">{leader.rank}</span>
 									{getRankIcon(leader.rank) && (
-										<span className="text-md">{getRankIcon(leader.rank)}</span>
+										<Icon
+											name={getRankIcon(leader.rank)!}
+											className="text-md text-foreground"
+										/>
 									)}
 								</div>
 								<div className="flex items-center gap-3">

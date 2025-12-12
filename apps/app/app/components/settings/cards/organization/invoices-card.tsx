@@ -8,6 +8,15 @@ import {
 	CardTitle,
 } from '@repo/ui/card'
 import { Icon } from '@repo/ui/icon'
+import {
+	Item,
+	ItemActions,
+	ItemContent,
+	ItemDescription,
+	ItemHeader,
+	ItemMedia,
+	ItemTitle,
+} from '@repo/ui/item'
 import { Link } from 'react-router'
 
 import { EmptyState } from '#app/components/empty-state.tsx'
@@ -78,38 +87,36 @@ export function InvoicesCard({ invoices }: InvoicesCardProps) {
 						icons={['file-text']}
 					/>
 				) : (
-					<div className="space-y-4">
+					<div className="space-y-3 p-6">
 						{invoices.map((invoice) => (
-							<div
-								key={invoice.id}
-								className="flex items-center justify-between rounded-lg border p-4"
-							>
-								<div className="flex-1">
-									<div className="flex items-center gap-3">
-										<div>
-											<p className="font-medium">
-												{invoice.number || `Invoice ${invoice.id?.slice(-8)}`}
-											</p>
-											<p className="text-muted-foreground text-sm">
-												{formatDate(invoice.created)}
-												{invoice.periodStart && invoice.periodEnd && (
-													<span className="ml-2">
-														({formatDate(invoice.periodStart)} -{' '}
-														{formatDate(invoice.periodEnd)})
-													</span>
-												)}
-											</p>
-										</div>
+							<Item key={invoice.id} size="sm">
+								<ItemMedia variant="icon">
+									<Icon name="file-text" className="h-4 w-4" />
+								</ItemMedia>
+								<ItemContent className="min-w-0">
+									<ItemHeader>
+										<ItemTitle className="truncate">
+											{invoice.number || `Invoice ${invoice.id?.slice(-8)}`}
+										</ItemTitle>
 										{getStatusBadge(invoice.status)}
-									</div>
-								</div>
-								<div className="flex items-center gap-4">
-									<div className="text-right">
+									</ItemHeader>
+									<ItemDescription className="text-xs sm:text-sm">
+										{formatDate(invoice.created)}
+										{invoice.periodStart && invoice.periodEnd && (
+											<span className="ml-2">
+												({formatDate(invoice.periodStart)} -{' '}
+												{formatDate(invoice.periodEnd)})
+											</span>
+										)}
+									</ItemDescription>
+								</ItemContent>
+								<ItemActions className="flex flex-wrap justify-end gap-3 sm:flex-nowrap sm:items-center">
+									<div className="text-right text-sm">
 										<p className="font-medium">
 											{formatCurrency(invoice.amountPaid, invoice.currency)}
 										</p>
 										{invoice.amountDue > 0 && (
-											<p className="text-muted-foreground text-sm">
+											<p className="text-muted-foreground text-xs">
 												Due:{' '}
 												{formatCurrency(invoice.amountDue, invoice.currency)}
 											</p>
@@ -141,8 +148,8 @@ export function InvoicesCard({ invoices }: InvoicesCardProps) {
 											</Button>
 										)}
 									</div>
-								</div>
-							</div>
+								</ItemActions>
+							</Item>
 						))}
 					</div>
 				)}

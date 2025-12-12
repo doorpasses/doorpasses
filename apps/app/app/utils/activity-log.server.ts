@@ -65,6 +65,7 @@ export async function getNoteActivityLogs(noteId: string, limit = 50) {
 					id: true,
 					name: true,
 					username: true,
+					image: { select: { objectKey: true } },
 				},
 			},
 			targetUser: {

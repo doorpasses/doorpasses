@@ -12,6 +12,7 @@ export {
 	clearCacheByType,
 	deleteCacheKeys,
 	invalidateUserCache,
+	invalidateUserOrganizationsCache,
 	invalidateUserSecurityCache,
 	type CacheKeyInfo,
 	type CacheStats,

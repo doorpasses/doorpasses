@@ -67,7 +67,7 @@ import {
 } from '#app/utils/activity-log.server.ts'
 import { requireUserId } from '#app/utils/auth.server.ts'
 import { sanitizeCommentContent } from '#app/utils/content-sanitization.server.ts'
-import { getNoteImgSrc, useIsPending } from '#app/utils/misc.tsx'
+import { getNoteImgSrc, getUserImgSrc, useIsPending } from '#app/utils/misc.tsx'
 import {
 	notifyCommentMentions,
 	notifyNoteOwner,
@@ -273,8 +273,16 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 	const organizedComments = organizeComments(comments).map(serializeComment)
 
-	// Get recent activity logs for this note
-	const activityLogs = await getNoteActivityLogs(note.id, 20)
+	// Get recent activity logs for this note (attach user avatar URL)
+	const activityLogs = (await getNoteActivityLogs(note.id, 20)).map((log) => ({
+		...log,
+		user: {
+			...log.user,
+			image: log.user.image?.objectKey
+				? getUserImgSrc(log.user.image.objectKey)
+				: null,
+		},
+	}))
 
 	// Check if current user has favorited this note
 	const isFavorited = await prisma.organizationNoteFavorite.findFirst({

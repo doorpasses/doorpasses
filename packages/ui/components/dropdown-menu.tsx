@@ -101,7 +101,10 @@ const DropdownMenuSubTrigger = ({
 		>
 			{children}
 			<span className="ltr:ml-auto rtl:mr-auto">
-				<Icon name="chevron-right" className="size-4 items-center rtl:rotate-180" />
+				<Icon
+					name="chevron-right"
+					className="size-4 items-center rtl:rotate-180"
+				/>
 			</span>
 		</DropdownMenuPrimitive.SubTrigger>
 	)
@@ -137,7 +140,8 @@ const DropdownMenuItem = ({
 			'ltr:text-left rtl:text-right',
 			inset && 'ltr:pl-8 rtl:pr-8',
 			className,
-			props.variant === 'destructive' && 'text-destructive',
+			props.variant === 'destructive' &&
+				'text-destructive focus:bg-destructive/25',
 		)}
 		{...props}
 	/>
@@ -155,7 +159,7 @@ const DropdownMenuCheckboxItem = ({
 			className={cn(
 				'focus:bg-accent focus:text-accent-foreground relative flex items-center rounded-sm py-1.5 text-sm outline-hidden transition-colors select-none data-disabled:pointer-events-none data-disabled:opacity-50',
 				'ltr:pr-2 ltr:pl-8 ltr:text-left',
-				'rtl:pl-2 rtl:pr-8 rtl:text-right',
+				'rtl:pr-8 rtl:pl-2 rtl:text-right',
 				className,
 			)}
 			checked={checked}
@@ -183,7 +187,7 @@ const DropdownMenuRadioItem = ({
 		className={cn(
 			'focus:bg-accent focus:text-accent-foreground relative flex items-center rounded-sm py-1.5 text-sm outline-hidden transition-colors select-none data-disabled:pointer-events-none data-disabled:opacity-50',
 			'ltr:pr-2 ltr:pl-8 ltr:text-left',
-			'rtl:pl-2 rtl:pr-8 rtl:text-right',
+			'rtl:pr-8 rtl:pl-2 rtl:text-right',
 			className,
 		)}
 		{...props}
@@ -234,7 +238,10 @@ const DropdownMenuShortcut = ({
 }: React.HTMLAttributes<HTMLSpanElement>) => {
 	return (
 		<span
-			className={cn('text-xs tracking-widest opacity-60 ltr:ml-auto rtl:mr-auto', className)}
+			className={cn(
+				'text-xs tracking-widest opacity-60 ltr:ml-auto rtl:mr-auto',
+				className,
+			)}
 			{...props}
 		/>
 	)

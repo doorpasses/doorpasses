@@ -12,6 +12,7 @@ export {
 	deleteCacheKeys,
 	invalidateUserCache,
 	invalidateUserSecurityCache,
+	invalidateUserOrganizationsCache,
 	type CacheKeyInfo,
 	type CacheStats,
 } from './src/cache.server.js'

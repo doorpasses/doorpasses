@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 
 import {
@@ -33,9 +33,25 @@ export function NavMain({
 		}[]
 	}[]
 }) {
-	const [openItems, setOpenItems] = useState<Set<string>>(new Set())
+	const [openItems, setOpenItems] = useState<Set<string>>(() => {
+		const activeItems = items
+			.filter((item) => item.isActive && item.items && item.items.length > 0)
+			.map((item) => item.title)
+		return new Set(activeItems)
+	})
 	const iconRefs = useRef<{ [key: string]: any }>({})
 	const { state } = useSidebar()
+
+	useEffect(() => {
+		const activeItems = items
+			.filter((item) => item.isActive && item.items && item.items.length > 0)
+			.map((item) => item.title)
+		setOpenItems((prev) => {
+			const newSet = new Set(prev)
+			activeItems.forEach((title) => newSet.add(title))
+			return newSet
+		})
+	}, [items])
 
 	const toggleItem = (title: string) => {
 		setOpenItems((prev) => {

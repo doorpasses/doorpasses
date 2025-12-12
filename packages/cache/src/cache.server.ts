@@ -465,6 +465,13 @@ export async function invalidateUserCache(userId: string) {
 	])
 }
 
+export async function invalidateUserOrganizationsCache(userId: string) {
+	await Promise.all([
+		cache.delete(`user-organizations:${userId}`),
+		lruCache.delete(`user-organizations:${userId}`),
+	])
+}
+
 export async function invalidateUserSecurityCache(userId: string) {
 	await Promise.all([
 		cache.delete(`user-security:${userId}`),

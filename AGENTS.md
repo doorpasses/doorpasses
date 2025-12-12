@@ -34,13 +34,22 @@ PUPPETEER_SKIP_DOWNLOAD=true npm install && npm run setup -s
 npm run test:e2e:install
 ```
 
-**Requirements**: Node.js 22.15.0, npm 10.9.0 (pinned with Volta)
+**Requirements**:
+
+- Node.js 22.15.0, npm 10.9.0 (pinned with Volta)
+- Docker Desktop (for local MongoDB used by CMS)
 
 ## Development
 
 ```bash
-# Start all apps in parallel
+# Start all apps in parallel (includes Docker services)
 npm run dev
+
+# Docker services are started automatically with npm run dev
+# Manual control if needed:
+npm run dev:services        # Start Docker services (MongoDB)
+npm run dev:services:stop   # Stop Docker services
+npm run dev:services:logs   # View Docker logs
 
 # Start specific apps
 npm run dev:app        # Main React Router app (port 3001)
@@ -53,6 +62,10 @@ npm run db:migrate     # Run Prisma migrations
 npm run db:seed        # Seed database with test data
 npm run db:reset       # Reset database (destructive)
 ```
+
+**Docker Services**: MongoDB runs automatically via Docker Compose when you run
+`npm run dev`. Docker Desktop must be installed and running. See
+`docs/docker-services.md` for troubleshooting.
 
 ## Build & Test
 
@@ -341,7 +354,15 @@ git commit --no-verify -m "fix: resolve ESLint warnings (verified manually)"
 - `ENCRYPTION_KEY` - 32 characters for general encryption
 - `SSO_ENCRYPTION_KEY` - 64 hex chars (32 bytes) for SSO
 - `INTEGRATION_ENCRYPTION_KEY` - 64 hex chars for integrations
+- `USE_S3_STORAGE` - Set to `true` to use S3 in CMS (default: local in dev)
 - See `.env.example` for complete list
+
+**CMS Storage**:
+
+- **Development**: Uses local file storage (`apps/cms/public/media/`)
+- **Production**: Uses S3-compatible storage (Tigris, AWS S3)
+- Toggle with `USE_S3_STORAGE` environment variable
+- See `docs/cms-storage.md` for details
 
 ## PR & Commit Guidelines
 

@@ -71,6 +71,10 @@ different applications.
 
 ### Development
 
+**Prerequisites**: Docker Desktop must be installed and running for local
+services (MongoDB for CMS). See
+[Docker Services Guide](./docs/docker-services.md) for setup.
+
 To run all the applications in development mode, run the following command from
 the root of the repository:
 
@@ -78,17 +82,29 @@ the root of the repository:
 npm run dev
 ```
 
-This will start the following applications:
+This will:
+
+1. Start Docker services (MongoDB) automatically
+2. Start all applications in parallel
+
+Applications started:
 
 - `web`
-- `background-jobs`
-- `docs`
-- `email`
-- `notifications`
+- `cms`
+- `admin`
 - `studio`
+- `docs`
 
 You can also run each application individually. Refer to the "Applications"
 section for the specific commands.
+
+## Documentation
+
+- 🔌 [Offline Development](./docs/offline-development.md) - Work without
+  internet
+- 🐳 [Docker Services](./docs/docker-services.md) - MongoDB and local services
+- 🤖 [Agent Guidelines](./AGENTS.md) - For AI coding assistants
+- 🤝 [Contributing](./CONTRIBUTING.md) - How to contribute
 
 ## Support
 

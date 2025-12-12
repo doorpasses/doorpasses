@@ -27,6 +27,14 @@ import {
 	InputGroupButton,
 	InputGroupInput,
 } from '@repo/ui/input-group'
+import {
+	Item,
+	ItemActions,
+	ItemContent,
+	ItemDescription,
+	ItemGroup,
+	ItemTitle,
+} from '@repo/ui/item'
 import { Separator } from '@repo/ui/separator'
 import { useState } from 'react'
 import { Form } from 'react-router'
@@ -273,49 +281,46 @@ export function OrganizationInvitations({
 								<h4 className="mb-3 text-sm font-medium">
 									<Trans>Pending Invitations</Trans>
 								</h4>
-								<div className="space-y-2">
+								<ItemGroup>
 									{pendingInvitations.map((invitation) => (
-										<div
-											key={invitation.id}
-											className="flex items-center justify-between rounded-lg border p-3"
-										>
-											<div className="flex-1">
-												<div className="flex items-center gap-2">
-													<span className="text-sm font-medium">
-														{invitation.email}
-													</span>
+										<Item key={invitation.id} variant="outline" size="sm">
+											<ItemContent>
+												<ItemTitle>
+													<span>{invitation.email}</span>
 													<Badge variant="secondary" className="text-xs">
 														{invitation.organizationRole.name}
 													</Badge>
-												</div>
+												</ItemTitle>
 												{invitation.inviter && (
-													<p className="text-muted-foreground mt-1 text-xs">
+													<ItemDescription>
 														<Trans>
 															Invited by{' '}
 															{invitation.inviter.name ||
 																invitation.inviter.email}
 														</Trans>
-													</p>
+													</ItemDescription>
 												)}
-											</div>
-											<Form method="POST">
-												<input
-													type="hidden"
-													name="intent"
-													value="remove-invitation"
-												/>
-												<input
-													type="hidden"
-													name="invitationId"
-													value={invitation.id}
-												/>
-												<Button type="submit" variant="ghost" size="sm">
-													<Icon name="trash-2" className="h-4 w-4" />
-												</Button>
-											</Form>
-										</div>
+											</ItemContent>
+											<ItemActions>
+												<Form method="POST">
+													<input
+														type="hidden"
+														name="intent"
+														value="remove-invitation"
+													/>
+													<input
+														type="hidden"
+														name="invitationId"
+														value={invitation.id}
+													/>
+													<Button type="submit" variant="ghost" size="sm">
+														<Icon name="trash-2" className="h-4 w-4" />
+													</Button>
+												</Form>
+											</ItemActions>
+										</Item>
 									))}
-								</div>
+								</ItemGroup>
 							</div>
 						</>
 					)}

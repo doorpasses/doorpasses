@@ -20,9 +20,9 @@ const DEFAULT_OG_IMAGE = '/images/og-image.jpg'
 export const seoConfig = createSeoConfig({
 	siteName: brand.name,
 	description: brand.products.app.description,
-	siteUrl: process.env.APP_URL || brand.url,
+	siteUrl: brand.url,
 	defaultImage: {
-		url: `${process.env.APP_URL || brand.url}${DEFAULT_OG_IMAGE}`,
+		url: `${brand.url}${DEFAULT_OG_IMAGE}`,
 		alt: `${brand.name} - ${brand.tagline}`,
 		width: 1200,
 		height: 630,
