@@ -141,6 +141,12 @@ function escapeString(str) {
 	return str.replace(/'/g, "\\'").replace(/\n/g, '\\n')
 }
 
+function getBrandDomain(brandName) {
+	// Convert brand name to domain format (lowercase, replace spaces with hyphens)
+	const domainName = brandName.toLowerCase().replace(/\s+/g, '-')
+	return `${domainName}.me`
+}
+
 function updateBrandConfig(brandInfo) {
 	const brandPath = join(rootDir, 'packages/config/brand.ts')
 	let content = readFileSync(brandPath, 'utf-8')
@@ -257,6 +263,91 @@ function updateBrandConfig(brandInfo) {
 	log(`✅ Updated ${brandPath}`, 'green')
 }
 
+function updateEnvFiles(brandName) {
+	const domain = getBrandDomain(brandName)
+	const envFiles = [
+		'apps/app/.env',
+		'apps/admin/.env',
+	]
+
+	let updatedCount = 0
+
+	for (const envFile of envFiles) {
+		const envPath = join(rootDir, envFile)
+		
+		try {
+			if (!existsSync(envPath)) {
+				log(`⚠️  Environment file not found: ${envFile}`, 'yellow')
+				continue
+			}
+
+			let content = readFileSync(envPath, 'utf-8')
+			
+			// Replace ROOT_APP value
+			const rootAppPattern = /^ROOT_APP=.*$/m
+			if (rootAppPattern.test(content)) {
+				content = content.replace(rootAppPattern, `ROOT_APP=${domain}`)
+				writeFileSync(envPath, content, 'utf-8')
+				updatedCount++
+				log(`✅ Updated ROOT_APP in ${envFile} to ${domain}`, 'green')
+			} else {
+				log(`⚠️  ROOT_APP not found in ${envFile}`, 'yellow')
+			}
+		} catch (error) {
+			log(`⚠️  Failed to update ${envFile}: ${error.message}`, 'yellow')
+		}
+	}
+
+	if (updatedCount > 0) {
+		log(`\n✅ Successfully updated ROOT_APP in ${updatedCount} environment files`, 'green')
+	}
+}
+
+function updateMobileAppConfig(brandInfo) {
+	const appJsonPath = join(rootDir, 'apps/mobile/app.json')
+	
+	try {
+		if (!existsSync(appJsonPath)) {
+			log(`⚠️  Mobile app.json not found: ${appJsonPath}`, 'yellow')
+			return
+		}
+
+		const content = readFileSync(appJsonPath, 'utf-8')
+		const appConfig = JSON.parse(content)
+		
+		// Update app name and slug based on brand
+		const mobileAppName = `${brandInfo.name} Mobile`
+		const slug = brandInfo.name.toLowerCase().replace(/\s+/g, '-') + '-mobile'
+		const domain = getBrandDomain(brandInfo.name)
+		
+		// Update expo configuration
+		appConfig.expo.name = mobileAppName
+		appConfig.expo.slug = slug
+		
+		// Update bundle identifiers
+		const bundleId = `com.${brandInfo.name.toLowerCase().replace(/\s+/g, '')}.mobile`
+		appConfig.expo.ios.bundleIdentifier = bundleId
+		appConfig.expo.android.package = bundleId
+		
+		// Update linking prefixes
+		appConfig.expo.linking.prefixes = [
+			`${slug}://`,
+			`https://${domain}`
+		]
+		
+		// Write back the updated configuration
+		writeFileSync(appJsonPath, JSON.stringify(appConfig, null, '\t'), 'utf-8')
+		log(`✅ Updated mobile app configuration in apps/mobile/app.json`, 'green')
+		log(`   - App name: ${mobileAppName}`, 'gray')
+		log(`   - Slug: ${slug}`, 'gray')
+		log(`   - Bundle ID: ${bundleId}`, 'gray')
+		log(`   - Domain: ${domain}`, 'gray')
+		
+	} catch (error) {
+		log(`⚠️  Failed to update mobile app.json: ${error.message}`, 'yellow')
+	}
+}
+
 function copyFavicon(faviconPath) {
 	if (!faviconPath) return
 
@@ -267,6 +358,8 @@ function copyFavicon(faviconPath) {
 		'apps/web/public/favicons/favicon.svg',
 		'apps/cms/public/favicon.svg',
 		'apps/docs/favicon.svg',
+		'apps/docs/logo/light.svg',
+		'apps/docs/logo/dark.svg'
 	]
 
 	let copiedCount = 0
@@ -313,6 +406,8 @@ async function main() {
 
 		const brandInfo = await promptBrandInfo()
 		updateBrandConfig(brandInfo)
+		updateEnvFiles(brandInfo.name)
+		updateMobileAppConfig(brandInfo)
 
 		const faviconPath = await promptFavicon()
 		if (faviconPath) {
