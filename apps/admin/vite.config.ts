@@ -1,5 +1,6 @@
 import { lingui } from '@lingui/vite-plugin'
 import { reactRouter } from '@react-router/dev/vite'
+import { brand } from '@repo/config/brand'
 import {
 	type SentryReactRouterBuildOptions,
 	sentryReactRouter,
@@ -8,6 +9,8 @@ import tailwindcss from '@tailwindcss/vite'
 import { defineConfig, type Plugin } from 'vite'
 import { envOnlyMacros } from 'vite-env-only'
 import macrosPlugin from 'vite-plugin-babel-macros'
+
+const domain = 'admin.' + brand.name.toLowerCase().replace(/\s+/g, '-') + '.me'
 
 const MODE = process.env.NODE_ENV
 
@@ -80,12 +83,17 @@ export default defineConfig((config) => ({
 		},
 	}),
 	server: {
-		allowedHosts: ['admin.doorpasses.me', 'localhost'],
+		allowedHosts: [domain, 'localhost'],
 		watch: {
 			ignored: ['**/playwright-report/**', '**/node_modules/.vite-temp/**'],
 		},
 		fs: {
 			allow: ['..'],
+		},
+		hmr: {
+			host: 'localhost',
+			port: 24678,
+			protocol: 'ws',
 		},
 	},
 	sentryConfig,

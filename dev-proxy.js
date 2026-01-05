@@ -8,7 +8,38 @@ const useHttp =
 const protocol = useHttp ? 'http' : 'https'
 const port = 2999
 
-const domain = 'doorpasses.me'
+// Function to get domain from brand configuration
+function getBrandDomain() {
+	try {
+		const fs = require('fs')
+		const path = require('path')
+		const brandConfigPath = path.join(__dirname, 'packages/config/brand.ts')
+
+		if (!fs.existsSync(brandConfigPath)) {
+			console.log('⚠️  Brand config not found, using default domain')
+			return 'epic-startup.me'
+		}
+
+		const brandContent = fs.readFileSync(brandConfigPath, 'utf-8')
+
+		// Extract brand name from the config
+		const nameMatch = brandContent.match(/name:\s*'([^']+)'/)
+		if (!nameMatch) {
+			console.log('⚠️  Could not parse brand name, using default domain')
+			return 'epic-startup.me'
+		}
+
+		const brandName = nameMatch[1]
+		// Convert brand name to domain format (lowercase, replace spaces with hyphens)
+		const domainName = brandName.toLowerCase().replace(/\s+/g, '-')
+		return `${domainName}.me`
+	} catch (error) {
+		console.log(`⚠️  Error reading brand config: ${error.message}`)
+		return 'epic-startup.me'
+	}
+}
+
+const domain = getBrandDomain()
 
 // Target mappings
 const targets = {
@@ -20,6 +51,8 @@ const targets = {
 	[`cms.${domain}:${port}`]: 'http://localhost:3006',
 	[`api.${domain}:${port}`]: 'http://localhost:3007',
 }
+
+console.table(targets)
 
 const proxy = httpProxy.createProxyServer({
 	ws: true,
