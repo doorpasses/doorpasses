@@ -7,17 +7,31 @@ export const REFRESH_TOKEN_EXPIRATION = 30 * 24 * 60 * 60 * 1000 // 30 days
 export const AUTHORIZATION_CODE_EXPIRATION = 10 * 60 * 1000 // 10 minutes
 
 // In-memory cache for authorization codes (in production, use Redis)
+// Using a Map with automatic cleanup to prevent memory leaks
 const authorizationCodeCache = new Map<
 	string,
 	{
 		userId: string
 		organizationId: string
 		clientName: string
+		redirectUri: string
 		expiresAt: number
 		codeChallenge?: string
 		codeChallengeMethod?: string
 	}
 >()
+
+// Clean up expired codes every minute with batched deletions
+// to prevent blocking the event loop with large caches
+setInterval(() => {
+	const now = Date.now()
+	const toDelete: string[] = []
+	for (const [code, entry] of authorizationCodeCache.entries()) {
+		if (entry.expiresAt < now) toDelete.push(code)
+		if (toDelete.length > 100) break // limit iteration per cleanup cycle
+	}
+	toDelete.forEach((code) => authorizationCodeCache.delete(code))
+}, 60 * 1000).unref() // unref to allow process to exit if this is the only thing keeping it alive
 
 // Generate cryptographically secure random token
 export function generateToken(): string {
@@ -122,12 +136,14 @@ export async function createAuthorizationCode({
 	userId,
 	organizationId,
 	clientName,
+	redirectUri,
 	codeChallenge,
 	codeChallengeMethod,
 }: {
 	userId: string
 	organizationId: string
 	clientName: string
+	redirectUri: string
 	codeChallenge?: string
 	codeChallengeMethod?: string
 }): Promise<string> {
@@ -139,6 +155,7 @@ export async function createAuthorizationCode({
 		userId,
 		organizationId,
 		clientName,
+		redirectUri,
 		expiresAt: Date.now() + AUTHORIZATION_CODE_EXPIRATION,
 		codeChallenge,
 		codeChallengeMethod,
@@ -147,15 +164,44 @@ export async function createAuthorizationCode({
 	return code
 }
 
+/**
+ * Normalize a redirect URI for consistent comparison.
+ * Handles trailing slashes and hostname case.
+ */
+function normalizeRedirectUri(uri: string): string {
+	try {
+		const url = new URL(uri)
+		// Remove trailing slash from pathname unless it's just '/'
+		if (url.pathname !== '/' && url.pathname.endsWith('/')) {
+			url.pathname = url.pathname.slice(0, -1)
+		}
+		// Lowercase the host
+		url.hostname = url.hostname.toLowerCase()
+		return url.toString()
+	} catch {
+		// If URL parsing fails, return original for strict comparison
+		return uri
+	}
+}
+
 // Exchange authorization code for tokens
 export async function exchangeAuthorizationCode(
 	code: string,
+	redirectUri: string,
 	codeVerifier?: string,
 ) {
 	const codeHash = hashToken(code)
 	const authData = authorizationCodeCache.get(codeHash)
 
 	if (!authData || authData.expiresAt < Date.now()) {
+		return null
+	}
+
+	// Verify redirect URI matches (with normalization for consistency)
+	if (
+		normalizeRedirectUri(authData.redirectUri) !==
+		normalizeRedirectUri(redirectUri)
+	) {
 		return null
 	}
 
