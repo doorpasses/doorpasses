@@ -1,4 +1,4 @@
-import type { FooterData } from '../types/footer'
+import { type FooterData } from '../types/footer'
 
 // CMS_URL will be populated at build time from environment variables
 // Astro's import.meta.env is typed in astro/client

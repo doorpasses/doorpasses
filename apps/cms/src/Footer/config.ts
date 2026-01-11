@@ -36,7 +36,7 @@ export const Footer: GlobalConfig = {
           },
         },
       ],
-      maxRows: 6, // Assuming reasonable max columns, say 4 or 6
+      maxRows: 6,
       admin: {
         initCollapsed: true,
         components: {
