@@ -35,13 +35,15 @@ import {
 	logMCPAuthorizationApproved,
 	logMCPAuthorizationDenied,
 } from '#app/utils/mcp/audit.server.ts'
-import { createAuthorizationCode } from '#app/utils/mcp/oauth.server.ts'
+import {
+	createAuthorizationCode,
+	validateMCPRedirectUri,
+} from '#app/utils/mcp/oauth.server.ts'
 import { userHasOrgAccess } from '#app/utils/organization/organizations.server.ts'
 import {
 	checkRateLimit,
 	RATE_LIMITS,
 	createRateLimitResponse,
-	getClientIp,
 } from '#app/utils/rate-limit.server.ts'
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -59,6 +61,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	invariantResponse(redirectUri, 'redirect_uri parameter is required', {
 		status: 400,
 	})
+
+	// Validate redirect URI to prevent open redirect attacks
+	const redirectUriValidation = validateMCPRedirectUri(redirectUri)
+	invariantResponse(
+		redirectUriValidation.isValid,
+		redirectUriValidation.error || 'Invalid redirect_uri',
+		{ status: 400 },
+	)
+
 	// Note: state is optional but recommended for CSRF protection
 
 	// Check if user has an active session
@@ -146,6 +157,18 @@ export async function action({ request }: ActionFunctionArgs) {
 	invariantResponse(organizationId, 'organizationId is required')
 	invariantResponse(clientName, 'clientName is required')
 	invariantResponse(redirectUri, 'redirectUri is required')
+
+	// Validate redirect URI again in action (defense in depth)
+	// This prevents attacks where form data could be tampered with
+	const actionRedirectUriValidation = validateMCPRedirectUri(
+		redirectUri as string,
+	)
+	invariantResponse(
+		actionRedirectUriValidation.isValid,
+		actionRedirectUriValidation.error || 'Invalid redirect_uri',
+		{ status: 400 },
+	)
+
 	// Note: state is optional
 
 	// Verify user has access to the organization
