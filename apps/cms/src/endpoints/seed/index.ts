@@ -308,8 +308,6 @@ export const seed = async ({
     payload.updateGlobal({
       slug: 'footer',
       data: {
-        copyrightText: '© 2024 Your Company. All rights reserved.',
-        tagline: 'Built with Payload',
         columns: [
           {
             title: 'Product',

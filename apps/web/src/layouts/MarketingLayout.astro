@@ -1,8 +1,11 @@
 ---
+import { brand, getCopyright } from '@repo/config/brand'
+import GridDesign from '~/components/GridDesign.astro'
 import Footer from '~/components/Footer.astro'
 import Header from '~/components/Header.astro'
 import Banner from '~/components/Banner.astro'
 import '../styles/tailwind.css'
+import Button from './../components/ui/Button.astro'
 import { getThemeFromCookie } from '~/utils/theme'
 import { fetchBannerData } from '~/lib/fetchBanner'
 
