@@ -13,9 +13,11 @@ import {
 	type CreateReporter,
 } from '@epic-web/cachified'
 import { remember } from '@epic-web/remember'
+import { cachifiedTimingReporter, type Timings } from '@repo/common'
+import { getInstanceInfo } from '@repo/common/litefs'
 import { LRUCache } from 'lru-cache'
 import { z } from 'zod'
-import { cachifiedTimingReporter, type Timings } from '@repo/common'
+import { updatePrimaryCacheValue } from './cache_.sqlite.server'
 
 const CACHE_DATABASE_PATH = process.env.CACHE_DATABASE_PATH ?? './cache.db'
 
@@ -28,7 +30,9 @@ function createDatabase(tryAgain = true): DatabaseSync {
 	const db = new DatabaseSync(CACHE_DATABASE_PATH)
 
 	try {
-		// create cache table with metadata JSON column and value JSON column if it does not exist already
+		// Always create cache table on all instances (primary and replicas)
+		// This ensures prepared statements don't fail during module initialization
+		// even if replica starts before database replication completes
 		db.exec(`
 			CREATE TABLE IF NOT EXISTS cache (
 				key TEXT PRIMARY KEY,
@@ -136,11 +140,59 @@ export const cache: CachifiedCache = {
 		return { metadata, value }
 	},
 	async set(key, entry) {
-		const value = JSON.stringify(entry.value, bufferReplacer)
-		setStatement.run(key, value, JSON.stringify(entry.metadata))
+		const { currentIsPrimary, primaryInstance } = await getInstanceInfo()
+
+		if (currentIsPrimary) {
+			const value = JSON.stringify(entry.value, bufferReplacer)
+			setStatement.run(key, value, JSON.stringify(entry.metadata))
+		} else {
+			// fire-and-forget cache update
+			void updatePrimaryCacheValue({
+				key,
+				cacheValue: entry,
+			})
+				.then((response) => {
+					if (!response.ok) {
+						console.error(
+							`Error updating cache value for key "${key}" on primary instance (${primaryInstance}): ${response.status} ${response.statusText}`,
+							{ entry },
+						)
+					}
+				})
+				.catch((error) => {
+					console.error(
+						`Failed to update cache value for key "${key}" on primary instance (${primaryInstance}):`,
+						error,
+						{ entry },
+					)
+				})
+		}
 	},
 	async delete(key) {
-		deleteStatement.run(key)
+		const { currentIsPrimary, primaryInstance } = await getInstanceInfo()
+
+		if (currentIsPrimary) {
+			deleteStatement.run(key)
+		} else {
+			// fire-and-forget cache update
+			void updatePrimaryCacheValue({
+				key,
+				cacheValue: undefined,
+			})
+				.then((response) => {
+					if (!response.ok) {
+						console.error(
+							`Error deleting cache value for key "${key}" on primary instance (${primaryInstance}): ${response.status} ${response.statusText}`,
+						)
+					}
+				})
+				.catch((error) => {
+					console.error(
+						`Failed to delete cache value for key "${key}" on primary instance (${primaryInstance}):`,
+						error,
+					)
+				})
+		}
 	},
 }
 
