@@ -88,10 +88,14 @@ const {
 
 				<!-- Tabs Navigation -->
 				<div class="flex-1 mb-8">
-					<div class="space-y-0 border-l border-dashed border-border">
+					<div class="space-y-0 border-l border-dashed border-border" role="tablist" aria-label="Feature tabs">
 						{tabs.map((tab, index) => (
 							<button 
 								class="tab-button w-full text-left p-6 border-b border-dashed border-border hover:bg-muted/20 transition-all duration-200 group"
+								id={`tab-button-${index}`}
+								role="tab"
+								aria-selected={index === 0 ? 'true' : 'false'}
+								aria-controls={`tab-panel-${index}`}
 								data-tab={index}
 								data-active={index === 0 ? 'true' : 'false'}
 							>
@@ -152,6 +156,9 @@ const {
 					{tabs.map((tab, index) => (
 						<div 
 							class="tab-panel absolute inset-0 transition-opacity duration-300"
+							id={`tab-panel-${index}`}
+							role="tabpanel"
+							aria-labelledby={`tab-button-${index}`}
 							data-panel={index}
 							style={index === 0 ? 'opacity: 1;' : 'opacity: 0; pointer-events: none;'}
 						>
@@ -170,6 +177,7 @@ const {
 									<button 
 										class="video-play-button absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/40 transition-colors group"
 										data-video-url={tab.videoUrl}
+										aria-label="Play video"
 									>
 										<div class="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
 											<svg 
@@ -215,6 +223,7 @@ const {
 			tabButtons.forEach((button, index) => {
 				const isActive = index === activeIndex
 				button.setAttribute('data-active', isActive.toString())
+				button.setAttribute('aria-selected', isActive.toString())
 				
 				// Handle description visibility
 				const description = button.querySelector('.tab-description') as HTMLElement
