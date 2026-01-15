@@ -1,4 +1,4 @@
-app = "epic-startup-admin"
+app = "doorpasses-admin"
 primary_region = "sjc"
 kill_signal = "SIGINT"
 kill_timeout = 5

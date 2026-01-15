@@ -1,13 +1,13 @@
 {
 	"expo": {
 		"name": "Epic Stack Mobile",
-		"slug": "epic-startup-mobile",
+		"slug": "doorpasses-mobile",
 		"version": "1.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
 		"userInterfaceStyle": "light",
 		"newArchEnabled": true,
-		"scheme": "epic-startup",
+		"scheme": "doorpasses",
 		"splash": {
 			"image": "./assets/splash-icon.png",
 			"resizeMode": "contain",
@@ -15,7 +15,7 @@
 		},
 		"ios": {
 			"supportsTablet": true,
-			"bundleIdentifier": "com.epic-startup.mobile"
+			"bundleIdentifier": "com.doorpasses.mobile"
 		},
 		"android": {
 			"adaptiveIcon": {
@@ -24,7 +24,7 @@
 			},
 			"edgeToEdgeEnabled": true,
 			"predictiveBackGestureEnabled": false,
-			"package": "com.epic-startup.mobile"
+			"package": "com.doorpasses.mobile"
 		},
 		"web": {
 			"favicon": "./assets/favicon.png",
@@ -36,7 +36,7 @@
 			"reactCanary": true
 		},
 		"linking": {
-			"prefixes": ["epic-startup://", "https://epic-startup.me"],
+			"prefixes": ["doorpasses://", "https://doorpasses.me"],
 			"config": {
 				"screens": {
 					"index": "",
