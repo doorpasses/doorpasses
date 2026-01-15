@@ -1,3 +1,5 @@
+import 'varlock/auto-load'
+
 import { styleText } from 'node:util'
 import { helmet } from '@nichtsam/helmet/node-http'
 import { logger, sentryLogger, wideEventMiddleware } from '@repo/observability'
@@ -8,12 +10,13 @@ import compression from 'compression'
 import express from 'express'
 import rateLimit from 'express-rate-limit'
 import getPort, { portNumbers } from 'get-port'
+import { ENV } from '#app/utils/env.server.ts'
 
-const MODE = process.env.NODE_ENV ?? 'development'
+const MODE = ENV.NODE_ENV
 const IS_PROD = MODE === 'production'
 const IS_DEV = MODE === 'development'
-const ALLOW_INDEXING = process.env.ALLOW_INDEXING !== 'false'
-const SENTRY_ENABLED = IS_PROD && process.env.SENTRY_DSN
+const ALLOW_INDEXING = ENV.ALLOW_INDEXING !== false
+const SENTRY_ENABLED = IS_PROD && ENV.SENTRY_DSN
 const BUILD_PATH = '../build/server/index.js'
 
 if (SENTRY_ENABLED) {
@@ -317,7 +320,7 @@ if (IS_DEV) {
 	app.use(await import(BUILD_PATH).then((mod) => mod.app))
 }
 
-const desiredPort = Number(process.env.PORT || 3001)
+const desiredPort = Number(process.env.PORT ?? 3001)
 const portToUse = await getPort({
 	port: portNumbers(desiredPort, desiredPort + 100),
 })

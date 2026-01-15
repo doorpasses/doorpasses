@@ -73,14 +73,11 @@ jobs:
 
       - name: 🏄 Copy test env vars
         run:
-          cp .env.example .env && cp apps/app/.env.example apps/app/.env && cp
-          apps/admin/.env.example apps/admin/.env && cp apps/cms/.env.example
-          apps/cms/.env
+          cp apps/cms/.env.example apps/cms/.env
 
       - name: 🛠 Setup Database
         run:
-          npx prisma migrate deploy --schema=packages/database/schema.prisma &&
-          npx prisma generate --sql --schema=packages/database/schema.prisma
+          npm run db:migrate:deploy && npm run db:generate
 
       - name: ⚡ Lint (Oxc - Fast)
         run: npm run lint:oxc
@@ -105,17 +102,14 @@ jobs:
 
       - name: 🏄 Copy test env vars
         run:
-          cp .env.example .env && cp apps/app/.env.example apps/app/.env && cp
-          apps/admin/.env.example apps/admin/.env && cp apps/cms/.env.example
-          apps/cms/.env
+          cp apps/cms/.env.example apps/cms/.env
 
       - name: 🔑 Inject CMS DATABASE_URI
         run: echo "DATABASE_URI=${{ secrets.DATABASE_URI }}" >> apps/cms/.env
 
       - name: 🛠 Setup Database
         run:
-          npx prisma migrate deploy --schema=packages/database/schema.prisma &&
-          npx prisma generate --sql --schema=packages/database/schema.prisma
+          npm run db:migrate:deploy && npm run db:generate
 
       - name: 🏗 Build
         run: npm run build
@@ -143,14 +137,11 @@ jobs:
 
       - name: 🏄 Copy test env vars
         run:
-          cp .env.example .env && cp apps/app/.env.example apps/app/.env && cp
-          apps/admin/.env.example apps/admin/.env && cp apps/cms/.env.example
-          apps/cms/.env
+          cp apps/cms/.env.example apps/cms/.env
 
       - name: 🛠 Setup Database
         run:
-          npx prisma migrate deploy --schema=packages/database/schema.prisma &&
-          npx prisma generate --sql --schema=packages/database/schema.prisma
+          npm run db:migrate:deploy && npm run db:generate
 
       - name: ⚡ Run vitest
         run: npm run test -- -- --coverage
@@ -165,9 +156,7 @@ jobs:
 
       - name: 🏄 Copy test env vars
         run:
-          cp .env.example .env && cp apps/app/.env.example apps/app/.env && cp
-          apps/admin/.env.example apps/admin/.env && cp apps/cms/.env.example
-          apps/cms/.env
+          cp apps/cms/.env.example apps/cms/.env
 
       - name: 🔑 Inject CMS DATABASE_URI
         run: echo "DATABASE_URI=${{ secrets.DATABASE_URI }}" >> apps/cms/.env
@@ -188,9 +177,7 @@ jobs:
 
       - name: 🛠 Setup Database
         run: |
-          npx prisma migrate deploy --schema=packages/database/schema.prisma
-          npx prisma db seed --schema=packages/database/schema.prisma
-          npx prisma generate --sql --schema=packages/database/schema.prisma
+          npm run db:migrate:deploy && npm run db:generate && npm run db:seed
 
       - name: 🏗 Build
         run: npm run build
@@ -238,7 +225,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: epic-startup-web
+          projectName: doorpasses-web
           directory: apps/web/dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
@@ -248,7 +235,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: epic-startup-web-staging
+          projectName: doorpasses-web-staging
           directory: apps/web/dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
